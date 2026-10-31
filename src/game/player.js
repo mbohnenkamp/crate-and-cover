@@ -24,7 +24,10 @@ export function createPlayer(spawn) {
 }
 
 export function emptyCommand() {
-  return { forward: 0, right: 0, jump: false, crouch: false, walk: false, yaw: 0, pitch: 0 };
+  return {
+    forward: 0, right: 0, jump: false, crouch: false, walk: false, yaw: 0, pitch: 0,
+    fire: false, alt: false, reload: false, select: null, wheel: 0, lastWeapon: false,
+  };
 }
 
 export function height(p) {
@@ -52,7 +55,8 @@ export function stepPlayer(p, cmd, world, dt) {
   let wz = -cos * cmd.forward - sin * cmd.right;
   const len = Math.hypot(wx, wz);
   if (len > 1) { wx /= len; wz /= len; }
-  const wishSpeed = (p.crouched ? MOVE.crouchSpeed : cmd.walk ? MOVE.walkSpeed : MOVE.runSpeed) * Math.min(len, 1);
+  const gait = p.crouched ? MOVE.crouchSpeed : cmd.walk ? MOVE.walkSpeed : MOVE.runSpeed;
+  const wishSpeed = gait * (p.speedFactor ?? 1) * Math.min(len, 1); // schwere Waffen bremsen
   if (len > 0) { wx /= len; wz /= len; }
 
   if (!cmd.jump) p.jumpHeld = false;
