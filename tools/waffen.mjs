@@ -18,7 +18,7 @@ function check(name, ok, detail) {
 // eine feste Zielscheibe im Abstand dist vor ihm
 function setup(dist, { weapon = 'gewehr', seed = 1 } = {}) {
   const m = { ...map, boxes: map.boxes.filter(b => b.type === 'boden'), stairs: [], targets: [{ pos: [0, 0, 12 - dist] }] };
-  const g = createGame(m, seed);
+  const g = createGame(m, { mode: 'schiessstand', seed });
   g.player.pos = { x: 0, y: 0, z: 12 };
   g.player.arms.current = weapon;
   g.player.arms.draw = 0;
@@ -98,7 +98,7 @@ const pitchTo = (dist, height) => Math.atan2(height - 1.65, dist);
 {
   // Zielscheibe hinter der Mauer bei z 7..7.5
   const m = { ...map, targets: [{ pos: [-5, 0, 4] }] };
-  const g = createGame(m, 1);
+  const g = createGame(m, { mode: 'schiessstand', seed: 1 });
   g.player.pos = { x: -5, y: 0, z: 12 };
   g.player.arms.draw = 0;
   g.player.pitch = pitchTo(8, 1.0);

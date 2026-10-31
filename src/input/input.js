@@ -46,7 +46,7 @@ export function createInput(canvas) {
   }, { passive: false });
 
   state.lock = () => {
-    if (!state.locked) canvas.requestPointerLock();
+    if (!state.locked) canvas.requestPointerLock()?.catch?.(() => {});
   };
   canvas.addEventListener('click', state.lock);
   state.toggleFullscreen = async () => {
@@ -60,6 +60,8 @@ export function createInput(canvas) {
     if (!state.locked) { keys.clear(); buttons.clear(); }
     state.onLockChange?.(state.locked);
   });
+  // Abgelehnt (z. B. zu schnell nach Esc erneut geklickt): Spiel muss das zeigen, sonst steht es still
+  document.addEventListener('pointerlockerror', () => state.onLockError?.());
   document.addEventListener('mousemove', e => {
     if (!state.locked) return;
     const s = VIEW.mouseSensitivity * state.sensitivityScale;

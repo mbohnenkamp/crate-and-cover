@@ -87,11 +87,11 @@ export function createViewmodel() {
     scene,
     camera,
     swing() { swingTime = 0; },
-    update(arms, info, dt) {
+    update(arms, info, dt, alive = true) {
       time += dt;
       swingTime += dt;
       const w = WEAPONS[arms.current];
-      for (const [id, g] of Object.entries(models)) g.visible = id === arms.current && !arms.scoped;
+      for (const [id, g] of Object.entries(models)) g.visible = alive && id === arms.current && !arms.scoped;
       const g = models[arms.current];
 
       let x = 0.25, y = -0.24, z = -0.55, rx = 0, ry = 0.02, rz = 0;

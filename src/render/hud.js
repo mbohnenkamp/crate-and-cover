@@ -1,12 +1,33 @@
-// Anzeige über dem Bild: Fadenkreuz nach Streuung, Treffermarke, Munition, Waffenleiste, Zielfernrohr.
+// Anzeige über dem Bild: Fadenkreuz nach Streuung, Treffermarke, Munition, Waffenleiste, Zielfernrohr,
+// Lebenspunkte, Punktestand und Zeit, Abschussliste, Anzeigetafel, Gefallen-Hinweis, Schadensblitz.
 
-import { WEAPONS, WEAPON_ORDER } from '../config.js';
+import { WEAPONS, WEAPON_ORDER, MATCH } from '../config.js';
 import { currentSpread } from '../game/weapons.js';
 
 const SHORT = { gewehr: 'Sturmgewehr', pistole: 'Pistole', messer: 'Messer', scharf: 'Scharfschütze' };
+export const TEAM_NAMES = { A: 'Blau', B: 'Orange' };
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]);
+
+export function boardHtml(game) {
+  const teams = game.mode === 'schiessstand' ? ['A'] : ['A', 'B'];
+  return teams.map(team => {
+    const rows = game.players
+      .filter(p => p.team === team)
+      .sort((a, b) => b.kills - a.kills || a.deaths - b.deaths)
+      .map(p => `<tr class="${p === game.player ? 'me' : ''}"><td>${esc(p.name)}</td><td>${p.kills}</td><td>${p.deaths}</td><td>${p.headshots}</td></tr>`)
+      .join('');
+    return `<table class="team-${team}"><thead><tr><th>${TEAM_NAMES[team]} · ${game.score[team]}</th><th>Abschüsse</th><th>Tode</th><th>Kopf</th></tr></thead><tbody>${rows}</tbody></table>`;
+  }).join('');
+}
+
+function fmtTime(s) {
+  const t = Math.max(0, Math.ceil(s));
+  return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')}`;
+}
 
 export function createHud() {
-  const $ = id => document.getElementById(id);
   const cross = $('crosshair');
   const lines = [...cross.children];
   const hitmark = $('hitmark');
@@ -16,34 +37,70 @@ export function createHud() {
   const reloadBar = $('reload-bar');
   const slots = $('slots');
   const feed = $('feed');
+  const health = $('health');
+  const score = $('score');
+  const board = $('board');
+  const death = $('death');
+  const damage = $('damage');
 
   slots.innerHTML = WEAPON_ORDER.map((id, i) => `<span data-id="${id}"><b>${i + 1}</b> ${SHORT[id]}</span>`).join('');
   const slotEls = [...slots.children];
 
+  let game = null;
   let hitTime = 99;
   let lastKill = false;
   let lastWeapon = null;
+  let hurt = 0;
+  let killedBy = null;
+
+  function feedLine(html, cls) {
+    const line = document.createElement('div');
+    line.innerHTML = html;
+    if (cls) line.className = cls;
+    feed.prepend(line);
+    while (feed.children.length > 6) feed.lastChild.remove();
+    setTimeout(() => line.remove(), 5000);
+  }
+
+  const nameTag = p => `<span class="t${p.team}">${esc(p.name)}</span>`;
 
   return {
+    setGame(g) {
+      game = g;
+      feed.innerHTML = '';
+      lastWeapon = null;
+      hurt = 0;
+      killedBy = null;
+      score.classList.toggle('hidden', g.mode === 'schiessstand');
+      health.parentElement.classList.toggle('hidden', g.mode === 'schiessstand');
+    },
     events(list) {
+      const me = game.player;
       for (const e of list) {
-        if (e.type !== 'hit') continue;
-        hitTime = 0;
-        lastKill = e.kill;
-        const line = document.createElement('div');
-        line.textContent = `${e.part === 'head' ? 'Kopftreffer' : 'Treffer'} · ${e.damage}${e.kill ? ' · gefallen' : ''}`;
-        if (e.part === 'head') line.className = 'head';
-        feed.prepend(line);
-        while (feed.children.length > 5) feed.lastChild.remove();
-        setTimeout(() => line.remove(), 3000);
+        if (e.type === 'hit' && e.by === me.id) {
+          hitTime = 0;
+          lastKill = e.kill;
+          if (game.mode === 'schiessstand') {
+            feedLine(`${e.part === 'head' ? 'Kopftreffer' : 'Treffer'} · ${e.damage}${e.kill ? ' · gefallen' : ''}`, e.part === 'head' ? 'head' : '');
+          }
+        }
+        if (e.type === 'damaged' && e.player === me.id) hurt = Math.min(1, hurt + e.damage / 60);
+        if (e.type === 'kill') {
+          const v = game.players[e.victim];
+          const k = e.killer !== null ? game.players[e.killer] : null;
+          if (k) feedLine(`${nameTag(k)} <small>${WEAPONS[e.weapon].name}${e.head ? ' · Kopf' : ''}</small> ${nameTag(v)}`, k === me || v === me ? 'mine' : '');
+          else feedLine(`${nameTag(v)} <small>abgestürzt</small>`);
+          if (v === me) killedBy = k ? `${esc(k.name)} · ${WEAPONS[e.weapon].name}${e.head ? ' · Kopftreffer' : ''}` : 'abgestürzt';
+        }
       }
     },
-    update(player, fovDeg, dt) {
+    update(fovDeg, dt, showBoard) {
+      const player = game.player;
       const a = player.arms;
       const w = WEAPONS[a.current];
 
-      scope.classList.toggle('hidden', !a.scoped);
-      cross.classList.toggle('hidden', a.scoped);
+      scope.classList.toggle('hidden', !a.scoped || !player.alive);
+      cross.classList.toggle('hidden', a.scoped || !player.alive);
       const spread = currentSpread(player);
       const gap = Math.tan(spread) / Math.tan((fovDeg * Math.PI) / 360) * (window.innerHeight / 2);
       const g = Math.round(3 + Math.min(gap, 120));
@@ -68,9 +125,28 @@ export function createHud() {
         const m = a.ammo[a.current];
         ammo.innerHTML = `<span class="${m.mag === 0 ? 'empty' : ''}">${m.mag}</span><small> / ${m.reserve}</small>`;
       }
-      const reloading = a.reload > 0;
+      const reloading = a.reload > 0 && player.alive;
       reloadBar.parentElement.classList.toggle('hidden', !reloading);
       if (reloading) reloadBar.style.width = `${(1 - a.reload / w.reload) * 100}%`;
+
+      health.textContent = Math.max(0, Math.ceil(player.health));
+      health.classList.toggle('low', player.health <= 30);
+
+      if (game.mode === 'deathmatch') {
+        score.innerHTML = `<span class="tA">${TEAM_NAMES.A} ${game.score.A}</span> : <span class="tB">${game.score.B} ${TEAM_NAMES.B}</span>`
+          + `<small>${fmtTime(game.timeLimit - game.time)} · Ziel ${game.killGoal}</small>`;
+      }
+
+      hurt = Math.max(0, hurt - dt * 1.5);
+      damage.style.opacity = player.alive ? hurt : 0.55;
+
+      death.classList.toggle('hidden', player.alive);
+      if (!player.alive) {
+        death.innerHTML = `Gefallen${killedBy ? ` — ${killedBy}` : ''}<small>zurück in ${Math.max(1, Math.ceil(MATCH.respawnTime - player.deadTime))} s</small>`;
+      }
+
+      board.classList.toggle('hidden', !showBoard);
+      if (showBoard) board.innerHTML = boardHtml(game);
     },
   };
 }

@@ -6,6 +6,7 @@ import { rayBox, rayWorld, direction } from './ray.js';
 import { hitboxes } from './hitbox.js';
 import { damageTarget } from './targets.js';
 import { horizontalSpeed } from './player.js';
+import { damagePlayer } from './game.js';
 
 export function createArms(start = 'gewehr') {
   const ammo = {};
@@ -156,9 +157,9 @@ function shoot(p, w, ammo, game, events) {
   d.x /= len; d.y /= len; d.z /= len;
 
   const origin = eyeOf(p);
-  const hit = trace(game, origin, d, COMBAT.range);
-  events.push({ type: 'shot', weapon: a.current, origin, end: pointAt(origin, d, hit.t), hit: hit.kind, normal: hit.normal });
-  if (hit.target) applyHit(w, hit, events);
+  const hit = trace(game, origin, d, COMBAT.range, p);
+  events.push({ type: 'shot', shooter: p.id, weapon: a.current, origin, end: pointAt(origin, d, hit.t), hit: hit.kind, normal: hit.normal });
+  applyHit(game, p, w, hit, events);
 
   ammo.mag--;
   a.cooldown = w.interval;
@@ -172,33 +173,42 @@ function swing(p, w, game, events) {
   const a = p.arms;
   const origin = eyeOf(p);
   const d = direction(p.yaw, p.pitch);
-  const hit = trace(game, origin, d, w.range);
-  events.push({ type: 'swing', weapon: a.current, origin, end: pointAt(origin, d, hit.t), hit: hit.kind, normal: hit.normal });
-  if (hit.target) applyHit(w, hit, events);
+  const hit = trace(game, origin, d, w.range, p);
+  events.push({ type: 'swing', shooter: p.id, weapon: a.current, origin, end: pointAt(origin, d, hit.t), hit: hit.kind, normal: hit.normal });
+  applyHit(game, p, w, hit, events);
   a.cooldown = w.interval;
   a.sinceShot = 0;
 }
 
-function applyHit(w, hit, events) {
+function applyHit(game, shooter, w, hit, events) {
+  if (!hit.target && !hit.player) return;
   const damage = Math.round(w.damage * (hit.kind === 'head' ? w.headMult : 1));
-  const kill = damageTarget(hit.target, damage);
-  events.push({ type: 'hit', target: hit.target.id, part: hit.kind, damage, kill });
+  const kill = hit.target
+    ? damageTarget(hit.target, damage)
+    : damagePlayer(game, hit.player, shooter, damage, hit.kind, shooter.arms.current, events);
+  events.push({ type: 'hit', by: shooter.id, target: hit.target?.id ?? null, player: hit.player?.id ?? null, part: hit.kind, damage, kill });
 }
 
 function pointAt(o, d, t) {
   return { x: o.x + d.x * t, y: o.y + d.y * t, z: o.z + d.z * t };
 }
 
-// Nächster Treffer: Karte oder Trefferzone einer Zielscheibe
-export function trace(game, origin, d, maxT) {
+// Nächster Treffer: Karte, Zielscheibe oder gegnerische Figur (kein Beschuss im eigenen Team)
+export function trace(game, origin, d, maxT, shooter) {
   const wall = rayWorld(game.world, origin, d, maxT);
   let best = wall ? { t: wall.t, kind: 'wall', normal: wall.normal } : { t: maxT, kind: null, normal: null };
-  for (const target of game.targets) {
-    if (!target.alive) continue;
-    for (const box of hitboxes(target.pos)) {
+  const check = (boxes, extra) => {
+    for (const box of boxes) {
       const h = rayBox(origin, d, box.min, box.max, best.t);
-      if (h && h.t < best.t) best = { t: h.t, kind: box.part, normal: h.normal, target };
+      if (h && h.t < best.t) best = { t: h.t, kind: box.part, normal: h.normal, ...extra };
     }
+  };
+  for (const target of game.targets) {
+    if (target.alive) check(hitboxes(target.pos), { target });
+  }
+  for (const other of game.players) {
+    if (!other.alive || other === shooter || other.team === shooter.team) continue;
+    check(hitboxes(other.pos, other.crouched), { player: other });
   }
   return best;
 }

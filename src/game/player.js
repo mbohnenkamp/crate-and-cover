@@ -207,6 +207,8 @@ function checkGround(p, world, snap) {
 }
 
 export function respawn(p, spawn) {
+  p.yaw = spawn.yaw ?? p.yaw;
+  p.pitch = 0;
   p.pos.x = spawn.pos[0];
   p.pos.y = spawn.pos[1];
   p.pos.z = spawn.pos[2];

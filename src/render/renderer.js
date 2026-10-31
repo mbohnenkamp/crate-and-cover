@@ -1,10 +1,8 @@
-// Darstellung mit Three.js: Karte aus Blöcken, Ego-Kamera.
-
 import * as THREE from 'three';
-import { VIEW, COMBAT } from '../config.js';
-import { hitboxes } from '../game/hitbox.js';
+import { VIEW } from '../config.js';
 import { createViewmodel } from './viewmodel.js';
 import { createEffects } from './effects.js';
+import { TEAM_COLORS, createFigure, updateFigure, createTargetFigure, removeFigure } from './figures.js';
 
 const COLORS = {
   boden: 0x9a9184,
@@ -17,10 +15,8 @@ const COLORS = {
   kante: 0xa39a8c,
 };
 
-const TEAM_COLORS = { A: 0x3d7bd9, B: 0xe0832f };
-
-export function createRenderer(canvas, game) {
-  const world = game.world;
+// Die Karte wird einmal gebaut, Figuren und Zielscheiben je Partie (setGame).
+export function createRenderer(canvas, world) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
   renderer.autoClear = false;
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -63,9 +59,11 @@ export function createRenderer(canvas, game) {
     scene.add(mark);
   }
 
-  const targets = game.targets.map(t => createTargetMesh(scene, t));
   const viewmodel = createViewmodel();
   const effects = createEffects(scene, camera);
+  let game = null;
+  let figures = [];
+  let targets = [];
 
   function resize() {
     const w = canvas.clientWidth;
@@ -80,73 +78,49 @@ export function createRenderer(canvas, game) {
 
   return {
     camera,
+    setGame(g) {
+      for (const f of [...figures, ...targets]) if (f) removeFigure(scene, f);
+      game = g;
+      figures = g.players.map(p => (p === g.player ? null : createFigure(scene, p.team)));
+      targets = g.targets.map(() => createTargetFigure(scene));
+      effects.clear();
+    },
     events(list) {
       for (const e of list) {
-        if (e.type === 'shot') effects.shot(e);
-        if (e.type === 'swing') { viewmodel.swing(); if (e.hit === 'wall') effects.impact(e.end, e.normal); }
-        if (e.type === 'hit') targets[e.target].flash = 0.09;
+        const own = e.shooter === game.player?.id;
+        if (e.type === 'shot') effects.shot(e, own);
+        if (e.type === 'swing') {
+          if (own) viewmodel.swing();
+          if (e.hit === 'wall') effects.impact(e.end, e.normal);
+        }
+        if (e.type === 'hit' && e.target !== null) targets[e.target].flash = 0.09;
+        if (e.type === 'hit' && e.player !== null && figures[e.player]) figures[e.player].flash = 0.09;
       }
     },
-    render(view, dt) {
+    // positions: interpolierte Fußpunkte aller Spieler in der Reihenfolge von game.players
+    render(view, positions, dt) {
       camera.position.set(view.x, view.y, view.z);
       camera.rotation.set(view.pitch, view.yaw, 0);
       if (camera.fov !== view.fov) {
         camera.fov = view.fov;
         camera.updateProjectionMatrix();
       }
-      for (let i = 0; i < targets.length; i++) updateTarget(targets[i], game.targets[i], dt);
+      game.players.forEach((p, i) => {
+        if (figures[i]) updateFigure(figures[i], positions[i], p.yaw, p.crouched, p.alive, dt);
+      });
+      game.targets.forEach((t, i) => updateFigure(targets[i], t.pos, 0, false, t.alive, dt));
       effects.update(dt);
-      viewmodel.update(game.player.arms, view, dt);
+      const me = game.player;
+      viewmodel.update(me.arms, view, dt, me.alive);
 
       renderer.clear();
       renderer.render(scene, camera);
-      renderer.clearDepth();
-      renderer.render(viewmodel.scene, viewmodel.camera);
+      if (me.alive && !view.overview) {
+        renderer.clearDepth();
+        renderer.render(viewmodel.scene, viewmodel.camera);
+      }
     },
   };
-}
-
-// Zielscheibe: rote Figur mit hellem Kopf. Treffer blitzt weiß, Fall kippt nach hinten und verschwindet.
-function createTargetMesh(scene, t) {
-  const group = new THREE.Group();
-  const pivot = new THREE.Group();
-  group.add(pivot);
-  const [head, body] = hitboxes({ x: 0, y: 0, z: 0 });
-  const mats = [];
-  for (const [box, color] of [[head, 0xf2e6d8], [body, 0xc6423a]]) {
-    const size = [0, 1, 2].map(i => box.max[i] - box.min[i]);
-    const mat = new THREE.MeshLambertMaterial({ color, transparent: true });
-    const mesh = new THREE.Mesh(new THREE.BoxGeometry(...size), mat);
-    mesh.position.set(0, (box.min[1] + box.max[1]) / 2, 0);
-    mesh.castShadow = true;
-    pivot.add(mesh);
-    mats.push(mat);
-  }
-  const ring = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.12, 0.62), new THREE.MeshLambertMaterial({ color: 0xffffff, transparent: true }));
-  ring.position.y = 1.05;
-  pivot.add(ring);
-  mats.push(ring.material);
-  scene.add(group);
-  return { group, pivot, mats, flash: 0, fall: 0 };
-}
-
-function updateTarget(m, t, dt) {
-  m.group.position.set(t.pos.x, t.pos.y, t.pos.z);
-  m.flash = Math.max(0, m.flash - dt);
-  for (const mat of m.mats) mat.emissive.setScalar(m.flash > 0 ? 0.9 : 0);
-  if (t.alive) {
-    m.fall = 0;
-    m.group.visible = true;
-    m.pivot.rotation.x = 0;
-    for (const mat of m.mats) mat.opacity = 1;
-    return;
-  }
-  m.fall += dt;
-  const k = Math.min(1, m.fall / 0.35);
-  m.pivot.rotation.x = -Math.PI / 2 * k * k;
-  const fade = Math.max(0, 1 - (m.fall - 0.6) / 0.4);
-  for (const mat of m.mats) mat.opacity = fade;
-  m.group.visible = m.fall < Math.min(1, COMBAT.respawnTime);
 }
 
 // Box mit Texturkoordinaten in Metern, damit das Raster überall 1 m groß ist

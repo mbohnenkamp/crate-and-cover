@@ -27,10 +27,12 @@ export function createEffects(scene, camera) {
     holes.push(hole);
   }
 
-  function shot(e) {
+  function shot(e, own) {
     if (e.hit === 'wall') impact(e.end, e.normal);
-    // Spur beginnt etwas rechts unterhalb der Kamera, wo die Waffe ist
-    const start = new THREE.Vector3(0.2, -0.15, -0.6).applyQuaternion(camera.quaternion).add(camera.position);
+    // Eigene Spur beginnt rechts unterhalb der Kamera, wo die Waffe ist; fremde an der Waffe der Figur
+    const start = own
+      ? new THREE.Vector3(0.2, -0.15, -0.6).applyQuaternion(camera.quaternion).add(camera.position)
+      : new THREE.Vector3(e.origin.x, e.origin.y - 0.35, e.origin.z);
     const geo = new THREE.BufferGeometry().setFromPoints([start, new THREE.Vector3(e.end.x, e.end.y, e.end.z)]);
     const line = new THREE.Line(geo, tracerMat.clone());
     scene.add(line);
@@ -56,5 +58,11 @@ export function createEffects(scene, camera) {
     }
   }
 
-  return { shot, impact, update };
+  function clear() {
+    for (const t of tracers) scene.remove(t.line);
+    tracers.length = 0;
+    for (const h of holes) { h.age = HOLE_LIFE; h.mesh.visible = false; }
+  }
+
+  return { shot, impact, update, clear };
 }

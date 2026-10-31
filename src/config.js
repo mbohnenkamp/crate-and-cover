@@ -73,3 +73,26 @@ export const COMBAT = {
   targetHealth: 100,
   respawnTime: 3,
 };
+
+export const MATCH = {
+  health: 100,
+  respawnTime: 3,
+  teamSize: 4,
+  killGoals: [25, 50],
+  timeLimits: [5, 10], // Minuten
+  defaults: { mode: 'deathmatch', difficulty: 'mittel', killGoal: 50, timeLimit: 10 },
+  names: {
+    A: ['Anna', 'Ben', 'Clara', 'David'],
+    B: ['Emma', 'Finn', 'Greta', 'Hannes'],
+  },
+};
+
+// Bots je Schwierigkeitsgrad. reaction: so lange muss ein Gegner sichtbar sein, bevor geschossen wird.
+// aimError: Zielfehler in Bogenmaß, wird kleiner, je länger der Bot ein Ziel verfolgt, aber nie unter errFloor.
+// turnSpeed: wie schnell der Blick schwenkt (rad/s). fireCone: so nah muss das Ziel am Fadenkreuz sein.
+// stopToShoot: bleibt zum Schießen stehen (genauer). recoilComp: wie gut der Rückstoß ausgeglichen wird.
+export const BOTS = {
+  leicht: { name: 'Leicht', reaction: 0.75, sight: 25, fov: 100, turnSpeed: 3.5, aimError: 0.07, settle: 1.2, errFloor: 0.5, headChance: 0.05, fireCone: 0.09, stopToShoot: 0, recoilComp: 0.4, burst: 4 },
+  mittel: { name: 'Mittel', reaction: 0.42, sight: 40, fov: 120, turnSpeed: 6, aimError: 0.035, settle: 0.8, errFloor: 0.3, headChance: 0.2, fireCone: 0.05, stopToShoot: 0.5, recoilComp: 0.6, burst: 6 },
+  schwer: { name: 'Schwer', reaction: 0.24, sight: 60, fov: 140, turnSpeed: 10, aimError: 0.014, settle: 0.5, errFloor: 0.2, headChance: 0.4, fireCone: 0.03, stopToShoot: 1, recoilComp: 0.9, burst: 10 },
+};

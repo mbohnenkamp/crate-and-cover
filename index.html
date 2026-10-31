@@ -34,14 +34,47 @@
     #feed .head { color: #ffd27a; }
     #info { position: fixed; left: 12px; top: 10px; color: #fff; font-size: 13px; text-shadow: 0 1px 2px #000; pointer-events: none; }
     #overlay { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
-      background: rgba(20, 24, 30, .72); color: #eef1f5; cursor: pointer; }
-    #overlay .box { max-width: 460px; padding: 28px 32px; background: rgba(30, 35, 44, .95); border-radius: 10px; }
+      background: rgba(20, 24, 30, .6); color: #eef1f5; }
+    #overlay .box { max-width: 680px; max-height: 92vh; overflow: auto; padding: 28px 32px; background: rgba(30, 35, 44, .95); border-radius: 10px; }
     #overlay h1 { margin: 0 0 4px; font-size: 26px; }
     #overlay p { margin: 0 0 18px; color: #aab4c0; }
     #overlay table { border-collapse: collapse; font-size: 14px; }
     #overlay td { padding: 3px 14px 3px 0; }
     #overlay td:first-child { color: #ffd27a; white-space: nowrap; }
-    #overlay .start { margin-top: 20px; font-weight: 600; color: #fff; }
+    #score { position: fixed; left: 50%; top: 10px; transform: translateX(-50%); text-align: center; color: #fff;
+      font-size: 22px; font-weight: 700; text-shadow: 0 1px 3px #000; pointer-events: none; }
+    #score small { display: block; font-size: 13px; font-weight: 400; color: #dfe4ea; }
+    .tA { color: #6fa8ff; } .tB { color: #ffa45c; }
+    #feed .mine { background: rgba(0,0,0,.35); padding: 1px 6px; border-radius: 3px; }
+    #feed small { color: #c8ced6; margin: 0 4px; }
+    #vitals { position: fixed; left: 22px; bottom: 18px; color: #fff; text-shadow: 0 1px 3px #000; pointer-events: none; }
+    #vitals small { display: block; font-size: 12px; color: #c8ced6; }
+    #health { font-size: 38px; font-weight: 700; }
+    #health.low { color: #ff5a4a; }
+    #damage { position: fixed; inset: 0; pointer-events: none; opacity: 0;
+      background: radial-gradient(circle at center, transparent 45%, rgba(200, 20, 10, .75) 100%); }
+    #death { position: fixed; left: 50%; top: 38%; transform: translateX(-50%); text-align: center; color: #fff;
+      font-size: 26px; font-weight: 700; text-shadow: 0 2px 4px #000; pointer-events: none; }
+    #death small { display: block; font-size: 15px; font-weight: 400; margin-top: 6px; }
+    #board { position: fixed; left: 50%; top: 18%; transform: translateX(-50%); display: flex; gap: 18px;
+      padding: 16px; background: rgba(20, 24, 30, .88); border-radius: 10px; pointer-events: none; }
+    #board table, #end-board table { border-collapse: collapse; color: #eef1f5; font-size: 14px; min-width: 300px; }
+    #board th, #board td, #end-board th, #end-board td { padding: 4px 10px; text-align: right; }
+    #board th:first-child, #board td:first-child, #end-board th:first-child, #end-board td:first-child { text-align: left; }
+    .team-A th:first-child { color: #6fa8ff; } .team-B th:first-child { color: #ffa45c; }
+    tr.me td { color: #ffd27a; font-weight: 600; }
+    #end-board { display: flex; gap: 18px; margin: 14px 0 18px; }
+    .opt { display: flex; gap: 6px; margin: 4px 0 12px; }
+    .label { font-size: 13px; color: #aab4c0; }
+    .opt button, .actions button { flex: 1; padding: 8px 10px; border: 1px solid #3c4655; border-radius: 6px;
+      background: #262d38; color: #eef1f5; font: inherit; font-size: 14px; cursor: pointer; }
+    .opt button.on { background: #3d7bd9; border-color: #3d7bd9; }
+    .actions { display: flex; gap: 8px; margin-top: 8px; }
+    .actions button.primary { background: #e0832f; border-color: #e0832f; font-weight: 600; }
+    #overlay details { margin-top: 16px; font-size: 13px; color: #aab4c0; }
+    #overlay summary { cursor: pointer; }
+    body.in-menu #hud, body.in-menu #vitals, body.in-menu #crosshair, body.in-menu #score,
+    body.in-menu #feed, body.in-menu #death, body.in-menu #damage, body.in-menu #scope { display: none !important; }
     .hidden { display: none !important; }
   </style>
 </head>
@@ -51,7 +84,12 @@
   <div id="crosshair"><i></i><i></i><i></i><i></i></div>
   <div id="hitmark" class="hidden"><i></i><i></i><i></i><i></i></div>
   <div id="reload" class="hidden"><div id="reload-bar"></div></div>
+  <div id="damage"></div>
+  <div id="score" class="hidden"></div>
   <div id="feed"></div>
+  <div id="death" class="hidden"></div>
+  <div id="board" class="hidden"></div>
+  <div id="vitals"><small>Leben</small><div id="health">100</div></div>
   <div id="hud">
     <div id="slots"></div>
     <div id="weapon-name"></div>
@@ -59,26 +97,47 @@
   </div>
   <div id="info"></div>
   <div id="overlay">
-    <div class="box">
+    <div class="box" id="menu">
       <h1>Arena Shooter</h1>
-      <p>V2 · Testkarte · Schießen auf Zielscheiben</p>
-      <table>
-        <tr><td>W A S D</td><td>Laufen</td></tr>
-        <tr><td>Maus</td><td>Umsehen</td></tr>
-        <tr><td>Leertaste</td><td>Springen</td></tr>
-        <tr><td>C oder Strg</td><td>Ducken (in der Luft: Ducksprung)</td></tr>
-        <tr><td>Shift</td><td>Schleichen</td></tr>
-        <tr><td>Linke Maustaste</td><td>Schießen</td></tr>
-        <tr><td>Rechte Maustaste</td><td>Zielfernrohr (Scharfschütze)</td></tr>
-        <tr><td>1 2 3 4</td><td>Sturmgewehr, Pistole, Messer, Scharfschütze</td></tr>
-        <tr><td>Mausrad · Q</td><td>Waffe wechseln · letzte Waffe</td></tr>
-        <tr><td>R</td><td>Nachladen</td></tr>
-        <tr><td>F</td><td>Vollbild (dann ist auch Strg+W sicher)</td></tr>
-        <tr><td>Rücktaste</td><td>Zurück zum Start, Munition voll</td></tr>
-        <tr><td>F3</td><td>Anzeige oben links an/aus</td></tr>
-        <tr><td>Esc</td><td>Pause</td></tr>
-      </table>
-      <div class="start">Klicken zum Starten</div>
+      <p>V3 · Testkarte · Team Blau gegen Team Orange, je vier Spieler</p>
+      <div class="label">Modus</div>
+      <div class="opt" data-key="mode"><button data-v="deathmatch">Team-Deathmatch</button><button data-v="schiessstand">Schießstand</button></div>
+      <div class="label">Bots</div>
+      <div class="opt" data-key="difficulty"><button data-v="leicht">Leicht</button><button data-v="mittel">Mittel</button><button data-v="schwer">Schwer</button></div>
+      <div class="label">Abschuss-Ziel je Team</div>
+      <div class="opt" data-key="killGoal"><button data-v="25">25</button><button data-v="50">50</button></div>
+      <div class="label">Zeit</div>
+      <div class="opt" data-key="timeLimit"><button data-v="5">5 Minuten</button><button data-v="10">10 Minuten</button></div>
+      <div class="actions"><button class="primary" id="btn-start">Starten</button></div>
+      <details>
+        <summary>Tastenbelegung</summary>
+        <table>
+          <tr><td>W A S D</td><td>Laufen</td></tr>
+          <tr><td>Maus</td><td>Umsehen</td></tr>
+          <tr><td>Leertaste</td><td>Springen</td></tr>
+          <tr><td>C oder Strg</td><td>Ducken (in der Luft: Ducksprung)</td></tr>
+          <tr><td>Shift</td><td>Schleichen</td></tr>
+          <tr><td>Linke Maustaste</td><td>Schießen</td></tr>
+          <tr><td>Rechte Maustaste</td><td>Zielfernrohr (Scharfschütze)</td></tr>
+          <tr><td>1 2 3 4</td><td>Sturmgewehr, Pistole, Messer, Scharfschütze</td></tr>
+          <tr><td>Mausrad · Q</td><td>Waffe wechseln · letzte Waffe</td></tr>
+          <tr><td>R</td><td>Nachladen</td></tr>
+          <tr><td>F</td><td>Vollbild (dann ist auch Strg+W sicher)</td></tr>
+          <tr><td>Tab</td><td>Anzeigetafel</td></tr>
+          <tr><td>Rücktaste</td><td>Schießstand: zurück zum Start, Munition voll</td></tr>
+          <tr><td>F3</td><td>Anzeige oben links an/aus</td></tr>
+          <tr><td>Esc</td><td>Pause</td></tr>
+        </table>
+      </details>
+    </div>
+    <div class="box hidden" id="pause">
+      <h1>Pause</h1>
+      <div class="actions"><button class="primary" id="btn-resume">Weiter</button><button id="btn-quit">Partie beenden</button></div>
+    </div>
+    <div class="box hidden" id="end">
+      <h1 id="end-title"></h1>
+      <div id="end-board"></div>
+      <div class="actions"><button class="primary" id="btn-again">Nochmal</button><button id="btn-menu">Startmenü</button></div>
     </div>
   </div>
   <script type="module" src="/src/main.js"></script>
