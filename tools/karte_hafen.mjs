@@ -65,6 +65,7 @@ both((X, s) => {
   container(X(15), 2.4, 0, COLORS[0]);
   stair([X(22.5), 0, 2.1], flip('-x', s), C.h, 1.6);
   stair([X(17.5), C.h, 2.1], flip('-x', s), C.h, 1.6);
+  box('steg', [X(12), C.h, 1.2], [X(13), 2 * C.h, 2.9]); // Podest oben, damit niemand neben der letzten Stufe abstürzt
 
   // Kran: Beine, Querträger oben in 10 m
   for (const z of [-5.5, 5.5]) box('kran', [X(6.6), 0, z - 0.4], [X(7.4), 10, z + 0.4]);

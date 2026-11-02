@@ -8,8 +8,10 @@ export function createNav(data, world) {
     nodes[a].links.push(b);
     nodes[b].links.push(a);
   }
-  // Erhöhte Plätze (Plattformen, Containerdächer, Brücke), dort gehen Bots gern hin
-  return { nodes, world, high: nodes.filter(n => n.y > 2) };
+  // Erhöhte Plätze (Plattformen, Containerdächer, Brücke), dort gehen Bots gern hin; die höchsten für Scharfschützen
+  const high = nodes.filter(n => n.y > 2);
+  const topY = Math.max(0, ...high.map(n => n.y));
+  return { nodes, world, high, top: high.filter(n => n.y > topY - 0.5) };
 }
 
 export function lineOfSight(world, a, b) {
@@ -32,7 +34,7 @@ export function walkable(world, pos, n) {
   const dx = n.x - pos.x;
   const dz = n.z - pos.z;
   const len = Math.hypot(dx, dz) || 1;
-  const side = { x: (-dz / len) * 0.35, z: (dx / len) * 0.35 };
+  const side = { x: (-dz / len) * 0.45, z: (dx / len) * 0.45 };
   for (const k of [0, 1, -1]) {
     const a = { x: pos.x + side.x * k, y: pos.y + 0.5, z: pos.z + side.z * k };
     const b = { x: n.x + side.x * k, y: n.y + 0.5, z: n.z + side.z * k };

@@ -9,9 +9,10 @@ import { createSound } from './audio/sound.js';
 import { createMinimap } from './render/minimap.js';
 import testkarte from './maps/testkarte.json';
 import hafen from './maps/hafen.json';
+import altstadt from './maps/altstadt.json';
 
 // Schießstand gibt es nur auf der Testkarte (dort stehen die Zielscheiben)
-const MAPS = { hafen, testkarte };
+const MAPS = { hafen, altstadt, testkarte };
 const mapFor = s => (s.mode === 'schiessstand' ? testkarte : MAPS[s.map]);
 
 const $ = id => document.getElementById(id);
@@ -230,7 +231,7 @@ function frame(now) {
   if (screen === 'menu') {
     // Überblick über die Karte, langsam kreisend
     const r = now / 1000 * 0.05;
-    const far = game.world.name === 'Hafen' ? 1.9 : 1;
+    const far = game.world.name === 'Testkarte' ? 1 : 1.8;
     camera = { x: Math.sin(r) * 13 * far, y: 14 * far, z: Math.cos(r) * 13 * far, yaw: r, pitch: -0.75, fov: VIEW.fov, speed: 0, onGround: true, overview: true };
   } else {
     camera = {

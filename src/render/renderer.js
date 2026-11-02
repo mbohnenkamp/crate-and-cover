@@ -11,6 +11,7 @@ const COLORS = {
   poller: 0x2b2d30,
   regal: 0x5b6a78,
   dach: 0x7b8088,
+  pfosten: 0x6b4a2f,
   boden: 0x9a9184,
   wand: 0xcfc8bb,
   plattform: 0x7f8c99,

@@ -9,8 +9,8 @@ import { createWorld, overlaps } from '../src/game/world.js';
 import { walk } from './lauf.mjs';
 
 const SPACING = 4;
-const INSET = 0.7;
-const MAX_HEIGHT = 5.5; // höher liegen nur Dach, Kran und Mauerkronen
+const INSET = 1.0;
+const MAX_HEIGHT = 8; // höher liegen nur Dächer, Kran und Turmspitze
 const LINK = 5.8;
 
 const name = process.argv[2];
@@ -30,16 +30,20 @@ function spread(lo, hi) {
   return n === 1 ? [(lo + hi) / 2] : Array.from({ length: n }, (_, i) => lo + (len * i) / (n - 1));
 }
 
-// Neuer Punkt oder der schon vorhandene in der Nähe; null, wenn dort niemand stehen kann
+// Neuer Punkt oder der schon vorhandene in der Nähe; null, wenn dort niemand stehen kann.
+// Treppenenden (exact) bekommen immer einen eigenen Punkt genau in der Treppenachse.
 const nodes = [];
-const add = (x, y, z) => {
+const add = (x, y, z, exact = false) => {
   x = +x.toFixed(2); y = +y.toFixed(3); z = +z.toFixed(2);
   if (!fits(x, y, z) || !supported(x, y, z)) return null;
-  const near = nodes.findIndex(n => Math.hypot(n[0] - x, n[2] - z) < 1.5 && Math.abs(n[1] - y) < 0.5);
+  const near = nodes.findIndex(n => Math.hypot(n[0] - x, n[2] - z) < (exact ? 0.1 : 1.5) && Math.abs(n[1] - y) < 0.5);
   if (near >= 0) return near;
   nodes.push([x, y, z]);
   return nodes.length - 1;
 };
+
+// Vorgaben der Karte zuerst (z. B. vor und hinter Türen)
+for (const h of map.navHints ?? []) add(...h);
 
 // Rasterpunkt; ist er verbaut (Regal, Kiste), wird ein freier Platz bis 1,6 m daneben gesucht
 const JITTER = [[0, 0], [0.8, 0], [-0.8, 0], [0, 0.8], [0, -0.8], [1.6, 0], [-1.6, 0], [0, 1.6], [0, -1.6], [1.2, 1.2], [-1.2, 1.2], [1.2, -1.2], [-1.2, -1.2]];
@@ -66,15 +70,32 @@ for (const t of map.stairs ?? []) {
   const top = [...t.start];
   top[axis] += sign * (t.steps - 0.5) * t.depth;
   top[1] += t.steps * t.rise;
-  stairEnds.push([add(...bottom), add(...top)].filter(i => i !== null));
+  stairEnds.push([add(...bottom, true), add(...top, true)].filter(i => i !== null));
 }
 
 // Verbinden: nahe Punkte auf gleicher Höhe, Treppenenden untereinander
 const links = [];
 const tried = new Set();
-function tryLink(a, b) {
+// Bots schneiden Kurven: der Weg braucht rundum mehr Platz als der Körper (20 cm, an Treppen 5 cm) und
+// durchgehend Boden unter den Füßen, sonst fällt ein Bot in eine Lücke neben dem Weg.
+function roomy(p, q, margin) {
+  const clear = BODY.halfWidth + margin;
+  const len = Math.hypot(q[0] - p[0], q[2] - p[2]);
+  const y = Math.max(p[1], q[1]) + 0.5;
+  const low = Math.min(p[1], q[1]) - 0.6;
+  const n = Math.max(1, Math.ceil(len / 0.1));
+  for (let i = 0; i <= n; i++) {
+    const x = p[0] + ((q[0] - p[0]) * i) / n;
+    const z = p[2] + ((q[2] - p[2]) * i) / n;
+    if (overlaps(world, x - clear, y, z - clear, x + clear, y + 1.2, z + clear)) return false;
+    if (!overlaps(world, x - 0.15, low, z - 0.15, x + 0.15, y - 0.45, z + 0.15)) return false;
+  }
+  return true;
+}
+// stair: 'pair' = unten und oben an derselben Treppe, 'near' = Treppenende mit Punkt daneben
+function tryLink(a, b, stair = null) {
   const key = a < b ? `${a},${b}` : `${b},${a}`;
-  if (tried.has(key)) return;
+  if (tried.has(key) || (stair !== 'pair' && !roomy(nodes[a], nodes[b], stair ? 0.05 : 0.2))) return;
   tried.add(key);
   if (walk(world, nodes[a], nodes[b]) && walk(world, nodes[b], nodes[a])) links.push([Math.min(a, b), Math.max(a, b)]);
 }
@@ -84,14 +105,14 @@ for (let a = 0; a < nodes.length; a++) {
     if (d <= LINK && Math.abs(nodes[a][1] - nodes[b][1]) < 0.5) tryLink(a, b);
   }
 }
-for (const ends of stairEnds) if (ends.length === 2) tryLink(...ends);
+for (const ends of stairEnds) if (ends.length === 2) tryLink(...ends, 'pair');
 // Treppenenden auch mit Punkten in der Nähe auf ihrer Höhe (Treppe endet auf schmalem Dach)
 for (const ends of stairEnds) {
   for (const a of ends) {
     for (let b = 0; b < nodes.length; b++) {
       if (b === a) continue;
       const d = Math.hypot(nodes[a][0] - nodes[b][0], nodes[a][2] - nodes[b][2]);
-      if (d <= LINK + 1 && Math.abs(nodes[a][1] - nodes[b][1]) < 0.7) tryLink(a, b);
+      if (d <= LINK + 1 && Math.abs(nodes[a][1] - nodes[b][1]) < 0.7) tryLink(a, b, 'near');
     }
   }
 }

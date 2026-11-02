@@ -31,6 +31,8 @@ export function createBrain(p) {
     stuck: { timer: 0, x: 0, z: 0 },
     hurtBy: null,
     cover: false,
+    hold: 0,
+    holdAt: null,
   };
 }
 
@@ -140,8 +142,16 @@ export function thinkBot(game, p, dt, events) {
     b.seenTime = 0;
     b.burst = 0;
     b.cover = false;
-    if (!b.path.length) b.path = planPath(game, p, b) ?? [];
-    move = followPath(p, b);
+    // Oben angekommen: eine Weile bleiben und die Gegend absuchen (Scharfschütze länger)
+    const holding = !b.path.length && b.hold > 0 && b.holdAt && Math.hypot(b.holdAt.x - p.pos.x, b.holdAt.z - p.pos.z) < 1.5;
+    if (holding) {
+      b.hold -= dt;
+      lookYaw = b.yaw + Math.sin(game.time * 0.7) * 0.5;
+    } else {
+      b.hold = 0;
+      if (!b.path.length) b.path = planPath(game, p, b) ?? [];
+    }
+    move = holding ? null : followPath(p, b);
     if (move) {
       lookYaw = Math.atan2(-move.x, -move.z);
       const next = b.path[0];
@@ -228,15 +238,21 @@ function planPath(game, p, b) {
   if (!game.nav) return null;
   const start = nearestNode(game.nav, p.pos);
   let goal;
-  if (b.lastSeen && game.time - b.lastSeenAt < 6) {
+  // Der Scharfschütze jagt Geräuschen meist nicht hinterher, er bezieht lieber Stellung
+  const sniper = p.loadout === 'scharf';
+  if (b.lastSeen && game.time - b.lastSeenAt < 6 && !(sniper && game.rng() < 0.7)) {
     goal = nearestNode(game.nav, b.lastSeen);
     if (goal === start) b.lastSeen = null;
   }
   if (!goal || goal === start) {
-    const { nodes, high } = game.nav;
-    const up = high.length && game.rng() < (p.loadout === 'scharf' ? HIGH_SNIPER : HIGH_OTHERS);
-    const pool = up ? high : nodes;
+    const { nodes, high, top } = game.nav;
+    const up = high.length && game.rng() < (sniper ? HIGH_SNIPER : HIGH_OTHERS);
+    const pool = !up ? nodes : sniper && game.rng() < 0.6 ? top : high;
     goal = pool[Math.floor(game.rng() * pool.length)];
+    if (up) {
+      b.holdAt = goal;
+      b.hold = sniper ? 12 + game.rng() * 12 : 3 + game.rng() * 5;
+    }
   }
   return findPath(game.nav, start, goal);
 }

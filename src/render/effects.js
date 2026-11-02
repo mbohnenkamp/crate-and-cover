@@ -12,13 +12,15 @@ const MAX_PUFFS = 48;
 const GRAVITY = 9.8;
 
 // Kartenblöcke nach Material
-const SURFACE = { kiste: 'holz', plattform: 'metall', balken: 'metall', container: 'metall', steg: 'metall', kran: 'metall', poller: 'metall', regal: 'metall', dach: 'metall' };
+const SURFACE = { kiste: 'holz', plattform: 'metall', balken: 'metall', container: 'metall', steg: 'metall', kran: 'metall', poller: 'metall', regal: 'metall', dach: 'metall',
+  decke: 'holz', bank: 'holz', pfosten: 'holz', stamm: 'holz', hecke: 'pflanze', laub: 'pflanze', stoff: 'pflanze' };
 
 // Je Oberfläche: Loch (Farbe innen, Rand), Brocken (Farben, Anzahl, Größe, Form), Funken, Staubwolke
 const LOOK = {
   stein: { hole: ['#1d1c1a', 'rgba(70,66,60,0.55)'], size: 0.07, bits: { colors: [0xb9b2a6, 0x9a9184, 0xcfc8bb], count: 6, size: 0.025, stretch: 1 }, sparks: 0, puff: { color: 0xd8d1c4, size: 0.45 } },
   holz: { hole: ['#24170d', 'rgba(205,160,105,0.7)'], size: 0.06, bits: { colors: [0xc89a62, 0xb07a43, 0x8a5a2e], count: 7, size: 0.02, stretch: 3.5 }, sparks: 0, puff: { color: 0xc9a77c, size: 0.3 } },
   metall: { hole: ['#15171a', 'rgba(215,222,230,0.7)'], size: 0.045, bits: { colors: [0x6f7a85], count: 2, size: 0.015, stretch: 1 }, sparks: 9, puff: { color: 0xbfc6cc, size: 0.22 } },
+  pflanze: { hole: ['#1f2a1a', 'rgba(60,90,50,0.5)'], size: 0.05, bits: { colors: [0x4f7d3f, 0x3f6b38, 0x6b8f4a], count: 6, size: 0.03, stretch: 0.3 }, sparks: 0, puff: { color: 0x7d9a6a, size: 0.25 } },
   koerper: { bits: { colors: [0x4a4d53, 0x2c2e33], count: 5, size: 0.02, stretch: 1 }, sparks: 0, puff: { color: 0x8a8d92, size: 0.35 } },
   helm: { bits: { colors: [0x2c2e33], count: 2, size: 0.015, stretch: 1 }, sparks: 12, puff: { color: 0xdfe4ea, size: 0.25 } },
 };
@@ -59,7 +61,7 @@ function puffTexture() {
 
 export function createEffects(scene, camera) {
   const holeGeo = new THREE.PlaneGeometry(1, 1);
-  const holeMaps = Object.fromEntries(['stein', 'holz', 'metall'].map(k => [k, holeTexture(LOOK[k].hole)]));
+  const holeMaps = Object.fromEntries(['stein', 'holz', 'metall', 'pflanze'].map(k => [k, holeTexture(LOOK[k].hole)]));
   const holes = [];
   const tracers = [];
   const tracerMat = new THREE.LineBasicMaterial({ color: 0xffe2a0, transparent: true });
