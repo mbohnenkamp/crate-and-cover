@@ -48,12 +48,14 @@ export function nearestNode(nav, pos) {
   let best = null;
   let bestD = Infinity;
   const sorted = nav.nodes.slice().sort((a, b) => dist(a, pos) - dist(b, pos));
+  // Erst unter den nächsten 8 suchen, sonst weiter (z. B. direkt hinter einer Wand neben einer Tür)
   for (const n of sorted.slice(0, 8)) {
     if (Math.abs(n.y - pos.y) > 1.5) continue;
     if (!walkable(nav.world, pos, n)) continue;
     const d = dist(n, pos);
     if (d < bestD) { bestD = d; best = n; }
   }
+  if (!best) best = sorted.slice(8, 40).find(n => Math.abs(n.y - pos.y) <= 1.5 && walkable(nav.world, pos, n));
   return best ?? sorted[0];
 }
 

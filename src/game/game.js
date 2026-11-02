@@ -1,7 +1,7 @@
 // Eine Partie: Karte, Spieler und Bots in zwei Teams, Zielscheiben, Zufall, Zeit, Punkte.
 // Ein Zeitschritt liefert Ereignisse für Bild und Ton. Kennt kein Three.js, läuft auch in Node.
 
-import { TICK_RATE, MATCH, STEPS } from '../config.js';
+import { TICK_RATE, MATCH, STEPS, MOVE } from '../config.js';
 import { createWorld } from './world.js';
 import { createPlayer, stepPlayer, respawn, horizontalSpeed } from './player.js';
 import { createArms, stepWeapon, refillArms } from './weapons.js';
@@ -118,6 +118,7 @@ export function stepGame(game, humanCmd) {
     const fallSpeed = -p.vel.y;
     stepPlayer(p, cmd, game.world, DT);
     footsteps(game, p, wasOnGround, fallSpeed, events);
+    fallDamage(game, p, wasOnGround, fallSpeed, events);
     if (p.pos.y < game.world.killY + 1) killPlayer(game, p, null, null, false, events);
   }
 
@@ -133,6 +134,17 @@ export function stepGame(game, humanCmd) {
     }
   }
   return events;
+}
+
+// Fallschaden nach der Aufprallgeschwindigkeit, umgerechnet in Fallhöhe
+function fallDamage(game, p, wasOnGround, fallSpeed, events) {
+  if (wasOnGround || !p.onGround || !p.alive) return;
+  const height = fallSpeed ** 2 / (2 * MOVE.gravity);
+  const damage = Math.round((height - MATCH.fall.safe) * MATCH.fall.perMeter);
+  if (damage <= 0) return;
+  p.health -= damage;
+  events.push({ type: 'damaged', player: p.id, by: null, damage, from: null });
+  if (p.health <= 0) killPlayer(game, p, null, null, false, events, 'fall');
 }
 
 // Laufen ist hörbar, Schleichen und geduckt Gehen nicht (wie in CS). Landungen nach einem Sprung auch.
@@ -165,7 +177,7 @@ export function damagePlayer(game, victim, shooter, damage, part, weapon, events
   return false;
 }
 
-function killPlayer(game, victim, killer, weapon, head, events) {
+function killPlayer(game, victim, killer, weapon, head, events, cause = null) {
   victim.health = 0;
   victim.alive = false;
   victim.deadTime = 0;
@@ -175,7 +187,7 @@ function killPlayer(game, victim, killer, weapon, head, events) {
     if (head) killer.headshots++;
     game.score[killer.team]++;
   }
-  events.push({ type: 'kill', killer: killer?.id ?? null, victim: victim.id, weapon, head });
+  events.push({ type: 'kill', killer: killer?.id ?? null, victim: victim.id, weapon, head, cause });
 }
 
 // Nur für den Schießstand: Spieler zurück zum Start, Munition voll

@@ -1,8 +1,8 @@
 import * as THREE from 'three';
-import { VIEW } from '../config.js';
+import { VIEW, MATCH } from '../config.js';
 import { createViewmodel, loadWeapons } from './viewmodel.js';
 import { createEffects } from './effects.js';
-import { TEAM_COLORS, createFigure, updateFigure, createTargetFigure, removeFigure, loadSoldier } from './figures.js';
+import { TEAM_COLORS, createFigure, updateFigure, updateBar, createTargetFigure, removeFigure, loadSoldier } from './figures.js';
 
 const COLORS = {
   container: 0x8c8f93,
@@ -155,6 +155,8 @@ export function createRenderer(canvas, world) {
         }
         if (e.type === 'hit' && e.target !== null) targets[e.target].flash = 0.09;
         if (e.type === 'hit' && e.player !== null && figures[e.player]) figures[e.player].flash = 0.09;
+        // Gegner zeigen ihren Lebensbalken 3 s nach jedem Schaden
+        if (e.type === 'damaged' && figures[e.player]) figures[e.player].hurtShow = 3;
       }
     },
     // positions: interpolierte Fußpunkte aller Spieler in der Reihenfolge von game.players
@@ -166,7 +168,11 @@ export function createRenderer(canvas, world) {
         camera.updateProjectionMatrix();
       }
       game.players.forEach((p, i) => {
-        if (figures[i]) updateFigure(figures[i], positions[i], p.yaw, p.crouched, p.alive, dt, p.arms.current, p.pitch);
+        if (!figures[i]) return;
+        updateFigure(figures[i], positions[i], p.yaw, p.crouched, p.alive, dt, p.arms.current, p.pitch);
+        const mate = p.team === game.player.team;
+        updateBar(figures[i], p.health, MATCH.health, p.alive, mate ? 1 : figures[i].hurtShow ?? 0, dt);
+        if (figures[i].hurtShow) figures[i].hurtShow = 0;
       });
       game.targets.forEach((t, i) => updateFigure(targets[i], t.pos, 0, false, t.alive, dt));
       effects.update(dt);

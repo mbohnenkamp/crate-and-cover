@@ -4,6 +4,7 @@
 import { BOTS, WEAPONS, STEPS } from '../config.js';
 import { emptyCommand } from './player.js';
 import { nearestNode, findPath, lineOfSight } from './nav.js';
+import { overlaps } from './world.js';
 
 const PERCEIVE_EVERY = 0.1;
 const COVER_RANGE = 14;
@@ -137,6 +138,12 @@ export function thinkBot(game, p, dt, events) {
       const f = { x: -Math.sin(want.yaw), z: -Math.cos(want.yaw) };
       const toward = want.dist > skill.sight * 0.6 ? 1 : want.dist < 4 ? -0.5 : 0;
       move = { x: r.x * b.strafe.dir + f.x * toward, z: r.z * b.strafe.dir + f.z * toward };
+      // Nicht über eine Kante ausweichen (Containerdach, Brücke, Stockwerk ohne Geländer)
+      if (!floorAhead(game.world, p.pos, move)) {
+        b.strafe.dir *= -1;
+        move = { x: r.x * b.strafe.dir, z: r.z * b.strafe.dir };
+        if (!floorAhead(game.world, p.pos, move)) move = null;
+      }
     }
   } else {
     b.seenTime = 0;
@@ -275,6 +282,15 @@ function coverPath(game, p, enemy) {
     if (len < bestLen) { bestLen = len; best = path; }
   }
   return best;
+}
+
+// Boden 0,9 m voraus in Bewegungsrichtung, höchstens 1 m tiefer als die Füße
+function floorAhead(world, pos, move) {
+  const len = Math.hypot(move.x, move.z);
+  if (len < 1e-6) return true;
+  const x = pos.x + (move.x / len) * 0.9;
+  const z = pos.z + (move.z / len) * 0.9;
+  return !!overlaps(world, x - 0.1, pos.y - 1, z - 0.1, x + 0.1, pos.y + 0.45, z + 0.1);
 }
 
 // Rechte Maustaste einmal drücken, nicht halten

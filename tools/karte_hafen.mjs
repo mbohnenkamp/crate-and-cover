@@ -66,6 +66,10 @@ both((X, s) => {
   stair([X(22.5), 0, 2.1], flip('-x', s), C.h, 1.6);
   stair([X(17.5), C.h, 2.1], flip('-x', s), C.h, 1.6);
   box('steg', [X(12), C.h, 1.2], [X(13), 2 * C.h, 2.9]); // Podest oben, damit niemand neben der letzten Stufe abstürzt
+  // Geländer an den offenen Kanten oben: Podest zur Mitte hin, Kranturm nach Norden und außen
+  box('balken', [X(12), 5.2, 1.05], [X(12.05), 6.2, 2.9]);
+  box('balken', [X(12), 5.2, -1.25], [X(18), 6.2, -1.2]);
+  box('balken', [X(18), 5.2, -1.2], [X(18.05), 6.2, 1.2]);
 
   // Kran: Beine, Querträger oben in 10 m
   for (const z of [-5.5, 5.5]) box('kran', [X(6.6), 0, z - 0.4], [X(7.4), 10, z + 0.4]);
@@ -135,6 +139,8 @@ const map = {
   boxes,
   stairs,
   spawns,
+  // Wegpunkte vor und hinter den Toren der Lagerhalle, damit die Bots hinein- und hinausfinden
+  navHints: [-1, 1].flatMap(s => [[s * 5.5, 0, 13], [s * 5.5, 0, 15.6], [s * 8.4, 0, 19.75], [s * 11.2, 0, 19.75]]),
 };
 writeFileSync(new URL('../src/maps/hafen.json', import.meta.url), JSON.stringify(map, null, 1));
 console.log(`Hafen: ${boxes.length} Blöcke, ${stairs.length} Treppen`);

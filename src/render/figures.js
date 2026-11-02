@@ -30,7 +30,43 @@ function block(parent, color, size, pos, mats) {
 
 // Vorderseite −Z, wie die Blickrichtung bei yaw 0
 export function createFigure(scene, team) {
-  return soldier ? soldierFigure(scene, team) : blockFigure(scene, team);
+  const f = soldier ? soldierFigure(scene, team) : blockFigure(scene, team);
+  f.bar = createBar();
+  f.group.add(f.bar.group);
+  return f;
+}
+
+// Lebensbalken über dem Kopf: dunkler Grund, Füllung grün/gelb/rot. Sprites drehen sich zur Kamera,
+// Wände verdecken sie wie alles andere.
+const BAR_W = 0.7;
+const BAR_H = 0.08;
+function createBar() {
+  const group = new THREE.Group();
+  const back = new THREE.Sprite(new THREE.SpriteMaterial({ color: 0x111111, transparent: true, opacity: 0.6 }));
+  back.scale.set(BAR_W + 0.04, BAR_H + 0.04, 1);
+  const fill = new THREE.Sprite(new THREE.SpriteMaterial({ color: 0x5bbf4a, transparent: true }));
+  fill.scale.set(BAR_W, BAR_H, 1);
+  group.add(back, fill);
+  group.visible = false;
+  return { group, back, fill, show: 0 };
+}
+
+// show: so lange noch sichtbar (Sekunden); Teamkameraden bekommen immer einen Wert > 0
+export function updateBar(f, health, max, alive, show, dt) {
+  const b = f.bar;
+  b.show = Math.max(show, b.show - dt);
+  const k = Math.max(0, Math.min(1, health / max));
+  b.group.visible = alive && b.show > 0;
+  if (!b.group.visible) return;
+  b.group.position.y = 2.05 - (f.kneel ?? 0) * 0.6;
+  // Füllung links bündig: der Ankerpunkt (center) liegt in Bildschirmrichtung, so dreht er nicht mit der Figur
+  const w = Math.max(0.001, k);
+  b.fill.scale.x = BAR_W * w;
+  b.fill.center.x = 0.5 / w;
+  b.fill.material.color.setHex(k > 0.6 ? 0x5bbf4a : k > 0.3 ? 0xe0c040 : 0xd9443a);
+  const fade = Math.min(1, b.show / 0.5);
+  b.fill.material.opacity = fade;
+  b.back.material.opacity = 0.6 * fade;
 }
 
 // Soldat: Arme nach vorn zur Waffe, Beine schwingen beim Laufen, kniet geduckt, Oberkörper und Kopf folgen dem Blick.
