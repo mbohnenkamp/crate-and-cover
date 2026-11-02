@@ -263,7 +263,7 @@ function playSounds(events) {
       case 'shot': sound.play(`shot_${e.weapon}`, own ? null : e.origin); break;
       case 'swing': sound.play('swing', own ? null : e.origin, own ? 1 : 0.6); break;
       case 'empty': if (own) sound.play('empty'); break;
-      case 'reload': sound.reload(e.time, own ? null : at(e.player)); break;
+      case 'reload': sound.reload(e.time, own ? null : at(e.player), e.weapon); break;
       case 'step': sound.play('step', own ? null : { ...e.pos, y: e.pos.y + 0.1 }, own ? 0.25 : 1); break;
       case 'land': sound.play('land', own ? null : e.pos, own ? 0.6 : 1); break;
       case 'damaged': if (e.player === me.id) sound.play('hurt'); break;

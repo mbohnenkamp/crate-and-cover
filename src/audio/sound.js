@@ -1,7 +1,20 @@
-// Erzeugte Geräusche (Web Audio), ohne Aufnahmen. Fremde Geräusche räumlich (HRTF), eigene direkt, dazu Raumhall.
-// Echte Aufnahmen aus MotionElements kommen später und ersetzen einzelne Rezepte.
+// Geräusche: Aufnahmen aus public/sounds/ (MotionElements, nicht in Git), wo vorhanden; sonst erzeugt (Web Audio).
+// Fremde Geräusche räumlich (HRTF), eigene direkt, dazu Raumhall.
 
 const NOISE_SECONDS = 1;
+
+// Aufnahmen je Geräusch, mehrere Fassungen werden zufällig gewechselt. Fehlt eine Datei, gilt das Rezept.
+const SAMPLES = {
+  shot_gewehr: { files: ['gewehr_1', 'gewehr_2', 'gewehr_3', 'gewehr_4'], gain: 0.8 },
+  shot_pistole: { files: ['pistole_1', 'pistole_2'], gain: 0.75 },
+  shot_scharf: { files: ['scharf_1'], gain: 0.9 },
+  swing: { files: ['messer'], gain: 0.6 },
+  step: { files: ['schritt_1', 'schritt_2', 'schritt_3', 'schritt_4'], gain: 0.5 },
+  land: { files: ['landung'], gain: 0.6 },
+  reload_gewehr: { files: ['nachladen_gewehr'], gain: 0.6 },
+  reload_pistole: { files: ['nachladen_pistole'], gain: 0.6 },
+  bolt: { files: ['verschluss'], gain: 0.6 },
+};
 
 export function createSound() {
   let ctx = null;
@@ -9,6 +22,7 @@ export function createSound() {
   let noise = null;
   let reverb = null;
   let volume = 0.7;
+  const buffers = {};
 
   function unlock() {
     if (!ctx) {
@@ -20,8 +34,33 @@ export function createSound() {
       const data = noise.getChannelData(0);
       for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
       reverb = createReverb();
+      loadSamples();
     }
     if (ctx.state === 'suspended') ctx.resume();
+  }
+
+  function loadSamples() {
+    const base = import.meta.env?.BASE_URL ?? '/';
+    for (const name of new Set(Object.values(SAMPLES).flatMap(s => s.files))) {
+      fetch(`${base}sounds/${name}.m4a`)
+        .then(r => (r.ok ? r.arrayBuffer() : Promise.reject(r.status)))
+        .then(data => ctx.decodeAudioData(data))
+        .then(buf => { buffers[name] = buf; })
+        .catch(() => {});
+    }
+  }
+
+  // Aufnahme abspielen, leicht verstimmt, damit Wiederholungen nicht gleich klingen. false, wenn keine geladen ist.
+  function sample(name, pos, gain, at = 0) {
+    const def = SAMPLES[name];
+    const loaded = def?.files.filter(f => buffers[f]) ?? [];
+    if (!loaded.length) return false;
+    const src = ctx.createBufferSource();
+    src.buffer = buffers[loaded[Math.floor(Math.random() * loaded.length)]];
+    src.playbackRate.value = 0.96 + Math.random() * 0.08;
+    src.connect(output(pos, gain * def.gain, 0.12));
+    src.start(ctx.currentTime + at);
+    return true;
   }
 
   function setVolume(v) {
@@ -171,12 +210,17 @@ export function createSound() {
 
   function play(name, pos = null, gain = 1) {
     if (!ctx || volume <= 0 || ctx.state !== 'running') return;
+    if (sample(name, pos, gain)) return;
     RECIPES[name](output(pos, gain, DRY.has(name) ? 0 : undefined));
   }
 
-  // Nachladen: Magazin raus, Magazin rein, Verschluss
-  function reload(time, pos = null) {
+  // Nachladen: Aufnahme je Waffe (Scharfschütze: Magazin, dann Verschluss am Ende), sonst erzeugte Klicks
+  function reload(time, pos = null, weapon = 'gewehr') {
     if (!ctx || volume <= 0 || ctx.state !== 'running') return;
+    if (weapon === 'pistole' ? sample('reload_pistole', pos, 1) : sample('reload_gewehr', pos, 1)) {
+      if (weapon === 'scharf') sample('bolt', pos, 1, time * 0.85);
+      return;
+    }
     const o = output(pos, 0.9);
     clack(o, 1400, 0.4, 0.15);
     clack(o, 1100, 0.5, time * 0.6);
@@ -188,7 +232,7 @@ export function createSound() {
   function demo() {
     if (!ctx) return;
     const seq = ['shot_gewehr', 'shot_gewehr', 'shot_gewehr', 'shot_pistole', 'shot_scharf', 'swing', 'step', 'step', 'land',
-      'hit', 'head', 'kill', 'hurt', 'fern:shot_gewehr', 'fern:step', 'fern:step', 'reload'];
+      'hit', 'head', 'kill', 'hurt', 'fern:shot_gewehr', 'fern:step', 'fern:step', 'reload', 'reload_scharf'];
     let at = 0;
     for (const item of seq) {
       const far = item.startsWith('fern:');
@@ -196,9 +240,10 @@ export function createSound() {
       setTimeout(() => {
         setListener({ x: 0, y: 1.6, z: 0 }, 0, 0);
         if (name === 'reload') reload(1.6);
+        else if (name === 'reload_scharf') reload(3.6, null, 'scharf');
         else play(name, far ? { x: -10, y: 1, z: 0 } : null);
       }, at * 1000);
-      at += name.startsWith('shot') ? 0.5 : 0.32;
+      at += name.startsWith('shot') ? 0.5 : name === 'reload' ? 2 : 0.32;
     }
   }
 
