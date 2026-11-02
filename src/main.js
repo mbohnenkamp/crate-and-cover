@@ -10,9 +10,10 @@ import { createMinimap } from './render/minimap.js';
 import testkarte from './maps/testkarte.json';
 import hafen from './maps/hafen.json';
 import altstadt from './maps/altstadt.json';
+import baustelle from './maps/baustelle.json';
 
 // Schießstand gibt es nur auf der Testkarte (dort stehen die Zielscheiben)
-const MAPS = { hafen, altstadt, testkarte };
+const MAPS = { hafen, altstadt, baustelle, testkarte };
 const mapFor = s => (s.mode === 'schiessstand' ? testkarte : MAPS[s.map]);
 
 const $ = id => document.getElementById(id);

@@ -13,7 +13,8 @@ const GRAVITY = 9.8;
 
 // Kartenblöcke nach Material
 const SURFACE = { kiste: 'holz', plattform: 'metall', balken: 'metall', container: 'metall', steg: 'metall', kran: 'metall', poller: 'metall', regal: 'metall', dach: 'metall',
-  decke: 'holz', bank: 'holz', pfosten: 'holz', stamm: 'holz', hecke: 'pflanze', laub: 'pflanze', stoff: 'pflanze' };
+  decke: 'holz', bank: 'holz', geruest: 'holz', bretterwand: 'holz', rohr: 'metall', stahl: 'metall', spundwand: 'metall',
+  bagger: 'metall', lkw: 'metall', klo: 'metall', mischer: 'metall', pfosten: 'holz', stamm: 'holz', hecke: 'pflanze', laub: 'pflanze', stoff: 'pflanze' };
 
 // Je Oberfläche: Loch (Farbe innen, Rand), Brocken (Farben, Anzahl, Größe, Form), Funken, Staubwolke
 const LOOK = {

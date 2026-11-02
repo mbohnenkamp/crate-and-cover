@@ -10,7 +10,7 @@ import { walk } from './lauf.mjs';
 
 const SPACING = 4;
 const INSET = 1.0;
-const MAX_HEIGHT = 8; // höher liegen nur Dächer, Kran und Turmspitze
+const MAX_HEIGHT = 10; // höher liegen nur Dächer, Kran und Turmspitze
 const LINK = 5.8;
 
 const name = process.argv[2];
