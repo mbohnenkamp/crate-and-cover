@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { VIEW } from '../config.js';
 import { createViewmodel } from './viewmodel.js';
 import { createEffects } from './effects.js';
-import { TEAM_COLORS, createFigure, updateFigure, createTargetFigure, removeFigure } from './figures.js';
+import { TEAM_COLORS, createFigure, updateFigure, createTargetFigure, removeFigure, loadSoldier } from './figures.js';
 
 const COLORS = {
   boden: 0x9a9184,
@@ -76,13 +76,20 @@ export function createRenderer(canvas, world) {
   window.addEventListener('resize', resize);
   resize();
 
+  function buildFigures() {
+    for (const f of [...figures, ...targets]) if (f) removeFigure(scene, f);
+    figures = game.players.map(p => (p === game.player ? null : createFigure(scene, p.team)));
+    targets = game.targets.map(() => createTargetFigure(scene));
+  }
+
+  // Soldatenmodell kommt nach; bis dahin (oder wenn es fehlt) Blockfiguren
+  loadSoldier().then(ok => { if (ok && game) buildFigures(); });
+
   return {
     camera,
     setGame(g) {
-      for (const f of [...figures, ...targets]) if (f) removeFigure(scene, f);
       game = g;
-      figures = g.players.map(p => (p === g.player ? null : createFigure(scene, p.team)));
-      targets = g.targets.map(() => createTargetFigure(scene));
+      buildFigures();
       effects.clear();
     },
     events(list) {
@@ -106,7 +113,7 @@ export function createRenderer(canvas, world) {
         camera.updateProjectionMatrix();
       }
       game.players.forEach((p, i) => {
-        if (figures[i]) updateFigure(figures[i], positions[i], p.yaw, p.crouched, p.alive, dt);
+        if (figures[i]) updateFigure(figures[i], positions[i], p.yaw, p.crouched, p.alive, dt, p.arms.current);
       });
       game.targets.forEach((t, i) => updateFigure(targets[i], t.pos, 0, false, t.alive, dt));
       effects.update(dt);

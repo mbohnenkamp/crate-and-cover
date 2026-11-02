@@ -50,6 +50,13 @@ const BUILD = {
   },
 };
 
+// Waffe als Blockmodell, Vorderseite −Z — auch für die Figuren der anderen Spieler
+export function buildWeapon(id) {
+  const g = new THREE.Group();
+  BUILD[id](g);
+  return g;
+}
+
 export function createViewmodel() {
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(60, 1, 0.01, 10);
