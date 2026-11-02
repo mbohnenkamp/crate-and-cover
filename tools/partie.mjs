@@ -1,11 +1,11 @@
 // Testspieler: ganze Partien nur mit Bots, ohne Grafik. Misst Abschüsse, Dauer, Waffen, Kopftreffer,
-// Festhängen, Pausen ohne Abschuss. Aufruf: node tools/partie.mjs [Seeds]   (npm test nutzt 2 Seeds)
+// Festhängen, Pausen ohne Abschuss. Aufruf: node tools/partie.mjs [Seeds] [Karte]   (npm test nutzt 2 Seeds)
 
 import { readFileSync } from 'node:fs';
 import { WEAPONS, MATCH } from '../src/config.js';
 import { createGame, stepGame } from '../src/game/game.js';
 
-const map = JSON.parse(readFileSync(new URL('../src/maps/testkarte.json', import.meta.url)));
+const map = JSON.parse(readFileSync(new URL(`../src/maps/${process.argv[3] ?? 'testkarte'}.json`, import.meta.url)));
 const seeds = Number(process.argv[2] ?? 2);
 let failed = 0;
 function check(name, ok, detail) {

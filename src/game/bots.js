@@ -7,6 +7,8 @@ import { nearestNode, findPath, lineOfSight } from './nav.js';
 
 const PERCEIVE_EVERY = 0.1;
 const COVER_RANGE = 14;
+const HIGH_SNIPER = 0.75;
+const HIGH_OTHERS = 0.25;
 
 export function createBrain(p) {
   return {
@@ -220,7 +222,8 @@ function perceive(game, p, b, skill) {
   }
 }
 
-// Ziel: zuletzt gesehener oder gehörter Gegner, sonst ein zufälliger Wegpunkt
+// Ziel: zuletzt gesehener oder gehörter Gegner, sonst ein zufälliger Wegpunkt; oft ein erhöhter Platz,
+// der Scharfschütze meistens
 function planPath(game, p, b) {
   if (!game.nav) return null;
   const start = nearestNode(game.nav, p.pos);
@@ -230,8 +233,10 @@ function planPath(game, p, b) {
     if (goal === start) b.lastSeen = null;
   }
   if (!goal || goal === start) {
-    const nodes = game.nav.nodes;
-    goal = nodes[Math.floor(game.rng() * nodes.length)];
+    const { nodes, high } = game.nav;
+    const up = high.length && game.rng() < (p.loadout === 'scharf' ? HIGH_SNIPER : HIGH_OTHERS);
+    const pool = up ? high : nodes;
+    goal = pool[Math.floor(game.rng() * pool.length)];
   }
   return findPath(game.nav, start, goal);
 }

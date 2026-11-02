@@ -12,7 +12,7 @@ const MAX_PUFFS = 48;
 const GRAVITY = 9.8;
 
 // Kartenblöcke nach Material
-const SURFACE = { kiste: 'holz', plattform: 'metall', balken: 'metall' };
+const SURFACE = { kiste: 'holz', plattform: 'metall', balken: 'metall', container: 'metall', steg: 'metall', kran: 'metall', poller: 'metall', regal: 'metall', dach: 'metall' };
 
 // Je Oberfläche: Loch (Farbe innen, Rand), Brocken (Farben, Anzahl, Größe, Form), Funken, Staubwolke
 const LOOK = {

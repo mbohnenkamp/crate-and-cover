@@ -80,7 +80,7 @@ export const MATCH = {
   teamSize: 4,
   killGoals: [25, 50],
   timeLimits: [5, 10], // Minuten
-  defaults: { mode: 'deathmatch', difficulty: 'mittel', killGoal: 50, timeLimit: 10, sensitivity: 1, volume: 70 },
+  defaults: { mode: 'deathmatch', map: 'hafen', difficulty: 'mittel', killGoal: 50, timeLimit: 10, sensitivity: 1, volume: 70 },
   names: {
     A: ['Anna', 'Ben', 'Clara', 'David'],
     B: ['Emma', 'Finn', 'Greta', 'Hannes'],

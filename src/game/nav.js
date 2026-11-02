@@ -8,7 +8,8 @@ export function createNav(data, world) {
     nodes[a].links.push(b);
     nodes[b].links.push(a);
   }
-  return { nodes, world };
+  // Erhöhte Plätze (Plattformen, Containerdächer, Brücke), dort gehen Bots gern hin
+  return { nodes, world, high: nodes.filter(n => n.y > 2) };
 }
 
 export function lineOfSight(world, a, b) {

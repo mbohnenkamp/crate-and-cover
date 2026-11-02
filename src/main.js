@@ -8,6 +8,11 @@ import { createWorld } from './game/world.js';
 import { createSound } from './audio/sound.js';
 import { createMinimap } from './render/minimap.js';
 import testkarte from './maps/testkarte.json';
+import hafen from './maps/hafen.json';
+
+// Schießstand gibt es nur auf der Testkarte (dort stehen die Zielscheiben)
+const MAPS = { hafen, testkarte };
+const mapFor = s => (s.mode === 'schiessstand' ? testkarte : MAPS[s.map]);
 
 const $ = id => document.getElementById(id);
 const canvas = $('game');
@@ -21,7 +26,7 @@ const DIFFICULTY_NAMES = { leicht: 'Leicht', mittel: 'Mittel', schwer: 'Schwer' 
 const settings = loadSettings();
 
 const input = createInput(canvas);
-const view = createRenderer(canvas, createWorld(testkarte));
+const view = createRenderer(canvas, createWorld(mapFor(settings)));
 const hud = createHud();
 const sound = createSound();
 const minimap = createMinimap($('minimap'));
@@ -37,6 +42,7 @@ function loadSettings() {
   try { stored = JSON.parse(localStorage.getItem(SETTINGS_KEY)) ?? {}; } catch {}
   const s = { ...MATCH.defaults };
   if (['deathmatch', 'schiessstand'].includes(stored.mode)) s.mode = stored.mode;
+  if (stored.map in MAPS) s.map = stored.map;
   if (['leicht', 'mittel', 'schwer'].includes(stored.difficulty)) s.difficulty = stored.difficulty;
   if (MATCH.killGoals.includes(stored.killGoal)) s.killGoal = stored.killGoal;
   if (MATCH.timeLimits.includes(stored.timeLimit)) s.timeLimit = stored.timeLimit;
@@ -66,6 +72,8 @@ for (const group of document.querySelectorAll('.opt')) {
     settings[key] = typeof MATCH.defaults[key] === 'number' ? Number(v) : v;
     saveSettings();
     mark();
+    // Im Menü zeigt der Hintergrund gleich die gewählte Karte
+    if ((key === 'map' || key === 'mode') && screen === 'menu') newGame();
   });
   mark();
 }
@@ -98,7 +106,7 @@ function loadBest() {
 function showBest() {
   const top = loadBest().sort((a, b) => b.kills - a.kills || a.deaths - b.deaths).slice(0, 10);
   $('best').innerHTML = top.length
-    ? `<table>${top.map(r => `<tr><td>${r.date}</td><td>${DIFFICULTY_NAMES[r.difficulty] ?? ''}</td><td>${r.result} ${r.score}</td><td>${r.kills} Abschüsse</td><td>${r.deaths} Tode</td><td>${r.headshots} Kopf</td></tr>`).join('')}</table>`
+    ? `<table>${top.map(r => `<tr><td>${r.date}</td><td>${r.map ?? 'Testkarte'}</td><td>${DIFFICULTY_NAMES[r.difficulty] ?? ''}</td><td>${r.result} ${r.score}</td><td>${r.kills} Abschüsse</td><td>${r.deaths} Tode</td><td>${r.headshots} Kopf</td></tr>`).join('')}</table>`
     : '<p>Noch keine Partie gespielt.</p>';
 }
 showBest();
@@ -110,6 +118,7 @@ function recordMatch(winner) {
   list.push({
     date: new Date().toLocaleDateString('de-DE'),
     difficulty: game.difficulty,
+    map: game.world.name,
     result: winner === null ? 'Unentschieden' : winner === me.team ? 'Sieg' : 'Niederlage',
     score: `${game.score.A}:${game.score.B}`,
     kills: me.kills,
@@ -122,7 +131,8 @@ function recordMatch(winner) {
 }
 
 function newGame() {
-  game = createGame(testkarte, { ...settings, seed: (Math.random() * 1e9) | 0 });
+  game = createGame(mapFor(settings), { ...settings, seed: (Math.random() * 1e9) | 0 });
+  view.setWorld(game.world);
   view.setGame(game);
   hud.setGame(game);
   minimap.setGame(game);
@@ -220,7 +230,8 @@ function frame(now) {
   if (screen === 'menu') {
     // Überblick über die Karte, langsam kreisend
     const r = now / 1000 * 0.05;
-    camera = { x: Math.sin(r) * 13, y: 14, z: Math.cos(r) * 13, yaw: r, pitch: -0.75, fov: VIEW.fov, speed: 0, onGround: true, overview: true };
+    const far = game.world.name === 'Hafen' ? 1.9 : 1;
+    camera = { x: Math.sin(r) * 13 * far, y: 14 * far, z: Math.cos(r) * 13 * far, yaw: r, pitch: -0.75, fov: VIEW.fov, speed: 0, onGround: true, overview: true };
   } else {
     camera = {
       x: mine.x,

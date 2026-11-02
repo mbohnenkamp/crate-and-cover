@@ -16,6 +16,8 @@ export function createMinimap(canvas) {
   canvas.style.width = canvas.style.height = `${SIZE}px`;
   const g = canvas.getContext('2d');
   let mapImage = null;
+  let mapWorld = null;
+  let water = false;
   let bounds = null;
   let game = null;
   let spotTimer = 0;
@@ -39,13 +41,15 @@ export function createMinimap(canvas) {
       m.fillRect(b.min[0] - bounds.x, b.min[2] - bounds.z, b.max[0] - b.min[0], b.max[2] - b.min[2]);
     }
     mapImage = c;
+    mapWorld = world.name;
+    water = !!world.water;
   }
 
   return {
     setGame(gm) {
       game = gm;
       spotted.clear();
-      if (!mapImage) drawMap(gm.world);
+      if (mapWorld !== gm.world.name) drawMap(gm.world);
     },
     update(dt, yaw) {
       const me = game.player;
@@ -66,7 +70,7 @@ export function createMinimap(canvas) {
       g.beginPath();
       g.arc(SIZE / 2, SIZE / 2, SIZE / 2 - 1, 0, Math.PI * 2);
       g.clip();
-      g.fillStyle = '#20242a';
+      g.fillStyle = water ? '#1e3a50' : '#20242a';
       g.fillRect(0, 0, SIZE, SIZE);
 
       // Welt so drehen und verschieben, dass du in der Mitte stehst und vorne oben ist

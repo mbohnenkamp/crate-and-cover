@@ -3,7 +3,7 @@
 export function createWorld(map) {
   const boxes = [];
   for (const b of map.boxes) {
-    boxes.push({ min: b.min, max: b.max, type: b.type });
+    boxes.push({ min: b.min, max: b.max, type: b.type, color: b.color });
   }
   for (const t of map.stairs ?? []) boxes.push(...expandStairs(t));
   return {
@@ -11,6 +11,8 @@ export function createWorld(map) {
     boxes,
     spawns: map.spawns,
     killY: map.killY ?? -20,
+    water: map.water ?? null,
+    fallText: map.fallText ?? 'abgestürzt',
   };
 }
 

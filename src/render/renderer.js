@@ -5,6 +5,12 @@ import { createEffects } from './effects.js';
 import { TEAM_COLORS, createFigure, updateFigure, createTargetFigure, removeFigure, loadSoldier } from './figures.js';
 
 const COLORS = {
+  container: 0x8c8f93,
+  steg: 0x6d7680,
+  kran: 0xd9a92e,
+  poller: 0x2b2d30,
+  regal: 0x5b6a78,
+  dach: 0x7b8088,
   boden: 0x9a9184,
   wand: 0xcfc8bb,
   plattform: 0x7f8c99,
@@ -15,7 +21,7 @@ const COLORS = {
   kante: 0xa39a8c,
 };
 
-// Die Karte wird einmal gebaut, Figuren und Zielscheiben je Partie (setGame).
+// Die Karte wird je Kartenwechsel gebaut (setWorld), Figuren und Zielscheiben je Partie (setGame).
 export function createRenderer(canvas, world) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
   renderer.autoClear = false;
@@ -40,24 +46,63 @@ export function createRenderer(canvas, world) {
   scene.add(sun);
 
   const grid = gridTexture();
-  const materials = {};
-  for (const b of world.boxes) {
-    materials[b.type] ??= new THREE.MeshLambertMaterial({ color: COLORS[b.type] ?? 0xff00ff, map: grid });
-    const mesh = new THREE.Mesh(boxGeometry(b), materials[b.type]);
-    mesh.castShadow = b.type !== 'boden';
-    mesh.receiveShadow = true;
-    scene.add(mesh);
-  }
+  const ribs = ribTexture();
+  let mapGroup = null;
+  let worldName = null;
 
-  for (const s of world.spawns) {
-    const mark = new THREE.Mesh(
-      new THREE.CircleGeometry(0.5, 24),
-      new THREE.MeshBasicMaterial({ color: TEAM_COLORS[s.team], transparent: true, opacity: 0.6 }),
-    );
-    mark.rotation.x = -Math.PI / 2;
-    mark.position.set(s.pos[0], s.pos[1] + 0.01, s.pos[2]);
-    scene.add(mark);
+  // Blöcke nach Typ und eigener Farbe, Container mit Rippen. Schatten der Sonne über die ganze Karte.
+  function setWorld(world) {
+    if (worldName === world.name) return;
+    worldName = world.name;
+    if (mapGroup) {
+      scene.remove(mapGroup);
+      mapGroup.traverse(o => { o.geometry?.dispose(); o.material?.dispose(); });
+    }
+    mapGroup = new THREE.Group();
+    const materials = {};
+    for (const b of world.boxes) {
+      const key = `${b.type}${b.color ?? ''}`;
+      materials[key] ??= new THREE.MeshLambertMaterial({
+        color: b.color ? new THREE.Color(b.color) : COLORS[b.type] ?? 0xff00ff,
+        map: b.type === 'container' ? ribs : grid,
+      });
+      const mesh = new THREE.Mesh(boxGeometry(b), materials[key]);
+      mesh.castShadow = b.type !== 'boden';
+      mesh.receiveShadow = true;
+      mapGroup.add(mesh);
+    }
+    for (const s of world.spawns) {
+      const mark = new THREE.Mesh(
+        new THREE.CircleGeometry(0.5, 24),
+        new THREE.MeshBasicMaterial({ color: TEAM_COLORS[s.team], transparent: true, opacity: 0.6 }),
+      );
+      mark.rotation.x = -Math.PI / 2;
+      mark.position.set(s.pos[0], s.pos[1] + 0.01, s.pos[2]);
+      mapGroup.add(mark);
+    }
+    if (world.water) {
+      const w = world.water;
+      const water = new THREE.Mesh(
+        new THREE.PlaneGeometry(w.max[0] - w.min[0], w.max[1] - w.min[1]),
+        new THREE.MeshLambertMaterial({ color: 0x2f6b8f, transparent: true, opacity: 0.88 }),
+      );
+      water.rotation.x = -Math.PI / 2;
+      water.position.set((w.min[0] + w.max[0]) / 2, w.y, (w.min[1] + w.max[1]) / 2);
+      water.receiveShadow = true;
+      mapGroup.add(water);
+    }
+    scene.add(mapGroup);
+    const floor = world.boxes.find(b => b.type === 'boden');
+    const hx = (floor.max[0] - floor.min[0]) / 2 + 4;
+    const hz = (floor.max[2] - floor.min[2]) / 2 + 4;
+    const r = Math.max(hx, hz);
+    Object.assign(sun.shadow.camera, { left: -r, right: r, top: r, bottom: -r, far: 120 });
+    sun.shadow.camera.updateProjectionMatrix();
+    sun.shadow.mapSize.setScalar(r > 30 ? 4096 : 2048);
+    sun.shadow.map?.dispose();
+    sun.shadow.map = null;
   }
+  setWorld(world);
 
   const viewmodel = createViewmodel();
   const effects = createEffects(scene, camera);
@@ -90,6 +135,7 @@ export function createRenderer(canvas, world) {
 
   return {
     camera,
+    setWorld,
     setGame(g) {
       game = g;
       buildFigures();
@@ -152,6 +198,26 @@ function boxGeometry(b) {
     }
   }
   return geo;
+}
+
+// Wellblech: senkrechte Rippen, 4 je Meter
+function ribTexture() {
+  const c = document.createElement('canvas');
+  c.width = c.height = 64;
+  const g = c.getContext('2d');
+  g.fillStyle = '#ffffff';
+  g.fillRect(0, 0, 64, 64);
+  for (let i = 0; i < 4; i++) {
+    g.fillStyle = '#d6d6d6';
+    g.fillRect(i * 16 + 10, 0, 4, 64);
+    g.fillStyle = '#f4f4f4';
+    g.fillRect(i * 16 + 2, 0, 4, 64);
+  }
+  const tex = new THREE.CanvasTexture(c);
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 8;
+  return tex;
 }
 
 function gridTexture() {

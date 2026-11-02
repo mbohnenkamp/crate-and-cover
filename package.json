@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node tools/bewegung.mjs && node tools/waffen.mjs && node tools/wege.mjs && node tools/sinne.mjs && node tools/partie.mjs 2"
+    "test": "node tools/bewegung.mjs && node tools/waffen.mjs && node tools/wege.mjs && node tools/wege.mjs hafen && node tools/sinne.mjs && node tools/partie.mjs 2"
   },
   "dependencies": {
     "three": "^0.186.1",
