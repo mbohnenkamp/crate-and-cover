@@ -4,3 +4,5 @@ dist/
 *.blend1
 # Lizenzierte Originale (MotionElements, Entwürfe) — nicht in Git
 entwuerfe/
+# Geschnittene Fassungen lizenzierter Töne (MotionElements) — nicht in Git, nicht veröffentlichen
+public/sounds/

@@ -82,6 +82,7 @@ for (const el of document.querySelectorAll('[data-setting]')) {
     settings[el.dataset.setting] = Number(el.value);
     saveSettings();
     showSliders();
+for (const el of document.querySelectorAll('.demo')) el.addEventListener('click', () => { sound.unlock(); sound.demo(); });
   });
 }
 showSliders();

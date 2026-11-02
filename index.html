@@ -85,6 +85,7 @@
     .settings { display: grid; grid-template-columns: auto 1fr 52px; gap: 8px 12px; align-items: center; margin: 4px 0 12px; font-size: 14px; }
     .settings input { width: 100%; accent-color: #3d7bd9; }
     .settings output { text-align: right; color: #ffd27a; }
+    .settings .demo { padding: 6px 10px; border: 1px solid #3c4655; border-radius: 6px; background: #262d38; color: #eef1f5; font: inherit; font-size: 13px; cursor: pointer; }
     #best table { width: 100%; }
     #best td { padding: 3px 10px 3px 0; color: #eef1f5; }
     #best td:first-child { color: #aab4c0; }
@@ -129,6 +130,7 @@
       <div class="settings">
         <span>Maus</span><input type="range" min="0.3" max="3" step="0.05" data-setting="sensitivity"><output data-for="sensitivity"></output>
         <span>Lautstärke</span><input type="range" min="0" max="100" step="5" data-setting="volume"><output data-for="volume"></output>
+        <span></span><button type="button" class="demo">Probehören</button><span></span>
       </div>
       <div class="actions"><button class="primary" id="btn-start">Starten</button></div>
       <details id="best-box">
@@ -162,6 +164,7 @@
       <div class="settings">
         <span>Maus</span><input type="range" min="0.3" max="3" step="0.05" data-setting="sensitivity"><output data-for="sensitivity"></output>
         <span>Lautstärke</span><input type="range" min="0" max="100" step="5" data-setting="volume"><output data-for="volume"></output>
+        <span></span><button type="button" class="demo">Probehören</button><span></span>
       </div>
       <div class="actions"><button class="primary" id="btn-resume">Weiter</button><button id="btn-quit">Partie beenden</button></div>
     </div>
