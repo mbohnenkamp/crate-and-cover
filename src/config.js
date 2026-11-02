@@ -92,7 +92,7 @@ export const MATCH = {
 // turnSpeed: wie schnell der Blick schwenkt (rad/s). fireCone: so nah muss das Ziel am Fadenkreuz sein.
 // stopToShoot: bleibt zum Schießen stehen (genauer). recoilComp: wie gut der Rückstoß ausgeglichen wird.
 export const BOTS = {
-  leicht: { name: 'Leicht', reaction: 0.75, sight: 25, fov: 100, turnSpeed: 3.5, aimError: 0.07, settle: 1.2, errFloor: 0.5, headChance: 0.05, fireCone: 0.09, stopToShoot: 0, recoilComp: 0.4, burst: 4 },
-  mittel: { name: 'Mittel', reaction: 0.42, sight: 40, fov: 120, turnSpeed: 6, aimError: 0.035, settle: 0.8, errFloor: 0.3, headChance: 0.2, fireCone: 0.05, stopToShoot: 0.5, recoilComp: 0.6, burst: 6 },
-  schwer: { name: 'Schwer', reaction: 0.24, sight: 60, fov: 140, turnSpeed: 10, aimError: 0.014, settle: 0.5, errFloor: 0.2, headChance: 0.4, fireCone: 0.03, stopToShoot: 1, recoilComp: 0.9, burst: 10 },
+  leicht: { name: 'Leicht', reaction: 1.0, sight: 20, fov: 90, turnSpeed: 2.8, aimError: 0.09, settle: 1.5, errFloor: 0.6, headChance: 0.03, fireCone: 0.1, stopToShoot: 0, recoilComp: 0.3, burst: 3 },
+  mittel: { name: 'Mittel', reaction: 0.6, sight: 32, fov: 110, turnSpeed: 4.5, aimError: 0.05, settle: 1.0, errFloor: 0.4, headChance: 0.1, fireCone: 0.06, stopToShoot: 0.3, recoilComp: 0.5, burst: 5 },
+  schwer: { name: 'Schwer', reaction: 0.35, sight: 50, fov: 130, turnSpeed: 7, aimError: 0.024, settle: 0.7, errFloor: 0.25, headChance: 0.25, fireCone: 0.04, stopToShoot: 0.7, recoilComp: 0.75, burst: 7 },
 };
