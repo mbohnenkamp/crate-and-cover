@@ -5,6 +5,7 @@ import { readFileSync } from 'node:fs';
 import { TICK_RATE } from '../src/config.js';
 import { createWorld } from '../src/game/world.js';
 import { createPlayer, stepPlayer, emptyCommand } from '../src/game/player.js';
+import { createNav, nearestNode } from '../src/game/nav.js';
 
 const map = JSON.parse(readFileSync(new URL('../src/maps/testkarte.json', import.meta.url)));
 const world = createWorld(map);
@@ -44,6 +45,15 @@ for (const [a, b] of links) {
 }
 console.log(`${bad ? 'FEHL' : 'ok  '} ${links.length * 2 - bad} von ${links.length * 2} Wegen begehbar`);
 failed += bad ? 1 : 0;
+
+// Vor den Duck-Durchgängen: der nächste Wegpunkt darf nicht hinter der Mauer liegen (aufrecht kommt man nicht durch)
+const nav = createNav(map.waypoints, world);
+for (const [z, side] of [[-8.2, -1], [8.2, 1]]) {
+  const n = nearestNode(nav, { x: 0, y: 0, z });
+  const ok = Math.sign(n.z - 7.25 * side) === side || Math.abs(n.z) > 7.5;
+  console.log(`${ok ? 'ok  ' : 'FEHL'} vor dem Duck-Durchgang bei z ${z}: nächster Wegpunkt auf derselben Seite — (${n.x}, ${n.z})`);
+  if (!ok) failed++;
+}
 
 console.log(failed ? `\n${failed} Prüfung(en) fehlgeschlagen` : '\nAlle Prüfungen bestanden');
 process.exit(failed ? 1 : 0);

@@ -23,9 +23,11 @@ function dist(a, b) {
   return Math.hypot(a.x - b.x, (a.y - b.y) * 2, a.z - b.z);
 }
 
-// Geradeaus begehbar? Drei Strahlen knapp über Stufenhöhe: Mitte und beide Körperseiten.
-// Sehen allein reicht nicht — über Treppenstufen sieht man, laufen kann man dort nicht.
-function walkable(world, pos, n) {
+// Geradeaus begehbar? Drei Strahlen knapp über Stufenhöhe (Mitte und beide Körperseiten) und einer in
+// Kopfhöhe. Sehen allein reicht nicht — über Treppenstufen sieht man, laufen kann man dort nicht;
+// und unter dem Sturz eines Duck-Durchgangs ist es in Kniehöhe frei, aufrecht kommt man nicht durch.
+export function walkable(world, pos, n) {
+  if (!lineOfSight(world, { x: pos.x, y: pos.y + 1.7, z: pos.z }, { x: n.x, y: n.y + 1.7, z: n.z })) return false;
   const dx = n.x - pos.x;
   const dz = n.z - pos.z;
   const len = Math.hypot(dx, dz) || 1;
