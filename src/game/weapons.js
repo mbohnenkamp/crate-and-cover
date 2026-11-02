@@ -159,7 +159,7 @@ function shoot(p, w, ammo, game, events) {
 
   const origin = eyeOf(p);
   const hit = trace(game, origin, d, COMBAT.range, p);
-  events.push({ type: 'shot', shooter: p.id, weapon: a.current, origin, end: pointAt(origin, d, hit.t), hit: hit.kind, normal: hit.normal });
+  events.push({ type: 'shot', shooter: p.id, weapon: a.current, origin, end: pointAt(origin, d, hit.t), hit: hit.kind, normal: hit.normal, surface: hit.surface ?? null });
   applyHit(game, p, w, hit, events);
 
   ammo.mag--;
@@ -175,7 +175,7 @@ function swing(p, w, game, events) {
   const origin = eyeOf(p);
   const d = direction(p.yaw, p.pitch);
   const hit = trace(game, origin, d, w.range, p);
-  events.push({ type: 'swing', shooter: p.id, weapon: a.current, origin, end: pointAt(origin, d, hit.t), hit: hit.kind, normal: hit.normal });
+  events.push({ type: 'swing', shooter: p.id, weapon: a.current, origin, end: pointAt(origin, d, hit.t), hit: hit.kind, normal: hit.normal, surface: hit.surface ?? null });
   applyHit(game, p, w, hit, events);
   a.cooldown = w.interval;
   a.sinceShot = 0;
@@ -197,7 +197,7 @@ function pointAt(o, d, t) {
 // Nächster Treffer: Karte, Zielscheibe oder gegnerische Figur (kein Beschuss im eigenen Team)
 export function trace(game, origin, d, maxT, shooter) {
   const wall = rayWorld(game.world, origin, d, maxT);
-  let best = wall ? { t: wall.t, kind: 'wall', normal: wall.normal } : { t: maxT, kind: null, normal: null };
+  let best = wall ? { t: wall.t, kind: 'wall', normal: wall.normal, surface: wall.type } : { t: maxT, kind: null, normal: null };
   const check = (boxes, extra) => {
     for (const box of boxes) {
       const h = rayBox(origin, d, box.min, box.max, best.t);

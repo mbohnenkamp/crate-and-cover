@@ -61,6 +61,34 @@ const BUILD = {
   },
 };
 
+let flashMap = null;
+
+// Mündungsfeuer: leuchtender Stern, dreht sich je Schuss (setzt die Waffe über material.rotation)
+export function createMuzzleFlash(size) {
+  if (!flashMap) {
+    const c = document.createElement('canvas');
+    c.width = c.height = 64;
+    const g = c.getContext('2d');
+    const grad = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+    grad.addColorStop(0, 'rgba(255,250,220,1)');
+    grad.addColorStop(0.25, 'rgba(255,214,110,0.9)');
+    grad.addColorStop(1, 'rgba(255,150,40,0)');
+    g.fillStyle = grad;
+    g.beginPath();
+    for (let i = 0; i < 16; i++) {
+      const a = (i / 16) * Math.PI * 2;
+      const r = i % 2 ? 9 : 31;
+      g.lineTo(32 + Math.cos(a) * r, 32 + Math.sin(a) * r);
+    }
+    g.fill();
+    flashMap = new THREE.CanvasTexture(c);
+  }
+  const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: flashMap, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true }));
+  sprite.scale.setScalar(size);
+  sprite.visible = false;
+  return sprite;
+}
+
 // Waffe, Vorderseite −Z — auch für die Figuren der anderen Spieler. Jede bekommt eigene Materialien.
 export function buildWeapon(id) {
   const model = loaded?.getObjectByName(`waffe_${id}`);
@@ -94,12 +122,8 @@ export function createViewmodel() {
       const g = buildWeapon(id);
       const muzzleZ = g.userData.muzzleZ;
       if (!WEAPONS[id].melee) {
-        const flash = new THREE.Mesh(
-          new THREE.BoxGeometry(0.07, 0.07, 0.1),
-          new THREE.MeshBasicMaterial({ color: 0xffd36b }),
-        );
-        flash.position.set(0, 0.015, muzzleZ - 0.05);
-        flash.visible = false;
+        const flash = createMuzzleFlash(0.22);
+        flash.position.set(0, 0.015, muzzleZ - 0.04);
         g.add(flash);
         g.userData.flash = flash;
       }
@@ -151,7 +175,9 @@ export function createViewmodel() {
         const kick = Math.exp(-arms.sinceShot * 18);
         z += 0.05 * kick * (arms.current === 'scharf' ? 2 : 1);
         rx += 0.08 * kick;
-        g.userData.flash.visible = arms.sinceShot < 0.04;
+        const flash = g.userData.flash;
+        if (!flash.visible && arms.sinceShot < 0.04) flash.material.rotation = Math.random() * Math.PI;
+        flash.visible = arms.sinceShot < 0.04;
       } else if (swingTime < 0.3) {
         const k = Math.sin(swingTime / 0.3 * Math.PI);
         x -= 0.12 * k;

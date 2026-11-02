@@ -28,7 +28,7 @@ export function rayWorld(world, o, d, maxT) {
   let best = null;
   for (const b of world.boxes) {
     const hit = rayBox(o, d, b.min, b.max, best ? best.t : maxT);
-    if (hit && (!best || hit.t < best.t)) best = hit;
+    if (hit && (!best || hit.t < best.t)) best = { ...hit, type: b.type };
   }
   return best;
 }

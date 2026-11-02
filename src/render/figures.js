@@ -4,7 +4,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { hitboxes } from '../game/hitbox.js';
-import { buildWeapon } from './viewmodel.js';
+import { buildWeapon, createMuzzleFlash } from './viewmodel.js';
 import { WEAPONS } from '../config.js';
 
 let soldier = null;
@@ -71,15 +71,13 @@ function soldierFigure(scene, team) {
   return { group, pivot, body, mats, flash: 0, fall: 0, parts, gunHolder, weapon: null, muzzle: 0, muzzleMesh: null, walk: 0, kneel: 0, last: null };
 }
 
-const MUZZLE_MAT = new THREE.MeshBasicMaterial({ color: 0xffd36b, transparent: true, opacity: 0.9 });
-const MUZZLE_GEO = new THREE.BoxGeometry(0.09, 0.09, 0.14);
 
 function setWeapon(f, id) {
   f.weapon = id;
   for (const old of [...f.gunHolder.children]) {
     f.gunHolder.remove(old);
     old.traverse(o => {
-      if (o === f.muzzleMesh) return;
+      if (o === f.muzzleMesh) { o.material.dispose(); return; }
       o.geometry?.dispose();
       if (o.material) f.mats.splice(f.mats.indexOf(o.material), 1);
     });
@@ -94,9 +92,8 @@ function setWeapon(f, id) {
     f.mats.push(o.material);
   });
   if (!WEAPONS[id].melee) {
-    f.muzzleMesh = new THREE.Mesh(MUZZLE_GEO, MUZZLE_MAT);
-    f.muzzleMesh.position.set(0, 0.015, gun.userData.muzzleZ - 0.06);
-    f.muzzleMesh.visible = false;
+    f.muzzleMesh = createMuzzleFlash(0.3);
+    f.muzzleMesh.position.set(0, 0.015, gun.userData.muzzleZ - 0.04);
     gun.add(f.muzzleMesh);
   }
   f.gunHolder.add(gun);
@@ -160,8 +157,7 @@ export function createTargetFigure(scene) {
 export function removeFigure(scene, f) {
   scene.remove(f.group);
   f.group.traverse(o => {
-    if (o.material === MUZZLE_MAT) return;
-    o.geometry?.dispose();
+    if (!o.isSprite) o.geometry?.dispose();
     o.material?.dispose();
   });
 }
@@ -204,6 +200,6 @@ function animateSoldier(f, pos, crouched, alive, dt, weapon, pitch) {
   f.muzzle = Math.max(0, f.muzzle - dt);
   if (f.muzzleMesh) {
     f.muzzleMesh.visible = f.muzzle > 0 && alive;
-    f.muzzleMesh.rotation.z = Math.random() * Math.PI;
+    f.muzzleMesh.material.rotation = Math.random() * Math.PI;
   }
 }

@@ -104,7 +104,7 @@ export function createRenderer(canvas, world) {
         }
         if (e.type === 'swing') {
           if (own) viewmodel.swing();
-          if (e.hit === 'wall') effects.impact(e.end, e.normal);
+          if (e.hit === 'wall') effects.impact(e.end, e.normal, e.surface, true);
         }
         if (e.type === 'hit' && e.target !== null) targets[e.target].flash = 0.09;
         if (e.type === 'hit' && e.player !== null && figures[e.player]) figures[e.player].flash = 0.09;
