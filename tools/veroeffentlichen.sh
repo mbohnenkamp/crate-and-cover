@@ -6,6 +6,7 @@ set -e
 cd "$(dirname "$0")/.."
 npx vite build
 rm -rf dist/sounds
+touch dist/.nojekyll # GitHub soll die Dateien unverändert ausliefern
 if find dist -iname '*.m4a' -o -iname '*.wav' -o -iname '*.mp3' | grep -q .; then
   echo "Abbruch: Tondateien im Build" >&2
   exit 1
