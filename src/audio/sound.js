@@ -14,6 +14,8 @@ const SAMPLES = {
   reload_gewehr: { files: ['nachladen_gewehr'], gain: 0.6 },
   reload_pistole: { files: ['nachladen_pistole'], gain: 0.6 },
   bolt: { files: ['verschluss'], gain: 0.6 },
+  // Ansager, erzeugt mit tools/stimme.sh; ohne Datei bleibt es still
+  headshot: { files: ['headshot'], gain: 1 },
 };
 
 export function createSound() {
@@ -51,14 +53,14 @@ export function createSound() {
   }
 
   // Aufnahme abspielen, leicht verstimmt, damit Wiederholungen nicht gleich klingen. false, wenn keine geladen ist.
-  function sample(name, pos, gain, at = 0) {
+  function sample(name, pos, gain, at = 0, wet = 0.12) {
     const def = SAMPLES[name];
     const loaded = def?.files.filter(f => buffers[f]) ?? [];
     if (!loaded.length) return false;
     const src = ctx.createBufferSource();
     src.buffer = buffers[loaded[Math.floor(Math.random() * loaded.length)]];
     src.playbackRate.value = 0.96 + Math.random() * 0.08;
-    src.connect(output(pos, gain * def.gain, 0.12));
+    src.connect(output(pos, gain * def.gain, wet));
     src.start(ctx.currentTime + at);
     return true;
   }
@@ -206,12 +208,12 @@ export function createSound() {
   };
 
   // Rückmeldungen (Treffer, Abschuss, eigener Schaden) ohne Hall, damit sie klar bleiben
-  const DRY = new Set(['hit', 'head', 'kill', 'hurt']);
+  const DRY = new Set(['hit', 'head', 'kill', 'hurt', 'headshot']);
 
   function play(name, pos = null, gain = 1) {
     if (!ctx || volume <= 0 || ctx.state !== 'running') return;
-    if (sample(name, pos, gain)) return;
-    RECIPES[name](output(pos, gain, DRY.has(name) ? 0 : undefined));
+    if (sample(name, pos, gain, 0, DRY.has(name) ? 0 : 0.12)) return;
+    RECIPES[name]?.(output(pos, gain, DRY.has(name) ? 0 : undefined));
   }
 
   // Nachladen: Aufnahme je Waffe (Scharfschütze: Magazin, dann Verschluss am Ende), sonst erzeugte Klicks
@@ -232,7 +234,7 @@ export function createSound() {
   function demo() {
     if (!ctx) return;
     const seq = ['shot_gewehr', 'shot_gewehr', 'shot_gewehr', 'shot_pistole', 'shot_scharf', 'swing', 'step', 'step', 'land',
-      'hit', 'head', 'kill', 'hurt', 'fern:shot_gewehr', 'fern:step', 'fern:step', 'reload', 'reload_scharf'];
+      'hit', 'head', 'headshot', 'kill', 'hurt', 'fern:shot_gewehr', 'fern:step', 'fern:step', 'reload', 'reload_scharf'];
     let at = 0;
     for (const item of seq) {
       const far = item.startsWith('fern:');
@@ -243,7 +245,7 @@ export function createSound() {
         else if (name === 'reload_scharf') reload(3.6, null, 'scharf');
         else play(name, far ? { x: -10, y: 1, z: 0 } : null);
       }, at * 1000);
-      at += name.startsWith('shot') ? 0.5 : name === 'reload' ? 2 : 0.32;
+      at += name.startsWith('shot') ? 0.5 : name === 'reload' ? 2 : name === 'headshot' ? 0.9 : 0.32;
     }
   }
 

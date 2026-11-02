@@ -53,7 +53,7 @@ const BUILD = {
 // Waffe als Blockmodell, Vorderseite −Z — auch für die Figuren der anderen Spieler
 export function buildWeapon(id) {
   const g = new THREE.Group();
-  BUILD[id](g);
+  g.userData.muzzleZ = BUILD[id](g);
   return g;
 }
 

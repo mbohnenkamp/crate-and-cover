@@ -270,6 +270,7 @@ function playSounds(events) {
       case 'hit':
         if (e.by === me.id) {
           sound.play(e.part === 'head' ? 'head' : 'hit');
+          if (e.part === 'head' && e.kill) sound.play('headshot');
           if (e.kill) sound.play('kill');
         }
         break;

@@ -1,6 +1,7 @@
 # Soldat nach entwuerfe/Soldat.png — baut Szene "Soldat" neu. Vorderseite −Y, Maße in Metern, 1,80 m groß.
-# Bewegliche Teile als eigene Knoten mit Drehpunkt (Hals, Schultern, Hüften), damit das Spiel Laufen und
-# Zielen zeigen kann: soldat_kopf, soldat_rumpf, soldat_arm_l/r, soldat_bein_l/r.
+# Bewegliche Teile als eigene Knoten mit Drehpunkt (Hüfte, Hals, Schultern, Knie), damit das Spiel Laufen,
+# Knien und Zielen zeigen kann: soldat_rumpf (trägt soldat_kopf, soldat_arm_l/r), soldat_bein_l/r (Oberschenkel)
+# mit soldat_unterbein_l/r.
 # Das Material soldat_team färbt das Spiel je Team um.
 import bpy, bmesh, math
 from mathutils import Vector
@@ -62,8 +63,9 @@ def ring(c, rx, ry, z, n=8, rot=math.pi / 8):
 def part(name, pivot, parent, build):
     node = bpy.data.objects.new(name, None)
     sc.collection.objects.link(node)
-    node.location = pivot
+    node.location = Vector(pivot) - parent.matrix_world.translation
     node.parent = parent
+    node.matrix_world.translation = pivot
     meshes = {}
     build(lambda m: meshes.setdefault(m, bmesh.new()))
     for m, bm in meshes.items():
@@ -150,6 +152,12 @@ def bein(sx):
         # Oberschenkel, Beintasche außen
         block(get(STOFF), x, 0, 0.50, 0.93, 0.15, 0.17, 0.17, 0.2)
         block(get(DUNKEL), x + sx * 0.1, 0, 0.62, 0.80, 0.05, 0.14)
+    return build
+
+
+def unterbein(sx):
+    def build(get):
+        x = sx * 0.105
         # Knieschoner
         block(get(DUNKEL), x, -0.085, 0.43, 0.58, 0.13, 0.05, 0.14, 0.05)
         # Unterschenkel
@@ -162,10 +170,11 @@ def bein(sx):
 
 
 rumpf_node = part('soldat_rumpf', (0, 0, 0.95), root, rumpf)
-part('soldat_kopf', (0, 0, 1.46), root, kopf)
+part('soldat_kopf', (0, 0, 1.46), rumpf_node, kopf)
 # Vorderseite −Y: die rechte Körperseite der Figur liegt bei −X
 for side, sx in (('r', -1), ('l', 1)):
-    part(f'soldat_arm_{side}', (sx * 0.25, 0, 1.40), root, arm(sx))
-    part(f'soldat_bein_{side}', (sx * 0.105, 0, 0.93), root, bein(sx))
+    part(f'soldat_arm_{side}', (sx * 0.25, 0, 1.40), rumpf_node, arm(sx))
+    bein_node = part(f'soldat_bein_{side}', (sx * 0.105, 0, 0.93), root, bein(sx))
+    part(f'soldat_unterbein_{side}', (sx * 0.105, 0, 0.50), bein_node, unterbein(sx))
 
 print('Soldat gebaut:', len([o for o in sc.objects if o.type == 'MESH']), 'Meshes')

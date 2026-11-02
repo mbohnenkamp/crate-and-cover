@@ -95,7 +95,10 @@ export function createRenderer(canvas, world) {
     events(list) {
       for (const e of list) {
         const own = e.shooter === game.player?.id;
-        if (e.type === 'shot') effects.shot(e, own);
+        if (e.type === 'shot') {
+          effects.shot(e, own);
+          if (figures[e.shooter]) figures[e.shooter].muzzle = 0.05;
+        }
         if (e.type === 'swing') {
           if (own) viewmodel.swing();
           if (e.hit === 'wall') effects.impact(e.end, e.normal);
@@ -113,7 +116,7 @@ export function createRenderer(canvas, world) {
         camera.updateProjectionMatrix();
       }
       game.players.forEach((p, i) => {
-        if (figures[i]) updateFigure(figures[i], positions[i], p.yaw, p.crouched, p.alive, dt, p.arms.current);
+        if (figures[i]) updateFigure(figures[i], positions[i], p.yaw, p.crouched, p.alive, dt, p.arms.current, p.pitch);
       });
       game.targets.forEach((t, i) => updateFigure(targets[i], t.pos, 0, false, t.alive, dt));
       effects.update(dt);
