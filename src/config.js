@@ -80,7 +80,7 @@ export const MATCH = {
   teamSize: 4,
   killGoals: [25, 50],
   timeLimits: [5, 10], // Minuten
-  defaults: { mode: 'deathmatch', difficulty: 'mittel', killGoal: 50, timeLimit: 10 },
+  defaults: { mode: 'deathmatch', difficulty: 'mittel', killGoal: 50, timeLimit: 10, sensitivity: 1, volume: 70 },
   names: {
     A: ['Anna', 'Ben', 'Clara', 'David'],
     B: ['Emma', 'Finn', 'Greta', 'Hannes'],
@@ -96,3 +96,7 @@ export const BOTS = {
   mittel: { name: 'Mittel', reaction: 0.6, sight: 32, fov: 110, turnSpeed: 4.5, aimError: 0.05, settle: 1.0, errFloor: 0.4, headChance: 0.1, fireCone: 0.06, stopToShoot: 0.3, recoilComp: 0.5, burst: 5 },
   schwer: { name: 'Schwer', reaction: 0.35, sight: 50, fov: 130, turnSpeed: 7, aimError: 0.024, settle: 0.7, errFloor: 0.25, headChance: 0.25, fireCone: 0.04, stopToShoot: 0.7, recoilComp: 0.75, burst: 7 },
 };
+
+// Schritte: ab diesem Tempo hörbar (Schleichen 2,9 m/s und geduckt 1,9 m/s bleiben leise), Schrittlänge,
+// ab welcher Fallgeschwindigkeit eine Landung zu hören ist. Bots hören Schritte bis hearSteps Meter.
+export const STEPS = { minSpeed: 3.3, length: 2.1, landSpeed: 4.5, hearShots: 20, hearSteps: 12 };

@@ -5,6 +5,8 @@ import { createInput } from './input/input.js';
 import { createRenderer } from './render/renderer.js';
 import { createHud, boardHtml, TEAM_NAMES } from './render/hud.js';
 import { createWorld } from './game/world.js';
+import { createSound } from './audio/sound.js';
+import { createMinimap } from './render/minimap.js';
 import testkarte from './maps/testkarte.json';
 
 const $ = id => document.getElementById(id);
@@ -14,11 +16,15 @@ const info = $('info');
 const screens = { menu: $('menu'), pause: $('pause'), end: $('end') };
 
 const SETTINGS_KEY = 'arena-shooter.einstellungen';
+const BEST_KEY = 'arena-shooter.bestenliste';
+const DIFFICULTY_NAMES = { leicht: 'Leicht', mittel: 'Mittel', schwer: 'Schwer' };
 const settings = loadSettings();
 
 const input = createInput(canvas);
 const view = createRenderer(canvas, createWorld(testkarte));
 const hud = createHud();
+const sound = createSound();
+const minimap = createMinimap($('minimap'));
 
 let game = null;
 let screen = 'menu';
@@ -34,6 +40,8 @@ function loadSettings() {
   if (['leicht', 'mittel', 'schwer'].includes(stored.difficulty)) s.difficulty = stored.difficulty;
   if (MATCH.killGoals.includes(stored.killGoal)) s.killGoal = stored.killGoal;
   if (MATCH.timeLimits.includes(stored.timeLimit)) s.timeLimit = stored.timeLimit;
+  if (stored.sensitivity >= 0.3 && stored.sensitivity <= 3) s.sensitivity = stored.sensitivity;
+  if (stored.volume >= 0 && stored.volume <= 100) s.volume = stored.volume;
   return s;
 }
 
@@ -62,16 +70,68 @@ for (const group of document.querySelectorAll('.opt')) {
   mark();
 }
 
+// Regler für Maus und Lautstärke, im Startmenü und in der Pause
+const sliderText = { sensitivity: v => `${v.toFixed(2)}×`, volume: v => `${v} %` };
+function showSliders() {
+  for (const el of document.querySelectorAll('[data-setting]')) el.value = settings[el.dataset.setting];
+  for (const el of document.querySelectorAll('output[data-for]')) el.textContent = sliderText[el.dataset.for](settings[el.dataset.for]);
+  sound.setVolume(settings.volume / 100);
+}
+for (const el of document.querySelectorAll('[data-setting]')) {
+  el.addEventListener('input', () => {
+    settings[el.dataset.setting] = Number(el.value);
+    saveSettings();
+    showSliders();
+  });
+}
+showSliders();
+
+// Bestenliste: die letzten 50 Partien Team-Deathmatch, angezeigt die zehn mit den meisten Abschüssen
+function loadBest() {
+  try {
+    const list = JSON.parse(localStorage.getItem(BEST_KEY));
+    return Array.isArray(list) ? list.filter(r => r && Number.isFinite(r.kills)) : [];
+  } catch { return []; }
+}
+
+function showBest() {
+  const top = loadBest().sort((a, b) => b.kills - a.kills || a.deaths - b.deaths).slice(0, 10);
+  $('best').innerHTML = top.length
+    ? `<table>${top.map(r => `<tr><td>${r.date}</td><td>${DIFFICULTY_NAMES[r.difficulty] ?? ''}</td><td>${r.result} ${r.score}</td><td>${r.kills} Abschüsse</td><td>${r.deaths} Tode</td><td>${r.headshots} Kopf</td></tr>`).join('')}</table>`
+    : '<p>Noch keine Partie gespielt.</p>';
+}
+showBest();
+
+function recordMatch(winner) {
+  const me = game.player;
+  const list = loadBest();
+  const before = Math.max(0, ...list.filter(r => r.difficulty === game.difficulty).map(r => r.kills));
+  list.push({
+    date: new Date().toLocaleDateString('de-DE'),
+    difficulty: game.difficulty,
+    result: winner === null ? 'Unentschieden' : winner === me.team ? 'Sieg' : 'Niederlage',
+    score: `${game.score.A}:${game.score.B}`,
+    kills: me.kills,
+    deaths: me.deaths,
+    headshots: me.headshots,
+  });
+  try { localStorage.setItem(BEST_KEY, JSON.stringify(list.slice(-50))); } catch {}
+  showBest();
+  return me.kills > before ? `Neue Bestmarke auf ${DIFFICULTY_NAMES[game.difficulty]}: ${me.kills} Abschüsse` : '';
+}
+
 function newGame() {
   game = createGame(testkarte, { ...settings, seed: (Math.random() * 1e9) | 0 });
   view.setGame(game);
   hud.setGame(game);
+  minimap.setGame(game);
   input.yaw = game.player.yaw;
   input.pitch = 0;
   prev = game.players.map(p => ({ ...p.pos }));
 }
 
 function startMatch() {
+  sound.unlock();
   newGame();
   showScreen(null);
   input.lock();
@@ -79,7 +139,7 @@ function startMatch() {
 
 $('btn-start').addEventListener('click', startMatch);
 $('btn-again').addEventListener('click', startMatch);
-$('btn-resume').addEventListener('click', () => input.lock());
+$('btn-resume').addEventListener('click', () => { sound.unlock(); input.lock(); });
 $('btn-quit').addEventListener('click', () => showScreen('menu'));
 $('btn-menu').addEventListener('click', () => showScreen('menu'));
 
@@ -105,6 +165,7 @@ function endMatch(winner) {
     ? `${winner === game.player.team ? 'Gewonnen' : 'Verloren'} — Team ${TEAM_NAMES[winner]} ${game.score.A}:${game.score.B}`
     : `Unentschieden ${game.score.A}:${game.score.B}`;
   $('end-board').innerHTML = boardHtml(game);
+  $('end-record').textContent = game.mode === 'deathmatch' ? recordMatch(winner) : '';
   document.exitPointerLock();
   showScreen('end');
 }
@@ -129,6 +190,7 @@ function frame(now) {
     const events = stepGame(game, input.command());
     view.events(events);
     hud.events(events);
+    playSounds(events);
     for (const e of events) {
       if (e.type === 'spawn' && e.player === me.id) {
         input.yaw = me.yaw;
@@ -142,7 +204,7 @@ function frame(now) {
   const a = me.arms;
   const scope = a.scoped && me.alive ? WEAPONS[a.current].scope : null;
   const fov = scope ? scope.fov : VIEW.fov;
-  input.sensitivityScale = Math.tan((fov * Math.PI) / 360) / Math.tan((VIEW.fov * Math.PI) / 360);
+  input.sensitivityScale = settings.sensitivity * Math.tan((fov * Math.PI) / 360) / Math.tan((VIEW.fov * Math.PI) / 360);
 
   const t = acc / DT;
   const lerp = (p, i) => {
@@ -172,7 +234,9 @@ function frame(now) {
   }
   view.render(camera, positions, running ? frameDt : 0);
   document.body.classList.toggle('in-menu', screen === 'menu');
-  hud.update(fov, frameDt, input.isDown('Tab') && running);
+  hud.update(fov, frameDt, input.isDown('Tab') && running, camera.yaw);
+  if (screen !== 'menu') minimap.update(frameDt, camera.yaw);
+  sound.setListener(camera, camera.yaw, camera.pitch);
 
   info.classList.toggle('hidden', !showInfo || screen !== null);
   if (showInfo) {
@@ -185,5 +249,32 @@ function frame(now) {
 
 requestAnimationFrame(frame);
 
+// Eigene Geräusche direkt, fremde räumlich an der Stelle, wo sie entstehen
+function playSounds(events) {
+  const me = game.player;
+  const at = id => {
+    const p = game.players[id];
+    return { x: p.pos.x, y: p.pos.y + 1.2, z: p.pos.z };
+  };
+  for (const e of events) {
+    const own = (e.shooter ?? e.player) === me.id;
+    switch (e.type) {
+      case 'shot': sound.play(`shot_${e.weapon}`, own ? null : e.origin); break;
+      case 'swing': sound.play('swing', own ? null : e.origin, own ? 1 : 0.6); break;
+      case 'empty': if (own) sound.play('empty'); break;
+      case 'reload': sound.reload(e.time, own ? null : at(e.player)); break;
+      case 'step': sound.play('step', own ? null : { ...e.pos, y: e.pos.y + 0.1 }, own ? 0.25 : 1); break;
+      case 'land': sound.play('land', own ? null : e.pos, own ? 0.6 : 1); break;
+      case 'damaged': if (e.player === me.id) sound.play('hurt'); break;
+      case 'hit':
+        if (e.by === me.id) {
+          sound.play(e.part === 'head' ? 'head' : 'hit');
+          if (e.kill) sound.play('kill');
+        }
+        break;
+    }
+  }
+}
+
 // Zum Prüfen im Browser
-window.arena = { get game() { return game; }, input, stepGame, startMatch, showScreen };
+window.arena = { get game() { return game; }, input, stepGame, startMatch, showScreen, sound, settings };

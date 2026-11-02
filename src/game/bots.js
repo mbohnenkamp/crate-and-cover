@@ -1,12 +1,11 @@
 // Bots: sehen, zielen, schießen, laufen über Wegpunkte, suchen Deckung, laden nach.
 // Ein Bot liefert je Zeitschritt dasselbe Kommando wie die Tastatur — die Spiellogik kennt keinen Unterschied.
 
-import { BOTS, WEAPONS } from '../config.js';
+import { BOTS, WEAPONS, STEPS } from '../config.js';
 import { emptyCommand } from './player.js';
 import { nearestNode, findPath, lineOfSight } from './nav.js';
 
 const PERCEIVE_EVERY = 0.1;
-const HEAR_RANGE = 20;
 const COVER_RANGE = 14;
 
 export function createBrain(p) {
@@ -207,10 +206,13 @@ function perceive(game, p, b, skill) {
   if (b.enemy !== null) b.path = [];
   b.enemy = null;
 
-  // Hören: Schüsse in der Nähe locken an
+  // Hören: Schüsse und Schritte in der Nähe locken an. Wer schleicht, bleibt ungehört.
   for (const e of game.players) {
-    if (!e.alive || e.team === p.team || e.arms.sinceShot > 0.3) continue;
-    if (Math.hypot(e.pos.x - p.pos.x, e.pos.z - p.pos.z) < HEAR_RANGE) {
+    if (!e.alive || e.team === p.team) continue;
+    const d = Math.hypot(e.pos.x - p.pos.x, e.pos.z - p.pos.z);
+    const shot = e.arms.sinceShot <= 0.3 && d < STEPS.hearShots;
+    const step = game.time - (e.lastStepAt ?? -99) <= 0.3 && d < STEPS.hearSteps;
+    if (shot || step) {
       if (!b.lastSeen || game.time - b.lastSeenAt > 1) b.path = [];
       b.lastSeen = { x: e.pos.x, y: e.pos.y, z: e.pos.z };
       b.lastSeenAt = game.time;

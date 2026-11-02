@@ -52,6 +52,8 @@ export function createHud() {
   let lastWeapon = null;
   let hurt = 0;
   let killedBy = null;
+  // Schadensrichtung: bis zu vier rote Bögen um die Mitte, zeigen zum Schützen, verblassen in 1,2 s
+  const arcs = [...$('hurtdir').children].map(el => ({ el, from: null, age: 99 }));
 
   function feedLine(html, cls) {
     const line = document.createElement('div');
@@ -71,6 +73,7 @@ export function createHud() {
       lastWeapon = null;
       hurt = 0;
       killedBy = null;
+      for (const a of arcs) { a.from = null; a.age = 99; }
       score.classList.toggle('hidden', g.mode === 'schiessstand');
       health.parentElement.classList.toggle('hidden', g.mode === 'schiessstand');
     },
@@ -84,7 +87,11 @@ export function createHud() {
             feedLine(`${e.part === 'head' ? 'Kopftreffer' : 'Treffer'} · ${e.damage}${e.kill ? ' · gefallen' : ''}`, e.part === 'head' ? 'head' : '');
           }
         }
-        if (e.type === 'damaged' && e.player === me.id) hurt = Math.min(1, hurt + e.damage / 60);
+        if (e.type === 'damaged' && e.player === me.id) {
+          hurt = Math.min(1, hurt + e.damage / 60);
+          const arc = arcs.find(a => a.from && a.shooter === e.by) ?? arcs.reduce((a, b) => (a.age > b.age ? a : b));
+          Object.assign(arc, { from: e.from, shooter: e.by, age: 0 });
+        }
         if (e.type === 'kill') {
           const v = game.players[e.victim];
           const k = e.killer !== null ? game.players[e.killer] : null;
@@ -94,7 +101,7 @@ export function createHud() {
         }
       }
     },
-    update(fovDeg, dt, showBoard) {
+    update(fovDeg, dt, showBoard, viewYaw) {
       const player = game.player;
       const a = player.arms;
       const w = WEAPONS[a.current];
@@ -135,6 +142,15 @@ export function createHud() {
       if (game.mode === 'deathmatch') {
         score.innerHTML = `<span class="tA">${TEAM_NAMES.A} ${game.score.A}</span> : <span class="tB">${game.score.B} ${TEAM_NAMES.B}</span>`
           + `<small>${fmtTime(game.timeLimit - game.time)} · Ziel ${game.killGoal}</small>`;
+      }
+
+      for (const a of arcs) {
+        a.age += dt;
+        const visible = a.from && a.age < 1.2 && player.alive;
+        a.el.style.opacity = visible ? 1 - a.age / 1.2 : 0;
+        if (!visible) continue;
+        const toShooter = Math.atan2(-(a.from.x - player.pos.x), -(a.from.z - player.pos.z));
+        a.el.style.transform = `rotate(${-(toShooter - viewYaw)}rad)`;
       }
 
       hurt = Math.max(0, hurt - dt * 1.5);

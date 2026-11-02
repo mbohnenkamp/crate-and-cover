@@ -75,11 +75,28 @@
     #overlay summary { cursor: pointer; }
     body.in-menu #hud, body.in-menu #vitals, body.in-menu #crosshair, body.in-menu #score,
     body.in-menu #feed, body.in-menu #death, body.in-menu #damage, body.in-menu #scope { display: none !important; }
+    #minimap { position: fixed; left: 14px; top: 14px; pointer-events: none; border-radius: 50%; }
+    #info { top: auto !important; bottom: 92px; left: 22px !important; }
+    #hurtdir { position: fixed; left: 50%; top: 50%; width: 0; height: 0; pointer-events: none; }
+    #hurtdir i { position: absolute; left: -90px; top: -90px; width: 180px; height: 180px; border-radius: 50%;
+      border-top: 7px solid rgba(255, 50, 30, .9); box-sizing: border-box; opacity: 0;
+      -webkit-mask: linear-gradient(90deg, transparent 30%, #000 42%, #000 58%, transparent 70%);
+              mask: linear-gradient(90deg, transparent 30%, #000 42%, #000 58%, transparent 70%); }
+    .settings { display: grid; grid-template-columns: auto 1fr 52px; gap: 8px 12px; align-items: center; margin: 4px 0 12px; font-size: 14px; }
+    .settings input { width: 100%; accent-color: #3d7bd9; }
+    .settings output { text-align: right; color: #ffd27a; }
+    #best table { width: 100%; }
+    #best td { padding: 3px 10px 3px 0; color: #eef1f5; }
+    #best td:first-child { color: #aab4c0; }
+    #end-record { color: #ffd27a; font-weight: 600; margin: -6px 0 10px; }
+    body.in-menu #minimap, body.in-menu #hurtdir { display: none !important; }
     .hidden { display: none !important; }
   </style>
 </head>
 <body>
   <canvas id="game"></canvas>
+  <canvas id="minimap"></canvas>
+  <div id="hurtdir"><i></i><i></i><i></i><i></i></div>
   <div id="scope" class="hidden"></div>
   <div id="crosshair"><i></i><i></i><i></i><i></i></div>
   <div id="hitmark" class="hidden"><i></i><i></i><i></i><i></i></div>
@@ -99,7 +116,7 @@
   <div id="overlay">
     <div class="box" id="menu">
       <h1>Crate &amp; Cover</h1>
-      <p>V3 · Testkarte · Team Blau gegen Team Orange, je vier Spieler</p>
+      <p>V4 · Testkarte · Team Blau gegen Team Orange, je vier Spieler</p>
       <div class="label">Modus</div>
       <div class="opt" data-key="mode"><button data-v="deathmatch">Team-Deathmatch</button><button data-v="schiessstand">Schießstand</button></div>
       <div class="label">Bots</div>
@@ -108,7 +125,16 @@
       <div class="opt" data-key="killGoal"><button data-v="25">25</button><button data-v="50">50</button></div>
       <div class="label">Zeit</div>
       <div class="opt" data-key="timeLimit"><button data-v="5">5 Minuten</button><button data-v="10">10 Minuten</button></div>
+      <div class="label">Einstellungen</div>
+      <div class="settings">
+        <span>Maus</span><input type="range" min="0.3" max="3" step="0.05" data-setting="sensitivity"><output data-for="sensitivity"></output>
+        <span>Lautstärke</span><input type="range" min="0" max="100" step="5" data-setting="volume"><output data-for="volume"></output>
+      </div>
       <div class="actions"><button class="primary" id="btn-start">Starten</button></div>
+      <details id="best-box">
+        <summary>Bestenliste</summary>
+        <div id="best"></div>
+      </details>
       <details>
         <summary>Tastenbelegung</summary>
         <table>
@@ -132,10 +158,16 @@
     </div>
     <div class="box hidden" id="pause">
       <h1>Pause</h1>
+      <div class="label">Einstellungen</div>
+      <div class="settings">
+        <span>Maus</span><input type="range" min="0.3" max="3" step="0.05" data-setting="sensitivity"><output data-for="sensitivity"></output>
+        <span>Lautstärke</span><input type="range" min="0" max="100" step="5" data-setting="volume"><output data-for="volume"></output>
+      </div>
       <div class="actions"><button class="primary" id="btn-resume">Weiter</button><button id="btn-quit">Partie beenden</button></div>
     </div>
     <div class="box hidden" id="end">
       <h1 id="end-title"></h1>
+      <div id="end-record"></div>
       <div id="end-board"></div>
       <div class="actions"><button class="primary" id="btn-again">Nochmal</button><button id="btn-menu">Startmenü</button></div>
     </div>

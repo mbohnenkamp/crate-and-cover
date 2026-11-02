@@ -1,9 +1,9 @@
 // Eine Partie: Karte, Spieler und Bots in zwei Teams, Zielscheiben, Zufall, Zeit, Punkte.
 // Ein Zeitschritt liefert Ereignisse für Bild und Ton. Kennt kein Three.js, läuft auch in Node.
 
-import { TICK_RATE, MATCH } from '../config.js';
+import { TICK_RATE, MATCH, STEPS } from '../config.js';
 import { createWorld } from './world.js';
-import { createPlayer, stepPlayer, respawn } from './player.js';
+import { createPlayer, stepPlayer, respawn, horizontalSpeed } from './player.js';
 import { createArms, stepWeapon, refillArms } from './weapons.js';
 import { createTargets, stepTargets } from './targets.js';
 import { createRng } from './rng.js';
@@ -114,7 +114,10 @@ export function stepGame(game, humanCmd) {
     p.yaw = cmd.yaw;
     p.pitch = cmd.pitch;
     stepWeapon(p, cmd, game, DT, events);
+    const wasOnGround = p.onGround;
+    const fallSpeed = -p.vel.y;
     stepPlayer(p, cmd, game.world, DT);
+    footsteps(game, p, wasOnGround, fallSpeed, events);
     if (p.pos.y < game.world.killY + 1) killPlayer(game, p, null, null, false, events);
   }
 
@@ -130,6 +133,25 @@ export function stepGame(game, humanCmd) {
     }
   }
   return events;
+}
+
+// Laufen ist hörbar, Schleichen und geduckt Gehen nicht (wie in CS). Landungen nach einem Sprung auch.
+function footsteps(game, p, wasOnGround, fallSpeed, events) {
+  if (!wasOnGround && p.onGround && fallSpeed > STEPS.landSpeed) {
+    p.lastStepAt = game.time;
+    events.push({ type: 'land', player: p.id, pos: { ...p.pos } });
+  }
+  const speed = horizontalSpeed(p);
+  if (!p.onGround || speed < STEPS.minSpeed) {
+    p.stepDist = 0;
+    return;
+  }
+  p.stepDist = (p.stepDist ?? 0) + speed * DT;
+  if (p.stepDist >= STEPS.length) {
+    p.stepDist = 0;
+    p.lastStepAt = game.time;
+    events.push({ type: 'step', player: p.id, pos: { ...p.pos } });
+  }
 }
 
 export function damagePlayer(game, victim, shooter, damage, part, weapon, events) {

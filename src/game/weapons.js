@@ -90,12 +90,12 @@ export function stepWeapon(p, cmd, game, dt, events) {
       const take = Math.min(w.magazine - ammo.mag, ammo.reserve);
       ammo.mag += take;
       ammo.reserve -= take;
-      events.push({ type: 'reloaded', weapon: a.current });
+      events.push({ type: 'reloaded', player: p.id, weapon: a.current });
     }
   }
 
   const canReload = !w.melee && a.reload === 0 && ammo.mag < w.magazine && ammo.reserve > 0;
-  if (canReload && (cmd.reload || (ammo.mag === 0 && a.cooldown === 0))) startReload(a, w, events);
+  if (canReload && (cmd.reload || (ammo.mag === 0 && a.cooldown === 0))) startReload(p, w, events);
 
   if (w.scope && cmd.alt && !a.altHeld) a.wantScope = !a.wantScope;
   a.scoped = !!w.scope && a.wantScope && a.reload === 0 && a.draw === 0 && a.cooldown === 0;
@@ -106,8 +106,8 @@ export function stepWeapon(p, cmd, game, dt, events) {
     if (w.melee) swing(p, w, game, events);
     else if (ammo.mag > 0) shoot(p, w, ammo, game, events);
     else if (!a.fireHeld) {
-      events.push({ type: 'empty', weapon: a.current });
-      if (canReload) startReload(a, w, events);
+      events.push({ type: 'empty', player: p.id, weapon: a.current });
+      if (canReload) startReload(p, w, events);
     }
   }
 
@@ -128,11 +128,12 @@ function tick(t, dt) {
   return t - dt > 1e-9 ? t - dt : 0;
 }
 
-function startReload(a, w, events) {
+function startReload(p, w, events) {
+  const a = p.arms;
   a.reload = w.reload;
   a.wantScope = false;
   a.scoped = false;
-  events.push({ type: 'reload', weapon: a.current, time: w.reload });
+  events.push({ type: 'reload', player: p.id, weapon: a.current, time: w.reload });
 }
 
 function eyeOf(p) {
