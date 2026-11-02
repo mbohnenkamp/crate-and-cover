@@ -62,8 +62,8 @@ box('boden', [-32, -3.6, 21], [32, 0, 26], ERDE);
 box('boden', [-32, -3.6, 12], [-9, 0, 21], ERDE);
 box('boden', [9, -3.6, 12], [32, 0, 21], ERDE);
 box('boden', [-9, -3.6, 12], [9, -2.6, 21], '#7d6b55');
-box('spundwand', [-9, -2.6, 11.9], [9, 0, 12], '#5d6670');
-box('spundwand', [-9, -2.6, 21], [9, 0, 21.1], '#5d6670');
+box('spundwand', [-9, -2.6, 12], [9, 0, 12.1], '#5d6670');
+box('spundwand', [-9, -2.6, 20.9], [9, 0, 21], '#5d6670');
 box('bretterwand', [-33, 0, -27], [-32, 3, 27], HOLZ);
 box('bretterwand', [32, 0, -27], [33, 3, 27], HOLZ);
 box('bretterwand', [-32, 0, -27], [32, 3, -26], HOLZ);
@@ -96,13 +96,14 @@ both((X, s) => {
 
   // Halbfertige Ziegelmauern im Erdgeschoss und im 1. Stock
   let [x0, x1] = xr(X, 2, 9);
-  box('ziegel', [x0, 0, -8], [x1, 2.9, -7.75], '#9a4e3a');
+  // Mauern 3 cm hinter der Säulenvorderseite, sonst flimmern die gemeinsamen Flächen
+  box('ziegel', [x0, 0, -7.97], [x1, 2.9, -7.77], '#9a4e3a');
   [x0, x1] = xr(X, 3, 9);
-  box('ziegel', [x0, 0, 7.75], [x1, 1.2, 8], '#9a4e3a');
+  box('ziegel', [x0, 0, 7.77], [x1, 1.2, 7.97], '#9a4e3a');
   [x0, x1] = xr(X, 1.5, 4.5);
   box('ziegel', [x0, 3.2, -0.5], [x1, 4.4, -0.25], '#9a4e3a');
   [x0, x1] = xr(X, 6.5, 9);
-  box('ziegel', [x0, 3.2, 7.75], [x1, 6.1, 8], '#9a4e3a');
+  box('ziegel', [x0, 3.2, 7.77], [x1, 6.1, 7.97], '#9a4e3a');
 
   // Gerüst an der Außenseite: Bohlen in 3,2 und 6,4 m, Treppe von außen in einem Zug bis oben
   [x0, x1] = xr(X, 11, 12.6);

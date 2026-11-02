@@ -45,7 +45,10 @@ function play(options) {
   };
 }
 
-const fmt = s => `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(2, '0')}`;
+const fmt = s => {
+  const t = Math.round(s);
+  return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')}`;
+};
 
 console.log(`Gleich starke Teams, Ziel 50 Abschüsse oder 10 Minuten, ${seeds} Seeds je Stufe:`);
 for (const difficulty of ['leicht', 'mittel', 'schwer']) {
