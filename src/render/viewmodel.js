@@ -1,7 +1,18 @@
 // Waffe unten rechts im Bild, aus Blöcken. Eigene Szene, damit sie nie in Wände ragt.
 
 import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { WEAPONS } from '../config.js';
+
+let loaded = null;
+
+// Waffen aus Blender (public/models/custom/waffen.glb, nach entwuerfe/Waffen.webp); fehlt die Datei, bleiben die Blöcke
+export function loadWeapons() {
+  return new GLTFLoader()
+    .loadAsync(`${import.meta.env.BASE_URL}models/custom/waffen.glb`)
+    .then(gltf => { loaded = gltf.scene; return true; })
+    .catch(() => false);
+}
 
 const METAL = 0x2f3236;
 const DARK = 0x1f2124;
@@ -50,10 +61,18 @@ const BUILD = {
   },
 };
 
-// Waffe als Blockmodell, Vorderseite −Z — auch für die Figuren der anderen Spieler
+// Waffe, Vorderseite −Z — auch für die Figuren der anderen Spieler. Jede bekommt eigene Materialien.
 export function buildWeapon(id) {
-  const g = new THREE.Group();
-  g.userData.muzzleZ = BUILD[id](g);
+  const model = loaded?.getObjectByName(`waffe_${id}`);
+  if (!model) {
+    const g = new THREE.Group();
+    g.userData.muzzleZ = BUILD[id](g);
+    return g;
+  }
+  const g = model.clone(true);
+  g.position.set(0, 0, 0);
+  g.traverse(o => { if (o.isMesh) o.material = o.material.clone(); });
+  g.userData.muzzleZ = new THREE.Box3().setFromObject(g).min.z;
   return g;
 }
 
@@ -69,23 +88,27 @@ export function createViewmodel() {
   holder.scale.setScalar(0.8);
   scene.add(holder);
   const models = {};
-  for (const id of Object.keys(WEAPONS)) {
-    const g = new THREE.Group();
-    const muzzleZ = BUILD[id](g);
-    if (!WEAPONS[id].melee) {
-      const flash = new THREE.Mesh(
-        new THREE.BoxGeometry(0.07, 0.07, 0.1),
-        new THREE.MeshBasicMaterial({ color: 0xffd36b }),
-      );
-      flash.position.set(0, 0.015, muzzleZ - 0.05);
-      flash.visible = false;
-      g.add(flash);
-      g.userData.flash = flash;
+  function fill() {
+    for (const g of Object.values(models)) holder.remove(g);
+    for (const id of Object.keys(WEAPONS)) {
+      const g = buildWeapon(id);
+      const muzzleZ = g.userData.muzzleZ;
+      if (!WEAPONS[id].melee) {
+        const flash = new THREE.Mesh(
+          new THREE.BoxGeometry(0.07, 0.07, 0.1),
+          new THREE.MeshBasicMaterial({ color: 0xffd36b }),
+        );
+        flash.position.set(0, 0.015, muzzleZ - 0.05);
+        flash.visible = false;
+        g.add(flash);
+        g.userData.flash = flash;
+      }
+      g.visible = false;
+      holder.add(g);
+      models[id] = g;
     }
-    g.visible = false;
-    holder.add(g);
-    models[id] = g;
   }
+  fill();
 
   let swingTime = 99;
   let time = 0;
@@ -93,6 +116,7 @@ export function createViewmodel() {
   return {
     scene,
     camera,
+    rebuild: fill,
     swing() { swingTime = 0; },
     update(arms, info, dt, alive = true) {
       time += dt;

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { VIEW } from '../config.js';
-import { createViewmodel } from './viewmodel.js';
+import { createViewmodel, loadWeapons } from './viewmodel.js';
 import { createEffects } from './effects.js';
 import { TEAM_COLORS, createFigure, updateFigure, createTargetFigure, removeFigure, loadSoldier } from './figures.js';
 
@@ -82,8 +82,11 @@ export function createRenderer(canvas, world) {
     targets = game.targets.map(() => createTargetFigure(scene));
   }
 
-  // Soldatenmodell kommt nach; bis dahin (oder wenn es fehlt) Blockfiguren
-  loadSoldier().then(ok => { if (ok && game) buildFigures(); });
+  // Modelle kommen nach; bis dahin (oder wenn sie fehlen) Blockfiguren und Blockwaffen
+  Promise.all([loadSoldier(), loadWeapons()]).then(() => {
+    viewmodel.rebuild();
+    if (game) buildFigures();
+  });
 
   return {
     camera,
