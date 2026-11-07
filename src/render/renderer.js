@@ -4,6 +4,12 @@ import { createViewmodel, loadWeapons, loadHands } from './viewmodel.js';
 import { createEffects } from './effects.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
+import { SMAAPass } from 'three/addons/postprocessing/SMAAPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { TEAM_COLORS, createFigure, updateFigure, updateBar, createTargetFigure, removeFigure, loadSoldier, updateCorpses, clearCorpses } from './figures.js';
 import { textureFor, lookFor } from './textures.js';
 import { createSky, DAYTIMES } from './sky.js';
@@ -158,6 +164,30 @@ export function createRenderer(canvas, world) {
   let figures = [];
   let targets = [];
 
+  // Nachbearbeitung mit Schalter: aus (direkt), leicht (Glühen und Kantenglättung), voll (dazu Umgebungsverdeckung)
+  let composer = null;
+  let effectLevel = 'aus';
+  function setEffects(level) {
+    effectLevel = level;
+    composer?.dispose();
+    composer = null;
+    if (level === 'aus') return;
+    const w = canvas.clientWidth;
+    const h = canvas.clientHeight;
+    composer = new EffectComposer(renderer);
+    composer.addPass(new RenderPass(scene, camera));
+    if (level === 'voll') {
+      const gtao = new GTAOPass(scene, camera, w, h);
+      gtao.updateGtaoMaterial({ radius: 0.6, distanceExponent: 1, thickness: 1, scale: 1, samples: 12, distanceFallOff: 1, screenSpaceRadius: false });
+      gtao.blendIntensity = 0.8;
+      composer.addPass(gtao);
+    }
+    composer.addPass(new UnrealBloomPass(new THREE.Vector2(w, h), 0.25, 0.5, 0.92));
+    composer.addPass(new OutputPass());
+    composer.addPass(new SMAAPass(w, h));
+    composer.setSize(w, h);
+  }
+
   function resize() {
     const w = canvas.clientWidth;
     const h = canvas.clientHeight;
@@ -165,6 +195,7 @@ export function createRenderer(canvas, world) {
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
     viewmodel.resize(w / h);
+    if (composer) setEffects(effectLevel);
   }
   window.addEventListener('resize', resize);
   resize();
@@ -184,6 +215,7 @@ export function createRenderer(canvas, world) {
   return {
     camera,
     setWorld,
+    setEffects,
     setGame(g) {
       game = g;
       buildFigures();
@@ -242,7 +274,8 @@ export function createRenderer(canvas, world) {
       viewmodel.update(me.arms, view, dt, me.alive);
 
       renderer.clear();
-      renderer.render(scene, camera);
+      if (composer) composer.render();
+      else renderer.render(scene, camera);
       if (me.alive && !view.overview) {
         renderer.clearDepth();
         renderer.render(viewmodel.scene, viewmodel.camera);

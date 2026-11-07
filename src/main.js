@@ -50,6 +50,7 @@ function loadSettings() {
   if (MATCH.timeLimits.includes(stored.timeLimit)) s.timeLimit = stored.timeLimit;
   if (stored.sensitivity >= 0.3 && stored.sensitivity <= 3) s.sensitivity = stored.sensitivity;
   if (stored.volume >= 0 && stored.volume <= 100) s.volume = stored.volume;
+  if (['aus', 'leicht', 'voll'].includes(stored.effekte)) s.effekte = stored.effekte;
   return s;
 }
 
@@ -76,6 +77,7 @@ for (const group of document.querySelectorAll('.opt')) {
     mark();
     // Im Menü zeigt der Hintergrund gleich die gewählte Karte
     if ((key === 'map' || key === 'mode') && screen === 'menu') newGame();
+    if (key === 'effekte') view.setEffects(settings.effekte);
   });
   mark();
 }
@@ -184,10 +186,15 @@ function endMatch(winner) {
 }
 
 newGame();
+view.setEffects(settings.effekte);
 showScreen('menu');
 
 let acc = 0;
 let last = performance.now();
+// Bildrate für die Anzeige (F3), alle halbe Sekunde neu
+let fps = 0;
+let fpsCount = 0;
+let fpsSince = last;
 
 function frame(now) {
   const frameDt = Math.min((now - last) / 1000, 0.25);
@@ -255,11 +262,17 @@ function frame(now) {
   if (screen !== 'menu') minimap.update(frameDt, camera.yaw);
   sound.setListener(camera, camera.yaw, camera.pitch);
 
+  fpsCount++;
+  if (now - fpsSince >= 500) {
+    fps = Math.round((fpsCount * 1000) / (now - fpsSince));
+    fpsCount = 0;
+    fpsSince = now;
+  }
   info.classList.toggle('hidden', !showInfo || screen !== null);
   if (showInfo) {
     const walking = input.isDown('ShiftLeft') || input.isDown('ShiftRight');
     const state = !me.onGround ? 'in der Luft' : me.crouched ? 'geduckt' : walking ? 'schleichen' : 'laufen';
-    info.textContent = `${horizontalSpeed(me).toFixed(1)} m/s · ${state} · Höhe ${me.pos.y.toFixed(2)} m`;
+    info.textContent = `${fps} fps · ${horizontalSpeed(me).toFixed(1)} m/s · ${state} · Höhe ${me.pos.y.toFixed(2)} m`;
   }
   requestAnimationFrame(frame);
 }
