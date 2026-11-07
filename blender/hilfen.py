@@ -61,6 +61,42 @@ def ring_a(cx, cy, a, z, n=8):
     return ring(cx, cy, a / math.cos(math.pi / n), z, n, math.pi / n)
 
 
+# Glied: achteckige Röhre von (x, y, z0) bis (x, y, z1), unten Radius r0, oben r1 (rx/ry getrennt möglich)
+def limb(bm, cx, cy, z0, z1, r0, r1=None, ry0=None, ry1=None):
+    r1 = r0 if r1 is None else r1
+    ry0 = r0 if ry0 is None else ry0
+    ry1 = r1 if ry1 is None else ry1
+    pts = []
+    for z, rx, ry in ((z0, r0, ry0), (z1, r1, ry1)):
+        pts += [(cx + rx * math.cos(math.pi / 8 + i * math.pi / 4), cy + ry * math.sin(math.pi / 8 + i * math.pi / 4), z) for i in range(8)]
+    hull(bm, pts)
+
+
+# Gelenkkugel (Ikosaeder, einmal unterteilt)
+def joint(bm, cx, cy, cz, r):
+    res = bmesh.ops.create_icosphere(bm, subdivisions=1, radius=r)
+    bmesh.ops.translate(bm, vec=(cx, cy, cz), verts=res['verts'])
+
+
+# Hand, locker greifend, in Ruhelage hängend: Handgelenk im Ursprung, Finger zeigen nach −Z (unten) und krümmen
+# sich nach −Y (vorn), Handrücken zeigt nach +Y. sx = −1 rechte Hand (Daumen innen bei +X), +1 linke Hand.
+# place(p) setzt jeden Punkt an seinen Platz (verschieben, drehen).
+def hand(bm, sx, scale, place):
+    s = scale
+    P = lambda x, y, z: place((x * s, y * s, z * s))
+    # Handfläche: 8 cm breit, 3 cm dick, 9 cm lang, unten etwas dünner
+    hull(bm, [P(a * 0.04, b, c) for a in (-1, 1) for b, c in ((0.015, 0), (-0.015, 0), (0.012, -0.09), (-0.015, -0.09))])
+    for i in range(4):
+        fx = -0.03 + i * 0.02
+        w = 0.008
+        # Grundglied nach unten, leicht nach vorn; Endglied nach vorn gekrümmt
+        hull(bm, [P(fx + a * w, b, c) for a in (-1, 1) for b, c in ((0.012, -0.085), (-0.012, -0.085), (0.0, -0.125), (-0.024, -0.12))])
+        hull(bm, [P(fx + a * w, b, c) for a in (-1, 1) for b, c in ((0.0, -0.125), (-0.024, -0.12), (-0.03, -0.15), (-0.05, -0.14))])
+    # Daumen innen: Basis am Handrand, Spitze nach vorn
+    tx = -sx * 0.045
+    hull(bm, [P(tx + a * 0.01, b, c) for a in (-1, 1) for b, c in ((0.01, -0.02), (-0.01, -0.02), (-0.03, -0.06), (-0.05, -0.05))])
+
+
 # Legt je Material ein Mesh unter dem Wurzelknoten ab. build(get) baut mit get(material) -> bmesh.
 def modell(sc, name, build):
     root = bpy.data.objects.new(name, None)

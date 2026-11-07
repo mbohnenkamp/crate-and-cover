@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { VIEW, MATCH } from '../config.js';
-import { createViewmodel, loadWeapons } from './viewmodel.js';
+import { createViewmodel, loadWeapons, loadHands } from './viewmodel.js';
 import { createEffects } from './effects.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -160,7 +160,7 @@ export function createRenderer(canvas, world) {
   }
 
   // Modelle kommen nach; bis dahin (oder wenn sie fehlen) Blockfiguren und Blockwaffen
-  Promise.all([loadSoldier(), loadWeapons()]).then(() => {
+  Promise.all([loadSoldier(), loadWeapons(), loadHands()]).then(() => {
     viewmodel.rebuild();
     if (game) buildFigures();
   });

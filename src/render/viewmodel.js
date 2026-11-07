@@ -5,12 +5,21 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { WEAPONS } from '../config.js';
 
 let loaded = null;
+let hands = null;
 
 // Waffen aus Blender (public/models/custom/waffen.glb, nach entwuerfe/Waffen.webp); fehlt die Datei, bleiben die Blöcke
 export function loadWeapons() {
   return new GLTFLoader()
     .loadAsync(`${import.meta.env.BASE_URL}models/custom/waffen.glb`)
     .then(gltf => { loaded = gltf.scene; return true; })
+    .catch(() => false);
+}
+
+// Hände und Arme für die Ego-Ansicht aus Blender (haende.glb, dieselbe Hand wie am Soldaten); sonst Blöcke
+export function loadHands() {
+  return new GLTFLoader()
+    .loadAsync(`${import.meta.env.BASE_URL}models/custom/haende.glb`)
+    .then(gltf => { hands = gltf.scene; return true; })
     .catch(() => false);
 }
 
@@ -75,9 +84,16 @@ const SKIN = 0xd9c2a5;
 const SLEEVE = 0x2c2e33;
 const CLOTH = 0x4a4d53;
 
-// Arm für die Ego-Ansicht: Ursprung in der Handmitte, +Z zeigt zum Ellbogen. Handschuh mit Fingern und Daumen,
-// Unterarm bis zum Ellbogen, hochgekrempelter Ärmel, Oberarm läuft aus dem Bild.
+// Arm für die Ego-Ansicht: Ursprung im Handgelenk, +Z zeigt zum Ellbogen. Aus Blender (Hand mit Fingern,
+// Unterarm, Ärmel, Oberarm) oder aus Blöcken, wenn das Modell fehlt.
 function buildArm(side) {
+  const model = hands?.getObjectByName(`hand_${side}`);
+  if (model) {
+    const g = model.clone(true);
+    g.position.set(0, 0, 0);
+    g.traverse(o => { if (o.isMesh) o.material = o.material.clone(); });
+    return g;
+  }
   const g = new THREE.Group();
   const sx = side === 'r' ? 1 : -1;
   part(g, GLOVE, [0.09, 0.08, 0.1], [0, 0, 0]);
@@ -98,7 +114,8 @@ function placeArm(arm, hand, elbow) {
 const lerp3 = (a, b, k) => [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k];
 
 // Ellbogen im Waffenraum: rechts unten hinten, links unten außen — die Arme laufen unten aus dem Bild
-const ELBOW = { r: [0.26, -0.6, 0.45], l: [-0.3, -0.65, 0.1] };
+// Weit seitlich und tief, damit man die Unterarme von der Seite sieht und nicht als dicken Querschnitt von vorn
+const ELBOW = { r: [0.5, -0.5, 0.25], l: [-0.55, -0.55, 0.0] };
 
 let flashMap = null;
 
@@ -172,9 +189,15 @@ export function createViewmodel() {
     }
   }
   fill();
-  const armR = buildArm('r');
-  const armL = buildArm('l');
-  holder.add(armR, armL);
+  let armR = null;
+  let armL = null;
+  function fillArms() {
+    if (armR) holder.remove(armR, armL);
+    armR = buildArm('r');
+    armL = buildArm('l');
+    holder.add(armR, armL);
+  }
+  fillArms();
 
   let swingTime = 99;
   let time = 0;
@@ -182,7 +205,7 @@ export function createViewmodel() {
   return {
     scene,
     camera,
-    rebuild: fill,
+    rebuild() { fill(); fillArms(); },
     swing() { swingTime = 0; },
     update(arms, info, dt, alive = true) {
       time += dt;

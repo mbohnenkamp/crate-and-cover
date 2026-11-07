@@ -112,7 +112,7 @@ function soldierFigure(scene, team) {
 
 // Arm mit zwei Knochen (Oberarm, Unterarm) so stellen, dass die Hand den Zielpunkt erreicht (Oberkörper-Raum).
 // Ruhelage beider Knochen zeigt nach −Y (Arm hängt herab). Der Ellbogen weicht in Richtung hint aus.
-const ARM = { upper: 0.3, lower: 0.285 };
+const ARM = { upper: 0.3, lower: 0.31 }; // Schulter bis Ellbogen, Ellbogen bis Griffmitte in der Hand
 const SHOULDER = { r: new THREE.Vector3(-0.25, 0.45, 0), l: new THREE.Vector3(0.25, 0.45, 0) };
 const ELBOW_HINT = { r: new THREE.Vector3(-0.7, -0.5, -0.25), l: new THREE.Vector3(0.7, -0.5, -0.25) };
 const DOWN = new THREE.Vector3(0, -1, 0);

@@ -3,8 +3,10 @@
 # Knien und Zielen zeigen kann: soldat_rumpf (trägt soldat_kopf, soldat_arm_l/r), soldat_bein_l/r (Oberschenkel)
 # mit soldat_unterbein_l/r.
 # Das Material soldat_team färbt das Spiel je Team um.
-import bpy, bmesh, math
+import bpy, bmesh, math, sys, os
 from mathutils import Vector
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from hilfen import limb, joint, hand
 
 sc = bpy.data.scenes.get('Soldat') or bpy.data.scenes.new('Soldat')
 if bpy.context.window:
@@ -135,44 +137,48 @@ def kopf(get):
 def arm(sx):
     def build(get):
         x = sx * 0.25
-        # Oberarm mit Schulter, bis zum Ellbogen in 1,10 m
-        block(get(STOFF), x, 0, 1.10, 1.43, 0.12, 0.13, 0.14, 0.15)
-        block(get(STOFF), x + sx * 0.005, -0.005, 1.25, 1.34, 0.145, 0.155)  # Tasche am Ärmel
-        block(get(DUNKEL), x, 0, 1.10, 1.14, 0.125, 0.135)  # hochgekrempelter Ärmel, obere Hälfte
+        # Schulterkugel, Oberarm achteckig und nach unten schlanker, bis zum Ellbogen in 1,10 m
+        joint(get(STOFF), x, 0, 1.40, 0.078)
+        limb(get(STOFF), x, 0, 1.10, 1.40, 0.058, 0.072)
+        block(get(STOFF), x + sx * 0.03, -0.005, 1.25, 1.33, 0.09, 0.14)  # Tasche am Ärmel
+        joint(get(DUNKEL), x, 0, 1.10, 0.055)  # Ellbogen
     return build
 
 
-# Unterarm ab dem Ellbogen (Drehpunkt 1,10 m): Ärmelrest, Haut, Handschuh, Daumen. Handmitte bei 0,815 m.
+# Unterarm ab dem Ellbogen (Drehpunkt 1,10 m): gekrempelter Ärmel, Haut, Handschuhstulpe, Hand mit Fingern.
+# Handgelenk in 0,84 m, Griffmitte etwa 0,79 m.
 def unterarm(sx):
     def build(get):
         x = sx * 0.25
-        block(get(DUNKEL), x, 0, 1.06, 1.10, 0.125, 0.135)
-        block(get(HAUT), x, 0, 0.88, 1.07, 0.095, 0.1, 0.105, 0.11)
-        block(get(SCHWARZ), x, 0, 0.74, 0.89, 0.1, 0.11, 0.11, 0.115)
-        block(get(SCHWARZ), x - sx * 0.045, -0.04, 0.79, 0.86, 0.035, 0.04)
+        limb(get(DUNKEL), x, 0, 1.03, 1.10, 0.062, 0.062)
+        limb(get(HAUT), x, 0, 0.86, 1.04, 0.04, 0.055)
+        limb(get(SCHWARZ), x, 0, 0.83, 0.88, 0.045, 0.045)
+        hand(get(SCHWARZ), sx, 0.85, lambda p: (x + p[0], p[1], 0.84 + p[2]))
     return build
 
 
 def bein(sx):
     def build(get):
         x = sx * 0.105
-        # Oberschenkel, Beintasche außen
-        block(get(STOFF), x, 0, 0.50, 0.93, 0.15, 0.17, 0.17, 0.2)
-        block(get(DUNKEL), x + sx * 0.1, 0, 0.62, 0.80, 0.05, 0.14)
+        # Hüftkugel, Oberschenkel achteckig und zum Knie schlanker, Beintasche außen
+        joint(get(STOFF), x, 0, 0.93, 0.09)
+        limb(get(STOFF), x, 0, 0.50, 0.93, 0.07, 0.088, 0.078, 0.098)
+        block(get(DUNKEL), x + sx * 0.09, 0, 0.62, 0.80, 0.05, 0.13)
     return build
 
 
 def unterbein(sx):
     def build(get):
         x = sx * 0.105
-        # Knieschoner
-        block(get(DUNKEL), x, -0.085, 0.43, 0.58, 0.13, 0.05, 0.14, 0.05)
-        # Unterschenkel
-        block(get(STOFF), x, 0, 0.17, 0.52, 0.13, 0.15, 0.15, 0.17)
+        # Knie und Knieschoner
+        joint(get(STOFF), x, 0, 0.50, 0.062)
+        block(get(DUNKEL), x, -0.075, 0.43, 0.58, 0.12, 0.05, 0.13, 0.05)
+        # Unterschenkel, zur Wade etwas dicker
+        limb(get(STOFF), x, 0, 0.2, 0.52, 0.058, 0.064, 0.064, 0.072)
         # Stiefel: Schaft, Vorderfuß mit schräger Kappe, Sohle
-        block(get(SCHWARZ), x, 0.005, 0.03, 0.21, 0.14, 0.17, 0.145, 0.165)
-        block(get(SCHWARZ), x, -0.09, 0.03, 0.1, 0.135, 0.1, 0.13, 0.06, off1=(0, 0.02))
-        block(get(DUNKEL), x, -0.035, 0.0, 0.035, 0.15, 0.29)
+        block(get(SCHWARZ), x, 0.005, 0.03, 0.22, 0.13, 0.15, 0.135, 0.16)
+        block(get(SCHWARZ), x, -0.09, 0.03, 0.1, 0.125, 0.1, 0.12, 0.06, off1=(0, 0.02))
+        block(get(DUNKEL), x, -0.035, 0.0, 0.035, 0.14, 0.29)
     return build
 
 
