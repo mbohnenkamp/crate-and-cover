@@ -3,7 +3,7 @@
 export function createWorld(map) {
   const boxes = [];
   for (const b of map.boxes) {
-    boxes.push({ min: b.min, max: b.max, type: b.type, color: b.color });
+    boxes.push({ min: b.min, max: b.max, type: b.type, color: b.color, look: b.look });
   }
   for (const t of map.stairs ?? []) boxes.push(...expandStairs(t));
   return {
@@ -13,6 +13,9 @@ export function createWorld(map) {
     killY: map.killY ?? -20,
     water: map.water ?? null,
     fallText: map.fallText ?? 'abgestürzt',
+    // Nur fürs Aussehen: Oberfläche je Blockart und Schmuckblöcke ohne Kollision (Rahmen, Gesimse, Zinnen)
+    looks: map.looks ?? null,
+    deko: map.deko ?? [],
   };
 }
 

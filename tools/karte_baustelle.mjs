@@ -5,15 +5,20 @@
 // Baugrube im Süden mit Treppen und Bagger, Baucontainer, Material, Bretterzaun rundum.
 
 import { writeFileSync } from 'node:fs';
+import { containerDeko, wheels, GLAS } from './schmuck.mjs';
 
 const boxes = [];
+const deko = []; // Schmuck ohne Kollision: Zaunpfosten, Räder, Scheiben, Container-Details, Kranbänder
 const stairs = [];
 
-function box(type, min, max, color) {
+function entry(type, min, max, color, look) {
   const b = { type, min: min.map((v, i) => +Math.min(v, max[i]).toFixed(3)), max: max.map((v, i) => +Math.max(v, min[i]).toFixed(3)) };
   if (color) b.color = color;
-  boxes.push(b);
+  if (look) b.look = look;
+  return b;
 }
+const box = (type, min, max, color, look) => boxes.push(entry(type, min, max, color, look));
+const trim = (type, min, max, color, look) => deko.push(entry(type, min, max, color, look));
 
 function both(build) {
   for (const s of [-1, 1]) build(a => s * a, s);
@@ -48,8 +53,11 @@ function slab(type, x0, x1, z0, z1, y0, y1, holes, color) {
 }
 
 const C = { len: 6, h: 2.6, w: 2.4 };
-function container(x, z, level, color) {
-  box('container', [x - C.len / 2, level * C.h, z - C.w / 2], [x + C.len / 2, (level + 1) * C.h, z + C.w / 2], color);
+function container(x, z, level, color, opts = {}) {
+  const min = [x - C.len / 2, level * C.h, z - C.w / 2];
+  const max = [x + C.len / 2, (level + 1) * C.h, z + C.w / 2];
+  box('container', min, max, color);
+  containerDeko(trim, min, max, color, opts);
 }
 
 const BETON = '#b8b4ad';
@@ -68,6 +76,22 @@ box('bretterwand', [-33, 0, -27], [-32, 3, 27], HOLZ);
 box('bretterwand', [32, 0, -27], [33, 3, 27], HOLZ);
 box('bretterwand', [-32, 0, -27], [32, 3, -26], HOLZ);
 box('bretterwand', [-32, 0, 26], [32, 3, 27], HOLZ);
+// Bretterzaun: Pfosten alle 2 m und zwei Querlatten, innen
+const ZAUN = '#6b4a2f';
+for (let a = -26; a <= 26; a += 2) {
+  trim('deko', [-32, 0, a - 0.06], [-31.88, 3.2, a + 0.06], ZAUN, 'bretter');
+  trim('deko', [31.88, 0, a - 0.06], [32, 3.2, a + 0.06], ZAUN, 'bretter');
+}
+for (let a = -32; a <= 32; a += 2) {
+  trim('deko', [a - 0.06, 0, -26], [a + 0.06, 3.2, -25.88], ZAUN, 'bretter');
+  trim('deko', [a - 0.06, 0, 25.88], [a + 0.06, 3.2, 26], ZAUN, 'bretter');
+}
+for (const [y0, y1] of [[0.7, 0.85], [2.2, 2.35]]) {
+  trim('deko', [-32, y0, -27], [-31.95, y1, 27], ZAUN, 'bretter');
+  trim('deko', [31.95, y0, -27], [32, y1, 27], ZAUN, 'bretter');
+  trim('deko', [-32, y0, -26], [32, y1, -25.95], ZAUN, 'bretter');
+  trim('deko', [-32, y0, 25.95], [32, y1, 26], ZAUN, 'bretter');
+}
 
 // Rohbau: Decken mit Treppenlöchern, Stützen, halbes Dach im Norden
 const L = [0, 3.2, 6.4, 9.6];
@@ -117,19 +141,29 @@ both((X, s) => {
 
   // Baucontainer: zwei übereinander, davor einer, Treppen bis aufs obere Dach
   container(X(27), -19.2, 0, '#c9b23a');
-  container(X(27), -19.2, 1, '#d8d4c8');
-  container(X(27), -16.8, 0, '#d8d4c8');
+  container(X(27), -19.2, 1, '#d8d4c8', { windows: true });
+  container(X(27), -16.8, 0, '#d8d4c8', { windows: true });
   stair([X(25), 0, -11.1], '-z', C.h, 1.4);
   stair([X(25), C.h, -17.2], flip('+x', s), C.h, 1.6);
-  for (const z of [-14, -12.6]) box('klo', [X(22.2) - 0.6, 0, z - 0.6], [X(22.2) + 0.6, 2.3, z + 0.6], '#3f7a4a');
+  for (const z of [-14, -12.6]) {
+    box('klo', [X(22.2) - 0.6, 0, z - 0.6], [X(22.2) + 0.6, 2.3, z + 0.6], '#3f7a4a');
+    // Tür und Lüftungsschlitz zur Mitte hin
+    const [d0, d1] = s < 0 ? [X(22.2) + 0.6, X(22.2) + 0.63] : [X(22.2) - 0.63, X(22.2) - 0.6];
+    trim('deko', [d0, 0.1, z - 0.4], [d1, 2.0, z + 0.4], '#2f5a38', 'glatt');
+    trim('deko', [d0, 2.05, z - 0.3], [d1, 2.2, z + 0.3], '#1e1f21', 'glatt');
+  }
 
-  // Lkw im Norden
+  // Lkw im Norden: Fahrerhaus zur Mitte hin, Räder, Windschutzscheibe
   [x0, x1] = xr(X, 13, 15);
   box('lkw', [x0, 0, -21], [x1, 3, -18.6], '#c9c4b8');
+  wheels(trim, [X(14)], 0, -21, -18.6);
+  const [w0, w1] = s < 0 ? [X(13), X(13) + 0.03] : [X(13) - 0.03, X(13)];
+  trim('deko', [w0, 1.6, -20.7], [w1, 2.6, -18.9], GLAS, 'glatt');
   [x0, x1] = xr(X, 15, 20);
   box('lkw', [x0, 0, -21], [x1, 1.4, -18.6], '#5d6670');
   box('lkw', [x0, 1.4, -21], [x1, 2.2, -20.8], '#5d6670');
   box('lkw', [x0, 1.4, -18.8], [x1, 2.2, -18.6], '#5d6670');
+  wheels(trim, [X(16.2), X(17.3), X(19.2)], 0, -21, -18.6);
 
   // Material: Ziegelpaletten, Sandhaufen, Betonmischer, Rohrstapel
   for (const [a, z, h] of [[5.6, -13.4, 1], [6.9, -13.4, 1], [6.2, -13.4, 2]]) {
@@ -150,6 +184,10 @@ both((X, s) => {
   box('bagger', [x0, 0.7, 13], [x1, 2.3, 15.5], '#d9b02e');
   [x0, x1] = xr(X, 12.2, 13.6);
   box('bagger', [x0, 2.3, 13.2], [x1, 3.6, 14.6], '#d9b02e');
+  // Scheiben am Führerhaus: zum Arm hin und zur Seite
+  const [g0, g1] = s < 0 ? [X(12.2), X(12.2) + 0.03] : [X(12.2) - 0.03, X(12.2)];
+  trim('deko', [g0, 2.6, 13.4], [g1, 3.4, 14.4], GLAS, 'glatt');
+  trim('deko', [x0 + 0.2, 2.6, 14.6], [x1 - 0.2, 3.4, 14.63], GLAS, 'glatt');
   [x0, x1] = xr(X, 9.6, 12);
   box('bagger', [x0, 2.6, 14], [x1, 3.2, 14.6], '#d9b02e');
   [x0, x1] = xr(X, 9.1, 9.8);
@@ -167,6 +205,10 @@ slab('steg', -2, 2, -12, -8, 9.4, 9.6, [[-1, 1, -11, -9]], '#5d6670');
 box('kran', [-1, 0, -11], [1, 14, -9], '#d9a92e');
 box('kran', [1, 12, -11], [2.6, 13.5, -9], '#d9a92e');
 box('kran', [-22, 14, -10.5], [20, 14.8, -9.5], '#d9a92e');
+// Gitterbänder am Mast und am Ausleger, Scheibe am Führerhaus
+for (let y = 1.9; y < 11.5; y += 2) trim('deko', [-1.05, y, -11.05], [1.05, y + 0.2, -8.95], '#8a6a1a', 'stahl');
+for (let x = -21.5; x < 20; x += 3) trim('deko', [x, 13.95, -10.55], [x + 0.2, 14.85, -9.45], '#8a6a1a', 'stahl');
+trim('deko', [2.6, 12.3, -10.7], [2.63, 13.3, -9.3], GLAS, 'glatt');
 box('kran', [-0.4, 14.8, -10.4], [0.4, 17, -9.6], '#d9a92e');
 box('kran', [-21, 12.5, -10.8], [-17, 14, -9.2], '#5d6670');
 box('balken', [14.95, 9, -10.05], [15.05, 14, -9.95]);
@@ -177,6 +219,6 @@ for (const [team, s, yaw] of [['A', -1, -Math.PI / 2], ['B', 1, Math.PI / 2]]) {
   for (const z of [-3, 0, 3, 6]) spawns.push({ team, pos: [s * 28, 0, z], yaw: +yaw.toFixed(5) });
 }
 
-const map = { name: 'Baustelle', killY: -20, boxes, stairs, spawns };
+const map = { name: 'Baustelle', killY: -20, boxes, stairs, spawns, looks: { boden: 'erde' }, deko };
 writeFileSync(new URL('../src/maps/baustelle.json', import.meta.url), JSON.stringify(map, null, 1));
-console.log(`Baustelle: ${boxes.length} Blöcke, ${stairs.length} Treppen`);
+console.log(`Baustelle: ${boxes.length} Blöcke, ${deko.length} Schmuckblöcke, ${stairs.length} Treppen`);

@@ -4,17 +4,23 @@
 // Mittelgang mit Kran und Brücke in 5,2 m Höhe zwischen zwei Containertürmen, zweite Containerreihe, Lagerhalle.
 
 import { writeFileSync } from 'node:fs';
+import { containerDeko, GLAS } from './schmuck.mjs';
 
 const C = { len: 6, h: 2.6, w: 2.4 };
 const COLORS = ['#a83a2c', '#3f7a4a', '#2d6e73', '#8c8f93', '#7a3046', '#c9a43a', '#5a4f8a'];
+const HALLE = '#aab1b8';
 const boxes = [];
+const deko = []; // Schmuck ohne Kollision: Container-Details, Torrahmen, Fenster, Kaikante
 const stairs = [];
 
-function box(type, min, max, color) {
-  const b = { type, min: min.map((v, i) => Math.min(v, max[i])), max: max.map((v, i) => Math.max(v, min[i])) };
+function entry(type, min, max, color, look) {
+  const b = { type, min: min.map((v, i) => +Math.min(v, max[i]).toFixed(3)), max: max.map((v, i) => +Math.max(v, min[i]).toFixed(3)) };
   if (color) b.color = color;
-  boxes.push(b);
+  if (look) b.look = look;
+  return b;
 }
+const box = (type, min, max, color, look) => boxes.push(entry(type, min, max, color, look));
+const trim = (type, min, max, color, look) => deko.push(entry(type, min, max, color, look));
 
 // Spiegeln: a ist der Abstand zur Mitte, s = −1 (Westen) oder +1 (Osten)
 function both(build) {
@@ -22,9 +28,12 @@ function both(build) {
 }
 
 // Container mit der langen Seite entlang x (along 'x') oder z, Mitte (x, z), Ebene 0, 1, 2 …
-function container(x, z, level, color, along = 'x') {
+function container(x, z, level, color, along = 'x', opts = {}) {
   const [hx, hz] = along === 'x' ? [C.len / 2, C.w / 2] : [C.w / 2, C.len / 2];
-  box('container', [x - hx, level * C.h, z - hz], [x + hx, (level + 1) * C.h, z + hz], color);
+  const min = [x - hx, level * C.h, z - hz];
+  const max = [x + hx, (level + 1) * C.h, z + hz];
+  box('container', min, max, color);
+  containerDeko(trim, min, max, color, opts);
 }
 
 function stair(start, dir, height, width) {
@@ -39,6 +48,8 @@ box('boden', [-36, -3, -20], [36, 0, 26]);
 box('wand', [-37, 0, -20], [-36, 6, 27]);
 box('wand', [36, 0, -20], [37, 6, 27]);
 box('wand', [-36, 0, 26], [36, 6, 27]);
+// Kaikante: dunkler Betonrand zum Wasser
+trim('deko', [-36, -0.5, -20.12], [36, 0.06, -20], '#6a6f75', 'beton');
 
 both((X, s) => {
   // Kai: Poller an der Kante, ein Container und Kisten als Deckung, die lange Sichtlinie bleibt frei
@@ -74,6 +85,8 @@ both((X, s) => {
   // Kran: Beine, Querträger oben in 10 m
   for (const z of [-5.5, 5.5]) box('kran', [X(6.6), 0, z - 0.4], [X(7.4), 10, z + 0.4]);
   box('kran', [X(6.6), 10, -5.9], [X(7.4), 11, 5.9]);
+  // Querstreben zwischen den Kranbeinen, über Kopfhöhe
+  for (const y of [3.5, 7]) trim('deko', [X(6.7), y, -5.1], [X(7.3), y + 0.3, 5.1], '#b8891f', 'stahl');
 
   // Deckung im Mittelgang bei den Spawns
   box('kiste', [X(27), 0, 3], [X(28.5), 1.5, 4.5]);
@@ -88,25 +101,38 @@ both((X, s) => {
   container(X(25), 9, 0, COLORS[5], 'z');
 
   // Bürocontainer bei den Spawns, Treppe aufs Dach
-  container(X(29), 16.2, 0, COLORS[3]);
+  container(X(29), 16.2, 0, '#d8d4c8', 'x', { windows: true });
   stair([X(21.5), 0, 16.2], flip('+x', s), C.h, 1.6);
   box('kiste', [X(14), 0, 18.5], [X(15.5), 1.5, 20]);
 
   // Lagerhalle: Seitenwand mit Tor, Nordwand mit Tor, Regale innen
-  box('wand', [X(9.6), 0, 14], [X(10), 6, 18]);
-  box('wand', [X(9.6), 0, 21.5], [X(10), 6, 25.4]);
-  box('wand', [X(9.6), 3.4, 18], [X(10), 6, 21.5]);
-  box('wand', [X(7), 0, 14], [X(9.6), 6, 14.4]);
-  box('wand', [X(4), 3.4, 14], [X(7), 6, 14.4]);
+  box('wand', [X(9.6), 0, 14], [X(10), 6, 18], HALLE, 'wellblech');
+  box('wand', [X(9.6), 0, 21.5], [X(10), 6, 25.4], HALLE, 'wellblech');
+  box('wand', [X(9.6), 3.4, 18], [X(10), 6, 21.5], HALLE, 'wellblech');
+  box('wand', [X(7), 0, 14], [X(9.6), 6, 14.4], HALLE, 'wellblech');
+  box('wand', [X(4), 3.4, 14], [X(7), 6, 14.4], HALLE, 'wellblech');
+  // Torrahmen an beiden Toren (Seite und Nordwand), außen
+  const sideFace = s < 0 ? [X(10) - 0.08, X(10)] : [X(10), X(10) + 0.08];
+  trim('deko', [sideFace[0], 0, 17.85], [sideFace[1], 3.55, 18], '#3c4248', 'stahl');
+  trim('deko', [sideFace[0], 0, 21.5], [sideFace[1], 3.55, 21.65], '#3c4248', 'stahl');
+  trim('deko', [sideFace[0], 3.4, 17.85], [sideFace[1], 3.55, 21.65], '#3c4248', 'stahl');
+  const [nx0, nx1] = [Math.min(X(3.85), X(7.15)), Math.max(X(3.85), X(7.15))];
+  trim('deko', [nx0, 0, 13.92], [nx0 + 0.15, 3.55, 14], '#3c4248', 'stahl');
+  trim('deko', [nx1 - 0.15, 0, 13.92], [nx1, 3.55, 14], '#3c4248', 'stahl');
+  trim('deko', [nx0, 3.4, 13.92], [nx1, 3.55, 14], '#3c4248', 'stahl');
   box('regal', [X(2.5), 0, 17.5], [X(7.5), 2.8, 18.5]);
   box('regal', [X(2.5), 0, 21], [X(7.5), 2.8, 22]);
   box('kiste', [X(4), 0, 19.3], [X(5.2), 1.2, 20.3]);
 });
 
 // Mitte: Nordwand der Halle zwischen den Toren, Südwand, Dach, Paletten
-box('wand', [-4, 0, 14], [4, 6, 14.4]);
-box('wand', [-10, 0, 25], [10, 6, 25.4]);
+box('wand', [-4, 0, 14], [4, 6, 14.4], HALLE, 'wellblech');
+box('wand', [-10, 0, 25], [10, 6, 25.4], HALLE, 'wellblech');
 box('dach', [-10, 6, 14], [10, 6.3, 25.4]);
+// Fensterband oben an der Nordwand der Halle und Dachkante
+for (const x of [-3.2, -1.2, 0.8]) trim('deko', [x, 4.4, 13.97], [x + 1.6, 5.2, 14], GLAS, 'glatt');
+trim('deko', [-10.06, 5.9, 13.94], [10.06, 6.36, 14], '#5d6670', 'stahl');
+trim('deko', [-10.06, 5.9, 25.4], [10.06, 6.36, 25.46], '#5d6670', 'stahl');
 box('kiste', [-1, 0, 19], [1, 1.2, 20.5]);
 
 // Brücke zwischen den Kranturm-Spitzen, mit Geländer
@@ -121,6 +147,7 @@ box('kran', [-1.5, 9.5, 9], [1.5, 11.5, 13]);
 box('kran', [-0.6, 10, 5.9], [0.6, 11, 9]);
 box('balken', [-0.05, 5.2, -26.05], [0.05, 10, -25.95]);
 box('container', [-3, 2.6, -27.2], [3, 5.2, -24.8], COLORS[0]);
+containerDeko(trim, [-3, 2.6, -27.2], [3, 5.2, -24.8], COLORS[0]);
 
 // Mittelgang: Kisten unter der Brücke
 box('kiste', [-1, 0, -3.5], [0.5, 1.5, -2]);
@@ -141,6 +168,8 @@ const map = {
   spawns,
   // Wegpunkte vor und hinter den Toren der Lagerhalle, damit die Bots hinein- und hinausfinden
   navHints: [-1, 1].flatMap(s => [[s * 5.5, 0, 13], [s * 5.5, 0, 15.6], [s * 8.4, 0, 19.75], [s * 11.2, 0, 19.75]]),
+  looks: { boden: 'beton', wand: 'beton', dach: 'wellblech', treppe: 'stahl' },
+  deko,
 };
 writeFileSync(new URL('../src/maps/hafen.json', import.meta.url), JSON.stringify(map, null, 1));
-console.log(`Hafen: ${boxes.length} Blöcke, ${stairs.length} Treppen`);
+console.log(`Hafen: ${boxes.length} Blöcke, ${deko.length} Schmuckblöcke, ${stairs.length} Treppen`);

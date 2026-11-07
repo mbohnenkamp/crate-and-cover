@@ -28,7 +28,8 @@
     5,
     25
    ],
-   "color": "#a39c90"
+   "color": "#a39c90",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -42,7 +43,8 @@
     5,
     25
    ],
-   "color": "#a39c90"
+   "color": "#a39c90",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -56,7 +58,8 @@
     5,
     -24
    ],
-   "color": "#a39c90"
+   "color": "#a39c90",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -70,7 +73,8 @@
     5,
     25
    ],
-   "color": "#a39c90"
+   "color": "#a39c90",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -4064,7 +4068,8 @@
     8,
     -21.5
    ],
-   "color": "#b3aa9b"
+   "color": "#b3aa9b",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -4078,7 +4083,8 @@
     4,
     -21.5
    ],
-   "color": "#b3aa9b"
+   "color": "#b3aa9b",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -4092,7 +4098,8 @@
     8,
     -21.5
    ],
-   "color": "#b3aa9b"
+   "color": "#b3aa9b",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -4106,7 +4113,8 @@
     8,
     -21.5
    ],
-   "color": "#b3aa9b"
+   "color": "#b3aa9b",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -4120,7 +4128,8 @@
     4,
     -21.5
    ],
-   "color": "#b3aa9b"
+   "color": "#b3aa9b",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -4134,7 +4143,8 @@
     8,
     -21.5
    ],
-   "color": "#b3aa9b"
+   "color": "#b3aa9b",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -4148,7 +4158,8 @@
     8,
     -21.5
    ],
-   "color": "#b3aa9b"
+   "color": "#b3aa9b",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -4162,7 +4173,8 @@
     8,
     -11
    ],
-   "color": "#b3aa9b"
+   "color": "#b3aa9b",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -4176,7 +4188,8 @@
     8,
     -20.5
    ],
-   "color": "#b3aa9b"
+   "color": "#b3aa9b",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -4190,7 +4203,8 @@
     4,
     -19.5
    ],
-   "color": "#b3aa9b"
+   "color": "#b3aa9b",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -4204,7 +4218,8 @@
     8,
     -19.5
    ],
-   "color": "#b3aa9b"
+   "color": "#b3aa9b",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -4218,7 +4233,8 @@
     8,
     -18.2
    ],
-   "color": "#b3aa9b"
+   "color": "#b3aa9b",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -4232,7 +4248,8 @@
     8,
     -16.4
    ],
-   "color": "#b3aa9b"
+   "color": "#b3aa9b",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -4246,7 +4263,8 @@
     8,
     -14.5
    ],
-   "color": "#b3aa9b"
+   "color": "#b3aa9b",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -4260,7 +4278,8 @@
     4,
     -13.5
    ],
-   "color": "#b3aa9b"
+   "color": "#b3aa9b",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -4274,7 +4293,8 @@
     8,
     -13.5
    ],
-   "color": "#b3aa9b"
+   "color": "#b3aa9b",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -4288,7 +4308,8 @@
     8,
     -11.5
    ],
-   "color": "#b3aa9b"
+   "color": "#b3aa9b",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -4302,7 +4323,8 @@
     8,
     -20.5
    ],
-   "color": "#b3aa9b"
+   "color": "#b3aa9b",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -4316,7 +4338,8 @@
     4,
     -19.5
    ],
-   "color": "#b3aa9b"
+   "color": "#b3aa9b",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -4330,7 +4353,8 @@
     8,
     -19.5
    ],
-   "color": "#b3aa9b"
+   "color": "#b3aa9b",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -4344,7 +4368,8 @@
     8,
     -18.2
    ],
-   "color": "#b3aa9b"
+   "color": "#b3aa9b",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -4358,7 +4383,8 @@
     8,
     -16.4
    ],
-   "color": "#b3aa9b"
+   "color": "#b3aa9b",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -4372,7 +4398,8 @@
     8,
     -14.5
    ],
-   "color": "#b3aa9b"
+   "color": "#b3aa9b",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -4386,7 +4413,8 @@
     4,
     -13.5
    ],
-   "color": "#b3aa9b"
+   "color": "#b3aa9b",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -4400,7 +4428,8 @@
     8,
     -13.5
    ],
-   "color": "#b3aa9b"
+   "color": "#b3aa9b",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -4414,7 +4443,8 @@
     8,
     -11.5
    ],
-   "color": "#b3aa9b"
+   "color": "#b3aa9b",
+   "look": "stein"
   },
   {
    "type": "dach",
@@ -4596,7 +4626,8 @@
     9.8,
     -10.6
    ],
-   "color": "#b3aa9b"
+   "color": "#b3aa9b",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -4610,7 +4641,8 @@
     8.4,
     -10.6
    ],
-   "color": "#b3aa9b"
+   "color": "#b3aa9b",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -4624,7 +4656,8 @@
     9.8,
     -10.6
    ],
-   "color": "#b3aa9b"
+   "color": "#b3aa9b",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -4638,7 +4671,8 @@
     9.8,
     -3.3
    ],
-   "color": "#b3aa9b"
+   "color": "#b3aa9b",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -4652,7 +4686,8 @@
     8.4,
     -3.3
    ],
-   "color": "#b3aa9b"
+   "color": "#b3aa9b",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -4666,7 +4701,8 @@
     9.8,
     -3.3
    ],
-   "color": "#b3aa9b"
+   "color": "#b3aa9b",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -4680,7 +4716,8 @@
     8.4,
     -3.3
    ],
-   "color": "#b3aa9b"
+   "color": "#b3aa9b",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -4694,7 +4731,8 @@
     9.8,
     -3.3
    ],
-   "color": "#b3aa9b"
+   "color": "#b3aa9b",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -4708,7 +4746,8 @@
     9.8,
     -9.2
    ],
-   "color": "#b3aa9b"
+   "color": "#b3aa9b",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -4722,7 +4761,8 @@
     8.4,
     -5.1
    ],
-   "color": "#b3aa9b"
+   "color": "#b3aa9b",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -4736,7 +4776,8 @@
     9.8,
     -3.7
    ],
-   "color": "#b3aa9b"
+   "color": "#b3aa9b",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -4750,7 +4791,8 @@
     9.8,
     -9.2
    ],
-   "color": "#b3aa9b"
+   "color": "#b3aa9b",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -4764,7 +4806,8 @@
     8.4,
     -5.1
    ],
-   "color": "#b3aa9b"
+   "color": "#b3aa9b",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -4778,7 +4821,8 @@
     9.8,
     -3.7
    ],
-   "color": "#b3aa9b"
+   "color": "#b3aa9b",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -4792,7 +4836,8 @@
     2.6,
     -9.4
    ],
-   "color": "#b3aa9b"
+   "color": "#b3aa9b",
+   "look": "stein"
   },
   {
    "type": "wand",
@@ -4806,7 +4851,8 @@
     5.2,
     -3.7
    ],
-   "color": "#b3aa9b"
+   "color": "#b3aa9b",
+   "look": "stein"
   },
   {
    "type": "decke",
@@ -5778,6 +5824,10827 @@
    0,
    18.7
   ]
+ ],
+ "looks": {
+  "boden": "pflaster",
+  "treppe": "bretter"
+ },
+ "deko": [
+  {
+   "type": "deko",
+   "min": [
+    -31,
+    5,
+    -24.6
+   ],
+   "max": [
+    -30,
+    5.6,
+    -23.8
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    30,
+    5,
+    -24.6
+   ],
+   "max": [
+    31,
+    5.6,
+    -23.8
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -31,
+    5,
+    -23
+   ],
+   "max": [
+    -30,
+    5.6,
+    -22.2
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    30,
+    5,
+    -23
+   ],
+   "max": [
+    31,
+    5.6,
+    -22.2
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -31,
+    5,
+    -21.4
+   ],
+   "max": [
+    -30,
+    5.6,
+    -20.6
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    30,
+    5,
+    -21.4
+   ],
+   "max": [
+    31,
+    5.6,
+    -20.6
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -31,
+    5,
+    -19.8
+   ],
+   "max": [
+    -30,
+    5.6,
+    -19
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    30,
+    5,
+    -19.8
+   ],
+   "max": [
+    31,
+    5.6,
+    -19
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -31,
+    5,
+    -18.2
+   ],
+   "max": [
+    -30,
+    5.6,
+    -17.4
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    30,
+    5,
+    -18.2
+   ],
+   "max": [
+    31,
+    5.6,
+    -17.4
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -31,
+    5,
+    -16.6
+   ],
+   "max": [
+    -30,
+    5.6,
+    -15.8
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    30,
+    5,
+    -16.6
+   ],
+   "max": [
+    31,
+    5.6,
+    -15.8
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -31,
+    5,
+    -15
+   ],
+   "max": [
+    -30,
+    5.6,
+    -14.2
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    30,
+    5,
+    -15
+   ],
+   "max": [
+    31,
+    5.6,
+    -14.2
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -31,
+    5,
+    -13.4
+   ],
+   "max": [
+    -30,
+    5.6,
+    -12.6
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    30,
+    5,
+    -13.4
+   ],
+   "max": [
+    31,
+    5.6,
+    -12.6
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -31,
+    5,
+    -11.8
+   ],
+   "max": [
+    -30,
+    5.6,
+    -11
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    30,
+    5,
+    -11.8
+   ],
+   "max": [
+    31,
+    5.6,
+    -11
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -31,
+    5,
+    -10.2
+   ],
+   "max": [
+    -30,
+    5.6,
+    -9.4
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    30,
+    5,
+    -10.2
+   ],
+   "max": [
+    31,
+    5.6,
+    -9.4
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -31,
+    5,
+    -8.6
+   ],
+   "max": [
+    -30,
+    5.6,
+    -7.8
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    30,
+    5,
+    -8.6
+   ],
+   "max": [
+    31,
+    5.6,
+    -7.8
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -31,
+    5,
+    -7
+   ],
+   "max": [
+    -30,
+    5.6,
+    -6.2
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    30,
+    5,
+    -7
+   ],
+   "max": [
+    31,
+    5.6,
+    -6.2
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -31,
+    5,
+    -5.4
+   ],
+   "max": [
+    -30,
+    5.6,
+    -4.6
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    30,
+    5,
+    -5.4
+   ],
+   "max": [
+    31,
+    5.6,
+    -4.6
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -31,
+    5,
+    -3.8
+   ],
+   "max": [
+    -30,
+    5.6,
+    -3
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    30,
+    5,
+    -3.8
+   ],
+   "max": [
+    31,
+    5.6,
+    -3
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -31,
+    5,
+    -2.2
+   ],
+   "max": [
+    -30,
+    5.6,
+    -1.4
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    30,
+    5,
+    -2.2
+   ],
+   "max": [
+    31,
+    5.6,
+    -1.4
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -31,
+    5,
+    -0.6
+   ],
+   "max": [
+    -30,
+    5.6,
+    0.2
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    30,
+    5,
+    -0.6
+   ],
+   "max": [
+    31,
+    5.6,
+    0.2
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -31,
+    5,
+    1
+   ],
+   "max": [
+    -30,
+    5.6,
+    1.8
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    30,
+    5,
+    1
+   ],
+   "max": [
+    31,
+    5.6,
+    1.8
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -31,
+    5,
+    2.6
+   ],
+   "max": [
+    -30,
+    5.6,
+    3.4
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    30,
+    5,
+    2.6
+   ],
+   "max": [
+    31,
+    5.6,
+    3.4
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -31,
+    5,
+    4.2
+   ],
+   "max": [
+    -30,
+    5.6,
+    5
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    30,
+    5,
+    4.2
+   ],
+   "max": [
+    31,
+    5.6,
+    5
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -31,
+    5,
+    5.8
+   ],
+   "max": [
+    -30,
+    5.6,
+    6.6
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    30,
+    5,
+    5.8
+   ],
+   "max": [
+    31,
+    5.6,
+    6.6
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -31,
+    5,
+    7.4
+   ],
+   "max": [
+    -30,
+    5.6,
+    8.2
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    30,
+    5,
+    7.4
+   ],
+   "max": [
+    31,
+    5.6,
+    8.2
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -31,
+    5,
+    9
+   ],
+   "max": [
+    -30,
+    5.6,
+    9.8
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    30,
+    5,
+    9
+   ],
+   "max": [
+    31,
+    5.6,
+    9.8
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -31,
+    5,
+    10.6
+   ],
+   "max": [
+    -30,
+    5.6,
+    11.4
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    30,
+    5,
+    10.6
+   ],
+   "max": [
+    31,
+    5.6,
+    11.4
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -31,
+    5,
+    12.2
+   ],
+   "max": [
+    -30,
+    5.6,
+    13
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    30,
+    5,
+    12.2
+   ],
+   "max": [
+    31,
+    5.6,
+    13
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -31,
+    5,
+    13.8
+   ],
+   "max": [
+    -30,
+    5.6,
+    14.6
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    30,
+    5,
+    13.8
+   ],
+   "max": [
+    31,
+    5.6,
+    14.6
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -31,
+    5,
+    15.4
+   ],
+   "max": [
+    -30,
+    5.6,
+    16.2
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    30,
+    5,
+    15.4
+   ],
+   "max": [
+    31,
+    5.6,
+    16.2
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -31,
+    5,
+    17
+   ],
+   "max": [
+    -30,
+    5.6,
+    17.8
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    30,
+    5,
+    17
+   ],
+   "max": [
+    31,
+    5.6,
+    17.8
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -31,
+    5,
+    18.6
+   ],
+   "max": [
+    -30,
+    5.6,
+    19.4
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    30,
+    5,
+    18.6
+   ],
+   "max": [
+    31,
+    5.6,
+    19.4
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -31,
+    5,
+    20.2
+   ],
+   "max": [
+    -30,
+    5.6,
+    21
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    30,
+    5,
+    20.2
+   ],
+   "max": [
+    31,
+    5.6,
+    21
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -31,
+    5,
+    21.8
+   ],
+   "max": [
+    -30,
+    5.6,
+    22.6
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    30,
+    5,
+    21.8
+   ],
+   "max": [
+    31,
+    5.6,
+    22.6
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -31,
+    5,
+    23.4
+   ],
+   "max": [
+    -30,
+    5.6,
+    24.2
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    30,
+    5,
+    23.4
+   ],
+   "max": [
+    31,
+    5.6,
+    24.2
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -29.6,
+    5,
+    -25
+   ],
+   "max": [
+    -28.8,
+    5.6,
+    -24
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -29.6,
+    5,
+    24
+   ],
+   "max": [
+    -28.8,
+    5.6,
+    25
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -28,
+    5,
+    -25
+   ],
+   "max": [
+    -27.2,
+    5.6,
+    -24
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -28,
+    5,
+    24
+   ],
+   "max": [
+    -27.2,
+    5.6,
+    25
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -26.4,
+    5,
+    -25
+   ],
+   "max": [
+    -25.6,
+    5.6,
+    -24
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -26.4,
+    5,
+    24
+   ],
+   "max": [
+    -25.6,
+    5.6,
+    25
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -24.8,
+    5,
+    -25
+   ],
+   "max": [
+    -24,
+    5.6,
+    -24
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -24.8,
+    5,
+    24
+   ],
+   "max": [
+    -24,
+    5.6,
+    25
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.2,
+    5,
+    -25
+   ],
+   "max": [
+    -22.4,
+    5.6,
+    -24
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.2,
+    5,
+    24
+   ],
+   "max": [
+    -22.4,
+    5.6,
+    25
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -21.6,
+    5,
+    -25
+   ],
+   "max": [
+    -20.8,
+    5.6,
+    -24
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -21.6,
+    5,
+    24
+   ],
+   "max": [
+    -20.8,
+    5.6,
+    25
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -20,
+    5,
+    -25
+   ],
+   "max": [
+    -19.2,
+    5.6,
+    -24
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -20,
+    5,
+    24
+   ],
+   "max": [
+    -19.2,
+    5.6,
+    25
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -18.4,
+    5,
+    -25
+   ],
+   "max": [
+    -17.6,
+    5.6,
+    -24
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -18.4,
+    5,
+    24
+   ],
+   "max": [
+    -17.6,
+    5.6,
+    25
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -16.8,
+    5,
+    -25
+   ],
+   "max": [
+    -16,
+    5.6,
+    -24
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -16.8,
+    5,
+    24
+   ],
+   "max": [
+    -16,
+    5.6,
+    25
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15.2,
+    5,
+    -25
+   ],
+   "max": [
+    -14.4,
+    5.6,
+    -24
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15.2,
+    5,
+    24
+   ],
+   "max": [
+    -14.4,
+    5.6,
+    25
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -13.6,
+    5,
+    -25
+   ],
+   "max": [
+    -12.8,
+    5.6,
+    -24
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -13.6,
+    5,
+    24
+   ],
+   "max": [
+    -12.8,
+    5.6,
+    25
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -12,
+    5,
+    -25
+   ],
+   "max": [
+    -11.2,
+    5.6,
+    -24
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -12,
+    5,
+    24
+   ],
+   "max": [
+    -11.2,
+    5.6,
+    25
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -10.4,
+    5,
+    -25
+   ],
+   "max": [
+    -9.6,
+    5.6,
+    -24
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -10.4,
+    5,
+    24
+   ],
+   "max": [
+    -9.6,
+    5.6,
+    25
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -8.8,
+    5,
+    -25
+   ],
+   "max": [
+    -8,
+    5.6,
+    -24
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -8.8,
+    5,
+    24
+   ],
+   "max": [
+    -8,
+    5.6,
+    25
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -7.2,
+    5,
+    -25
+   ],
+   "max": [
+    -6.4,
+    5.6,
+    -24
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -7.2,
+    5,
+    24
+   ],
+   "max": [
+    -6.4,
+    5.6,
+    25
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -5.6,
+    5,
+    -25
+   ],
+   "max": [
+    -4.8,
+    5.6,
+    -24
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -5.6,
+    5,
+    24
+   ],
+   "max": [
+    -4.8,
+    5.6,
+    25
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -4,
+    5,
+    -25
+   ],
+   "max": [
+    -3.2,
+    5.6,
+    -24
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -4,
+    5,
+    24
+   ],
+   "max": [
+    -3.2,
+    5.6,
+    25
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -2.4,
+    5,
+    -25
+   ],
+   "max": [
+    -1.6,
+    5.6,
+    -24
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -2.4,
+    5,
+    24
+   ],
+   "max": [
+    -1.6,
+    5.6,
+    25
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -0.8,
+    5,
+    -25
+   ],
+   "max": [
+    0,
+    5.6,
+    -24
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -0.8,
+    5,
+    24
+   ],
+   "max": [
+    0,
+    5.6,
+    25
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    0.8,
+    5,
+    -25
+   ],
+   "max": [
+    1.6,
+    5.6,
+    -24
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    0.8,
+    5,
+    24
+   ],
+   "max": [
+    1.6,
+    5.6,
+    25
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    2.4,
+    5,
+    -25
+   ],
+   "max": [
+    3.2,
+    5.6,
+    -24
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    2.4,
+    5,
+    24
+   ],
+   "max": [
+    3.2,
+    5.6,
+    25
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    4,
+    5,
+    -25
+   ],
+   "max": [
+    4.8,
+    5.6,
+    -24
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    4,
+    5,
+    24
+   ],
+   "max": [
+    4.8,
+    5.6,
+    25
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    5.6,
+    5,
+    -25
+   ],
+   "max": [
+    6.4,
+    5.6,
+    -24
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    5.6,
+    5,
+    24
+   ],
+   "max": [
+    6.4,
+    5.6,
+    25
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    7.2,
+    5,
+    -25
+   ],
+   "max": [
+    8,
+    5.6,
+    -24
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    7.2,
+    5,
+    24
+   ],
+   "max": [
+    8,
+    5.6,
+    25
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    8.8,
+    5,
+    -25
+   ],
+   "max": [
+    9.6,
+    5.6,
+    -24
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    8.8,
+    5,
+    24
+   ],
+   "max": [
+    9.6,
+    5.6,
+    25
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    10.4,
+    5,
+    -25
+   ],
+   "max": [
+    11.2,
+    5.6,
+    -24
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    10.4,
+    5,
+    24
+   ],
+   "max": [
+    11.2,
+    5.6,
+    25
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    12,
+    5,
+    -25
+   ],
+   "max": [
+    12.8,
+    5.6,
+    -24
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    12,
+    5,
+    24
+   ],
+   "max": [
+    12.8,
+    5.6,
+    25
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    13.6,
+    5,
+    -25
+   ],
+   "max": [
+    14.4,
+    5.6,
+    -24
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    13.6,
+    5,
+    24
+   ],
+   "max": [
+    14.4,
+    5.6,
+    25
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    15.2,
+    5,
+    -25
+   ],
+   "max": [
+    16,
+    5.6,
+    -24
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    15.2,
+    5,
+    24
+   ],
+   "max": [
+    16,
+    5.6,
+    25
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    16.8,
+    5,
+    -25
+   ],
+   "max": [
+    17.6,
+    5.6,
+    -24
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    16.8,
+    5,
+    24
+   ],
+   "max": [
+    17.6,
+    5.6,
+    25
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    18.4,
+    5,
+    -25
+   ],
+   "max": [
+    19.2,
+    5.6,
+    -24
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    18.4,
+    5,
+    24
+   ],
+   "max": [
+    19.2,
+    5.6,
+    25
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    20,
+    5,
+    -25
+   ],
+   "max": [
+    20.8,
+    5.6,
+    -24
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    20,
+    5,
+    24
+   ],
+   "max": [
+    20.8,
+    5.6,
+    25
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    21.6,
+    5,
+    -25
+   ],
+   "max": [
+    22.4,
+    5.6,
+    -24
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    21.6,
+    5,
+    24
+   ],
+   "max": [
+    22.4,
+    5.6,
+    25
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23.2,
+    5,
+    -25
+   ],
+   "max": [
+    24,
+    5.6,
+    -24
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23.2,
+    5,
+    24
+   ],
+   "max": [
+    24,
+    5.6,
+    25
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    24.8,
+    5,
+    -25
+   ],
+   "max": [
+    25.6,
+    5.6,
+    -24
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    24.8,
+    5,
+    24
+   ],
+   "max": [
+    25.6,
+    5.6,
+    25
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    26.4,
+    5,
+    -25
+   ],
+   "max": [
+    27.2,
+    5.6,
+    -24
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    26.4,
+    5,
+    24
+   ],
+   "max": [
+    27.2,
+    5.6,
+    25
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    28,
+    5,
+    -25
+   ],
+   "max": [
+    28.8,
+    5.6,
+    -24
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    28,
+    5,
+    24
+   ],
+   "max": [
+    28.8,
+    5.6,
+    25
+   ],
+   "color": "#a39c90",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -19.7,
+    1,
+    -19.05
+   ],
+   "max": [
+    -19.6,
+    2.2,
+    -19
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -18.4,
+    1,
+    -19.05
+   ],
+   "max": [
+    -18.3,
+    2.2,
+    -19
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -19.7,
+    2.2,
+    -19.05
+   ],
+   "max": [
+    -18.3,
+    2.3,
+    -19
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -19.75,
+    0.92,
+    -19.14
+   ],
+   "max": [
+    -18.25,
+    1,
+    -19
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -21.033,
+    4,
+    -19.05
+   ],
+   "max": [
+    -20.933,
+    5.2,
+    -19
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -19.733,
+    4,
+    -19.05
+   ],
+   "max": [
+    -19.633,
+    5.2,
+    -19
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -21.033,
+    5.2,
+    -19.05
+   ],
+   "max": [
+    -19.633,
+    5.3,
+    -19
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -21.083,
+    3.92,
+    -19.14
+   ],
+   "max": [
+    -19.583,
+    4,
+    -19
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -18.367,
+    4,
+    -19.05
+   ],
+   "max": [
+    -18.267,
+    5.2,
+    -19
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -17.067,
+    4,
+    -19.05
+   ],
+   "max": [
+    -16.967,
+    5.2,
+    -19
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -18.367,
+    5.2,
+    -19.05
+   ],
+   "max": [
+    -16.967,
+    5.3,
+    -19
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -18.417,
+    3.92,
+    -19.14
+   ],
+   "max": [
+    -16.917,
+    4,
+    -19
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -20,
+    0,
+    -11
+   ],
+   "max": [
+    -19.9,
+    2.4,
+    -10.95
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -18.1,
+    0,
+    -11
+   ],
+   "max": [
+    -18,
+    2.4,
+    -10.95
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -20,
+    2.4,
+    -11
+   ],
+   "max": [
+    -18,
+    2.5,
+    -10.95
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -21.033,
+    4,
+    -11
+   ],
+   "max": [
+    -20.933,
+    5.2,
+    -10.95
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -19.733,
+    4,
+    -11
+   ],
+   "max": [
+    -19.633,
+    5.2,
+    -10.95
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -21.033,
+    5.2,
+    -11
+   ],
+   "max": [
+    -19.633,
+    5.3,
+    -10.95
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -21.083,
+    3.92,
+    -11
+   ],
+   "max": [
+    -19.583,
+    4,
+    -10.86
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -18.367,
+    4,
+    -11
+   ],
+   "max": [
+    -18.267,
+    5.2,
+    -10.95
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -17.067,
+    4,
+    -11
+   ],
+   "max": [
+    -16.967,
+    5.2,
+    -10.95
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -18.367,
+    5.2,
+    -11
+   ],
+   "max": [
+    -16.967,
+    5.3,
+    -10.95
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -18.417,
+    3.92,
+    -11
+   ],
+   "max": [
+    -16.917,
+    4,
+    -10.86
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.05,
+    4,
+    -17.033
+   ],
+   "max": [
+    -23,
+    5.2,
+    -16.933
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.05,
+    4,
+    -15.733
+   ],
+   "max": [
+    -23,
+    5.2,
+    -15.633
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.05,
+    5.2,
+    -17.033
+   ],
+   "max": [
+    -23,
+    5.3,
+    -15.633
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.14,
+    3.92,
+    -17.083
+   ],
+   "max": [
+    -23,
+    4,
+    -15.583
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.05,
+    4,
+    -14.367
+   ],
+   "max": [
+    -23,
+    5.2,
+    -14.267
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.05,
+    4,
+    -13.067
+   ],
+   "max": [
+    -23,
+    5.2,
+    -12.967
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.05,
+    5.2,
+    -14.367
+   ],
+   "max": [
+    -23,
+    5.3,
+    -12.967
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.14,
+    3.92,
+    -14.417
+   ],
+   "max": [
+    -23,
+    4,
+    -12.917
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    0,
+    -16
+   ],
+   "max": [
+    -14.95,
+    2.4,
+    -15.9
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    0,
+    -14.1
+   ],
+   "max": [
+    -14.95,
+    2.4,
+    -14
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    2.4,
+    -16
+   ],
+   "max": [
+    -14.95,
+    2.5,
+    -14
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    4,
+    -17.033
+   ],
+   "max": [
+    -14.95,
+    5.2,
+    -16.933
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    4,
+    -15.733
+   ],
+   "max": [
+    -14.95,
+    5.2,
+    -15.633
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    5.2,
+    -17.033
+   ],
+   "max": [
+    -14.95,
+    5.3,
+    -15.633
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    3.92,
+    -17.083
+   ],
+   "max": [
+    -14.86,
+    4,
+    -15.583
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    4,
+    -14.367
+   ],
+   "max": [
+    -14.95,
+    5.2,
+    -14.267
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    4,
+    -13.067
+   ],
+   "max": [
+    -14.95,
+    5.2,
+    -12.967
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    5.2,
+    -14.367
+   ],
+   "max": [
+    -14.95,
+    5.3,
+    -12.967
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    3.92,
+    -14.417
+   ],
+   "max": [
+    -14.86,
+    4,
+    -12.917
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.04,
+    0,
+    -19.04
+   ],
+   "max": [
+    -14.96,
+    0.5,
+    -19
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.1,
+    3.15,
+    -19.1
+   ],
+   "max": [
+    -14.9,
+    3.35,
+    -19
+   ],
+   "color": "#f1ebdf",
+   "look": "putz"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.06,
+    3.35,
+    -19.06
+   ],
+   "max": [
+    -14.94,
+    3.55,
+    -19
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.06,
+    5.75,
+    -19.06
+   ],
+   "max": [
+    -14.94,
+    5.95,
+    -19
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23,
+    3.55,
+    -19.06
+   ],
+   "max": [
+    -22.93,
+    5.75,
+    -19
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -21.737,
+    3.55,
+    -19.06
+   ],
+   "max": [
+    -21.597,
+    5.75,
+    -19
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -19.07,
+    3.55,
+    -19.06
+   ],
+   "max": [
+    -18.93,
+    5.75,
+    -19
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -16.403,
+    3.55,
+    -19.06
+   ],
+   "max": [
+    -16.263,
+    5.75,
+    -19
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15.07,
+    3.55,
+    -19.06
+   ],
+   "max": [
+    -15,
+    5.75,
+    -19
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.04,
+    0,
+    -11
+   ],
+   "max": [
+    -20,
+    0.5,
+    -10.96
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -18,
+    0,
+    -11
+   ],
+   "max": [
+    -14.96,
+    0.5,
+    -10.96
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.1,
+    3.15,
+    -11
+   ],
+   "max": [
+    -14.9,
+    3.35,
+    -10.9
+   ],
+   "color": "#f1ebdf",
+   "look": "putz"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.06,
+    3.35,
+    -11
+   ],
+   "max": [
+    -14.94,
+    3.55,
+    -10.94
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.06,
+    5.75,
+    -11
+   ],
+   "max": [
+    -14.94,
+    5.95,
+    -10.94
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23,
+    3.55,
+    -11
+   ],
+   "max": [
+    -22.93,
+    5.75,
+    -10.94
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -21.737,
+    3.55,
+    -11
+   ],
+   "max": [
+    -21.597,
+    5.75,
+    -10.94
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -19.07,
+    3.55,
+    -11
+   ],
+   "max": [
+    -18.93,
+    5.75,
+    -10.94
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -16.403,
+    3.55,
+    -11
+   ],
+   "max": [
+    -16.263,
+    5.75,
+    -10.94
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15.07,
+    3.55,
+    -11
+   ],
+   "max": [
+    -15,
+    5.75,
+    -10.94
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.04,
+    0,
+    -19
+   ],
+   "max": [
+    -23,
+    0.5,
+    -11
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.1,
+    3.15,
+    -19
+   ],
+   "max": [
+    -23,
+    3.35,
+    -11
+   ],
+   "color": "#f1ebdf",
+   "look": "putz"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.06,
+    3.35,
+    -19
+   ],
+   "max": [
+    -23,
+    3.55,
+    -11
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.06,
+    5.75,
+    -19
+   ],
+   "max": [
+    -23,
+    5.95,
+    -11
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.06,
+    3.55,
+    -19
+   ],
+   "max": [
+    -23,
+    5.75,
+    -18.93
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.06,
+    3.55,
+    -17.737
+   ],
+   "max": [
+    -23,
+    5.75,
+    -17.597
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.06,
+    3.55,
+    -15.07
+   ],
+   "max": [
+    -23,
+    5.75,
+    -14.93
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.06,
+    3.55,
+    -12.403
+   ],
+   "max": [
+    -23,
+    5.75,
+    -12.263
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.06,
+    3.55,
+    -11.07
+   ],
+   "max": [
+    -23,
+    5.75,
+    -11
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    0,
+    -19
+   ],
+   "max": [
+    -14.96,
+    0.5,
+    -16
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    0,
+    -14
+   ],
+   "max": [
+    -14.96,
+    0.5,
+    -11
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    3.15,
+    -19
+   ],
+   "max": [
+    -14.9,
+    3.35,
+    -11
+   ],
+   "color": "#f1ebdf",
+   "look": "putz"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    3.35,
+    -19
+   ],
+   "max": [
+    -14.94,
+    3.55,
+    -11
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    5.75,
+    -19
+   ],
+   "max": [
+    -14.94,
+    5.95,
+    -11
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    3.55,
+    -19
+   ],
+   "max": [
+    -14.94,
+    5.75,
+    -18.93
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    3.55,
+    -17.737
+   ],
+   "max": [
+    -14.94,
+    5.75,
+    -17.597
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    3.55,
+    -15.07
+   ],
+   "max": [
+    -14.94,
+    5.75,
+    -14.93
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    3.55,
+    -12.403
+   ],
+   "max": [
+    -14.94,
+    5.75,
+    -12.263
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    3.55,
+    -11.07
+   ],
+   "max": [
+    -14.94,
+    5.75,
+    -11
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -18.5,
+    0,
+    -7.05
+   ],
+   "max": [
+    -18.4,
+    2.4,
+    -7
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -16.6,
+    0,
+    -7.05
+   ],
+   "max": [
+    -16.5,
+    2.4,
+    -7
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -18.5,
+    2.4,
+    -7.05
+   ],
+   "max": [
+    -16.5,
+    2.5,
+    -7
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -21.033,
+    4,
+    -7.05
+   ],
+   "max": [
+    -20.933,
+    5.2,
+    -7
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -19.733,
+    4,
+    -7.05
+   ],
+   "max": [
+    -19.633,
+    5.2,
+    -7
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -21.033,
+    5.2,
+    -7.05
+   ],
+   "max": [
+    -19.633,
+    5.3,
+    -7
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -21.083,
+    3.92,
+    -7.14
+   ],
+   "max": [
+    -19.583,
+    4,
+    -7
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -18.367,
+    4,
+    -7.05
+   ],
+   "max": [
+    -18.267,
+    5.2,
+    -7
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -17.067,
+    4,
+    -7.05
+   ],
+   "max": [
+    -16.967,
+    5.2,
+    -7
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -18.367,
+    5.2,
+    -7.05
+   ],
+   "max": [
+    -16.967,
+    5.3,
+    -7
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -18.417,
+    3.92,
+    -7.14
+   ],
+   "max": [
+    -16.917,
+    4,
+    -7
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -19.7,
+    1,
+    1
+   ],
+   "max": [
+    -19.6,
+    2.2,
+    1.05
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -18.4,
+    1,
+    1
+   ],
+   "max": [
+    -18.3,
+    2.2,
+    1.05
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -19.7,
+    2.2,
+    1
+   ],
+   "max": [
+    -18.3,
+    2.3,
+    1.05
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -19.75,
+    0.92,
+    1
+   ],
+   "max": [
+    -18.25,
+    1,
+    1.14
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -21.033,
+    4,
+    1
+   ],
+   "max": [
+    -20.933,
+    5.2,
+    1.05
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -19.733,
+    4,
+    1
+   ],
+   "max": [
+    -19.633,
+    5.2,
+    1.05
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -21.033,
+    5.2,
+    1
+   ],
+   "max": [
+    -19.633,
+    5.3,
+    1.05
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -21.083,
+    3.92,
+    1
+   ],
+   "max": [
+    -19.583,
+    4,
+    1.14
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -18.367,
+    4,
+    1
+   ],
+   "max": [
+    -18.267,
+    5.2,
+    1.05
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -17.067,
+    4,
+    1
+   ],
+   "max": [
+    -16.967,
+    5.2,
+    1.05
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -18.367,
+    5.2,
+    1
+   ],
+   "max": [
+    -16.967,
+    5.3,
+    1.05
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -18.417,
+    3.92,
+    1
+   ],
+   "max": [
+    -16.917,
+    4,
+    1.14
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.05,
+    4,
+    -5.033
+   ],
+   "max": [
+    -23,
+    5.2,
+    -4.933
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.05,
+    4,
+    -3.733
+   ],
+   "max": [
+    -23,
+    5.2,
+    -3.633
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.05,
+    5.2,
+    -5.033
+   ],
+   "max": [
+    -23,
+    5.3,
+    -3.633
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.14,
+    3.92,
+    -5.083
+   ],
+   "max": [
+    -23,
+    4,
+    -3.583
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.05,
+    4,
+    -2.367
+   ],
+   "max": [
+    -23,
+    5.2,
+    -2.267
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.05,
+    4,
+    -1.067
+   ],
+   "max": [
+    -23,
+    5.2,
+    -0.967
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.05,
+    5.2,
+    -2.367
+   ],
+   "max": [
+    -23,
+    5.3,
+    -0.967
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.14,
+    3.92,
+    -2.417
+   ],
+   "max": [
+    -23,
+    4,
+    -0.917
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    0,
+    -4
+   ],
+   "max": [
+    -14.95,
+    2.4,
+    -3.9
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    0,
+    -2.1
+   ],
+   "max": [
+    -14.95,
+    2.4,
+    -2
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    2.4,
+    -4
+   ],
+   "max": [
+    -14.95,
+    2.5,
+    -2
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    4,
+    -5.033
+   ],
+   "max": [
+    -14.95,
+    5.2,
+    -4.933
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    4,
+    -3.733
+   ],
+   "max": [
+    -14.95,
+    5.2,
+    -3.633
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    5.2,
+    -5.033
+   ],
+   "max": [
+    -14.95,
+    5.3,
+    -3.633
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    3.92,
+    -5.083
+   ],
+   "max": [
+    -14.86,
+    4,
+    -3.583
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    4,
+    -2.367
+   ],
+   "max": [
+    -14.95,
+    5.2,
+    -2.267
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    4,
+    -1.067
+   ],
+   "max": [
+    -14.95,
+    5.2,
+    -0.967
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    5.2,
+    -2.367
+   ],
+   "max": [
+    -14.95,
+    5.3,
+    -0.967
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    3.92,
+    -2.417
+   ],
+   "max": [
+    -14.86,
+    4,
+    -0.917
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.04,
+    0,
+    -7.04
+   ],
+   "max": [
+    -18.5,
+    0.5,
+    -7
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -16.5,
+    0,
+    -7.04
+   ],
+   "max": [
+    -14.96,
+    0.5,
+    -7
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.1,
+    3.15,
+    -7.1
+   ],
+   "max": [
+    -14.9,
+    3.35,
+    -7
+   ],
+   "color": "#f1ebdf",
+   "look": "putz"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.06,
+    3.35,
+    -7.06
+   ],
+   "max": [
+    -14.94,
+    3.55,
+    -7
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.06,
+    5.75,
+    -7.06
+   ],
+   "max": [
+    -14.94,
+    5.95,
+    -7
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23,
+    3.55,
+    -7.06
+   ],
+   "max": [
+    -22.93,
+    5.75,
+    -7
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -21.737,
+    3.55,
+    -7.06
+   ],
+   "max": [
+    -21.597,
+    5.75,
+    -7
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -19.07,
+    3.55,
+    -7.06
+   ],
+   "max": [
+    -18.93,
+    5.75,
+    -7
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -16.403,
+    3.55,
+    -7.06
+   ],
+   "max": [
+    -16.263,
+    5.75,
+    -7
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15.07,
+    3.55,
+    -7.06
+   ],
+   "max": [
+    -15,
+    5.75,
+    -7
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.04,
+    0,
+    1
+   ],
+   "max": [
+    -14.96,
+    0.5,
+    1.04
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.1,
+    3.15,
+    1
+   ],
+   "max": [
+    -14.9,
+    3.35,
+    1.1
+   ],
+   "color": "#f1ebdf",
+   "look": "putz"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.06,
+    3.35,
+    1
+   ],
+   "max": [
+    -14.94,
+    3.55,
+    1.06
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.06,
+    5.75,
+    1
+   ],
+   "max": [
+    -14.94,
+    5.95,
+    1.06
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23,
+    3.55,
+    1
+   ],
+   "max": [
+    -22.93,
+    5.75,
+    1.06
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -21.737,
+    3.55,
+    1
+   ],
+   "max": [
+    -21.597,
+    5.75,
+    1.06
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -19.07,
+    3.55,
+    1
+   ],
+   "max": [
+    -18.93,
+    5.75,
+    1.06
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -16.403,
+    3.55,
+    1
+   ],
+   "max": [
+    -16.263,
+    5.75,
+    1.06
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15.07,
+    3.55,
+    1
+   ],
+   "max": [
+    -15,
+    5.75,
+    1.06
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.04,
+    0,
+    -7
+   ],
+   "max": [
+    -23,
+    0.5,
+    1
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.1,
+    3.15,
+    -7
+   ],
+   "max": [
+    -23,
+    3.35,
+    1
+   ],
+   "color": "#f1ebdf",
+   "look": "putz"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.06,
+    3.35,
+    -7
+   ],
+   "max": [
+    -23,
+    3.55,
+    1
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.06,
+    5.75,
+    -7
+   ],
+   "max": [
+    -23,
+    5.95,
+    1
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.06,
+    3.55,
+    -7
+   ],
+   "max": [
+    -23,
+    5.75,
+    -6.93
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.06,
+    3.55,
+    -5.737
+   ],
+   "max": [
+    -23,
+    5.75,
+    -5.597
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.06,
+    3.55,
+    -3.07
+   ],
+   "max": [
+    -23,
+    5.75,
+    -2.93
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.06,
+    3.55,
+    -0.403
+   ],
+   "max": [
+    -23,
+    5.75,
+    -0.263
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.06,
+    3.55,
+    0.93
+   ],
+   "max": [
+    -23,
+    5.75,
+    1
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    0,
+    -7
+   ],
+   "max": [
+    -14.96,
+    0.5,
+    -4
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    0,
+    -2
+   ],
+   "max": [
+    -14.96,
+    0.5,
+    1
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    3.15,
+    -7
+   ],
+   "max": [
+    -14.9,
+    3.35,
+    1
+   ],
+   "color": "#f1ebdf",
+   "look": "putz"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    3.35,
+    -7
+   ],
+   "max": [
+    -14.94,
+    3.55,
+    1
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    5.75,
+    -7
+   ],
+   "max": [
+    -14.94,
+    5.95,
+    1
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    3.55,
+    -7
+   ],
+   "max": [
+    -14.94,
+    5.75,
+    -6.93
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    3.55,
+    -5.737
+   ],
+   "max": [
+    -14.94,
+    5.75,
+    -5.597
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    3.55,
+    -3.07
+   ],
+   "max": [
+    -14.94,
+    5.75,
+    -2.93
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    3.55,
+    -0.403
+   ],
+   "max": [
+    -14.94,
+    5.75,
+    -0.263
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    3.55,
+    0.93
+   ],
+   "max": [
+    -14.94,
+    5.75,
+    1
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -20,
+    0,
+    4.95
+   ],
+   "max": [
+    -19.9,
+    2.4,
+    5
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -18.1,
+    0,
+    4.95
+   ],
+   "max": [
+    -18,
+    2.4,
+    5
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -20,
+    2.4,
+    4.95
+   ],
+   "max": [
+    -18,
+    2.5,
+    5
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -21.033,
+    4,
+    4.95
+   ],
+   "max": [
+    -20.933,
+    5.2,
+    5
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -19.733,
+    4,
+    4.95
+   ],
+   "max": [
+    -19.633,
+    5.2,
+    5
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -21.033,
+    5.2,
+    4.95
+   ],
+   "max": [
+    -19.633,
+    5.3,
+    5
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -21.083,
+    3.92,
+    4.86
+   ],
+   "max": [
+    -19.583,
+    4,
+    5
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -18.367,
+    4,
+    4.95
+   ],
+   "max": [
+    -18.267,
+    5.2,
+    5
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -17.067,
+    4,
+    4.95
+   ],
+   "max": [
+    -16.967,
+    5.2,
+    5
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -18.367,
+    5.2,
+    4.95
+   ],
+   "max": [
+    -16.967,
+    5.3,
+    5
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -18.417,
+    3.92,
+    4.86
+   ],
+   "max": [
+    -16.917,
+    4,
+    5
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -18,
+    0,
+    13
+   ],
+   "max": [
+    -17.9,
+    2.4,
+    13.05
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -16.1,
+    0,
+    13
+   ],
+   "max": [
+    -16,
+    2.4,
+    13.05
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -18,
+    2.4,
+    13
+   ],
+   "max": [
+    -16,
+    2.5,
+    13.05
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -19.7,
+    1,
+    13
+   ],
+   "max": [
+    -19.6,
+    2.2,
+    13.05
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -18.4,
+    1,
+    13
+   ],
+   "max": [
+    -18.3,
+    2.2,
+    13.05
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -19.7,
+    2.2,
+    13
+   ],
+   "max": [
+    -18.3,
+    2.3,
+    13.05
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -19.75,
+    0.92,
+    13
+   ],
+   "max": [
+    -18.25,
+    1,
+    13.14
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -21.033,
+    4,
+    13
+   ],
+   "max": [
+    -20.933,
+    5.2,
+    13.05
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -19.733,
+    4,
+    13
+   ],
+   "max": [
+    -19.633,
+    5.2,
+    13.05
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -21.033,
+    5.2,
+    13
+   ],
+   "max": [
+    -19.633,
+    5.3,
+    13.05
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -21.083,
+    3.92,
+    13
+   ],
+   "max": [
+    -19.583,
+    4,
+    13.14
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -18.367,
+    4,
+    13
+   ],
+   "max": [
+    -18.267,
+    5.2,
+    13.05
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -17.067,
+    4,
+    13
+   ],
+   "max": [
+    -16.967,
+    5.2,
+    13.05
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -18.367,
+    5.2,
+    13
+   ],
+   "max": [
+    -16.967,
+    5.3,
+    13.05
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -18.417,
+    3.92,
+    13
+   ],
+   "max": [
+    -16.917,
+    4,
+    13.14
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.05,
+    4,
+    6.967
+   ],
+   "max": [
+    -23,
+    5.2,
+    7.067
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.05,
+    4,
+    8.267
+   ],
+   "max": [
+    -23,
+    5.2,
+    8.367
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.05,
+    5.2,
+    6.967
+   ],
+   "max": [
+    -23,
+    5.3,
+    8.367
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.14,
+    3.92,
+    6.917
+   ],
+   "max": [
+    -23,
+    4,
+    8.417
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.05,
+    4,
+    9.633
+   ],
+   "max": [
+    -23,
+    5.2,
+    9.733
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.05,
+    4,
+    10.933
+   ],
+   "max": [
+    -23,
+    5.2,
+    11.033
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.05,
+    5.2,
+    9.633
+   ],
+   "max": [
+    -23,
+    5.3,
+    11.033
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.14,
+    3.92,
+    9.583
+   ],
+   "max": [
+    -23,
+    4,
+    11.083
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    0,
+    8
+   ],
+   "max": [
+    -14.95,
+    2.4,
+    8.1
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    0,
+    9.9
+   ],
+   "max": [
+    -14.95,
+    2.4,
+    10
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    2.4,
+    8
+   ],
+   "max": [
+    -14.95,
+    2.5,
+    10
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    4,
+    6.967
+   ],
+   "max": [
+    -14.95,
+    5.2,
+    7.067
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    4,
+    8.267
+   ],
+   "max": [
+    -14.95,
+    5.2,
+    8.367
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    5.2,
+    6.967
+   ],
+   "max": [
+    -14.95,
+    5.3,
+    8.367
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    3.92,
+    6.917
+   ],
+   "max": [
+    -14.86,
+    4,
+    8.417
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    4,
+    9.633
+   ],
+   "max": [
+    -14.95,
+    5.2,
+    9.733
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    4,
+    10.933
+   ],
+   "max": [
+    -14.95,
+    5.2,
+    11.033
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    5.2,
+    9.633
+   ],
+   "max": [
+    -14.95,
+    5.3,
+    11.033
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    3.92,
+    9.583
+   ],
+   "max": [
+    -14.86,
+    4,
+    11.083
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.04,
+    0,
+    4.96
+   ],
+   "max": [
+    -20,
+    0.5,
+    5
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -18,
+    0,
+    4.96
+   ],
+   "max": [
+    -14.96,
+    0.5,
+    5
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.1,
+    3.15,
+    4.9
+   ],
+   "max": [
+    -14.9,
+    3.35,
+    5
+   ],
+   "color": "#f1ebdf",
+   "look": "putz"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.06,
+    3.35,
+    4.94
+   ],
+   "max": [
+    -14.94,
+    3.55,
+    5
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.06,
+    5.75,
+    4.94
+   ],
+   "max": [
+    -14.94,
+    5.95,
+    5
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23,
+    3.55,
+    4.94
+   ],
+   "max": [
+    -22.93,
+    5.75,
+    5
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -21.737,
+    3.55,
+    4.94
+   ],
+   "max": [
+    -21.597,
+    5.75,
+    5
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -19.07,
+    3.55,
+    4.94
+   ],
+   "max": [
+    -18.93,
+    5.75,
+    5
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -16.403,
+    3.55,
+    4.94
+   ],
+   "max": [
+    -16.263,
+    5.75,
+    5
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15.07,
+    3.55,
+    4.94
+   ],
+   "max": [
+    -15,
+    5.75,
+    5
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.04,
+    0,
+    13
+   ],
+   "max": [
+    -18,
+    0.5,
+    13.04
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -16,
+    0,
+    13
+   ],
+   "max": [
+    -14.96,
+    0.5,
+    13.04
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.1,
+    3.15,
+    13
+   ],
+   "max": [
+    -14.9,
+    3.35,
+    13.1
+   ],
+   "color": "#f1ebdf",
+   "look": "putz"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.06,
+    3.35,
+    13
+   ],
+   "max": [
+    -14.94,
+    3.55,
+    13.06
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.06,
+    5.75,
+    13
+   ],
+   "max": [
+    -14.94,
+    5.95,
+    13.06
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23,
+    3.55,
+    13
+   ],
+   "max": [
+    -22.93,
+    5.75,
+    13.06
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -21.737,
+    3.55,
+    13
+   ],
+   "max": [
+    -21.597,
+    5.75,
+    13.06
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -19.07,
+    3.55,
+    13
+   ],
+   "max": [
+    -18.93,
+    5.75,
+    13.06
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -16.403,
+    3.55,
+    13
+   ],
+   "max": [
+    -16.263,
+    5.75,
+    13.06
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15.07,
+    3.55,
+    13
+   ],
+   "max": [
+    -15,
+    5.75,
+    13.06
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.04,
+    0,
+    5
+   ],
+   "max": [
+    -23,
+    0.5,
+    13
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.1,
+    3.15,
+    5
+   ],
+   "max": [
+    -23,
+    3.35,
+    13
+   ],
+   "color": "#f1ebdf",
+   "look": "putz"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.06,
+    3.35,
+    5
+   ],
+   "max": [
+    -23,
+    3.55,
+    13
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.06,
+    5.75,
+    5
+   ],
+   "max": [
+    -23,
+    5.95,
+    13
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.06,
+    3.55,
+    5
+   ],
+   "max": [
+    -23,
+    5.75,
+    5.07
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.06,
+    3.55,
+    6.263
+   ],
+   "max": [
+    -23,
+    5.75,
+    6.403
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.06,
+    3.55,
+    8.93
+   ],
+   "max": [
+    -23,
+    5.75,
+    9.07
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.06,
+    3.55,
+    11.597
+   ],
+   "max": [
+    -23,
+    5.75,
+    11.737
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -23.06,
+    3.55,
+    12.93
+   ],
+   "max": [
+    -23,
+    5.75,
+    13
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    0,
+    5
+   ],
+   "max": [
+    -14.96,
+    0.5,
+    8
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    0,
+    10
+   ],
+   "max": [
+    -14.96,
+    0.5,
+    13
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    3.15,
+    5
+   ],
+   "max": [
+    -14.9,
+    3.35,
+    13
+   ],
+   "color": "#f1ebdf",
+   "look": "putz"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    3.35,
+    5
+   ],
+   "max": [
+    -14.94,
+    3.55,
+    13
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    5.75,
+    5
+   ],
+   "max": [
+    -14.94,
+    5.95,
+    13
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    3.55,
+    5
+   ],
+   "max": [
+    -14.94,
+    5.75,
+    5.07
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    3.55,
+    6.263
+   ],
+   "max": [
+    -14.94,
+    5.75,
+    6.403
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    3.55,
+    8.93
+   ],
+   "max": [
+    -14.94,
+    5.75,
+    9.07
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    3.55,
+    11.597
+   ],
+   "max": [
+    -14.94,
+    5.75,
+    11.737
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -15,
+    3.55,
+    12.93
+   ],
+   "max": [
+    -14.94,
+    5.75,
+    13
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    18.3,
+    1,
+    -19.05
+   ],
+   "max": [
+    18.4,
+    2.2,
+    -19
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    19.6,
+    1,
+    -19.05
+   ],
+   "max": [
+    19.7,
+    2.2,
+    -19
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    18.3,
+    2.2,
+    -19.05
+   ],
+   "max": [
+    19.7,
+    2.3,
+    -19
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    18.25,
+    0.92,
+    -19.14
+   ],
+   "max": [
+    19.75,
+    1,
+    -19
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    16.967,
+    4,
+    -19.05
+   ],
+   "max": [
+    17.067,
+    5.2,
+    -19
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    18.267,
+    4,
+    -19.05
+   ],
+   "max": [
+    18.367,
+    5.2,
+    -19
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    16.967,
+    5.2,
+    -19.05
+   ],
+   "max": [
+    18.367,
+    5.3,
+    -19
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    16.917,
+    3.92,
+    -19.14
+   ],
+   "max": [
+    18.417,
+    4,
+    -19
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    19.633,
+    4,
+    -19.05
+   ],
+   "max": [
+    19.733,
+    5.2,
+    -19
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    20.933,
+    4,
+    -19.05
+   ],
+   "max": [
+    21.033,
+    5.2,
+    -19
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    19.633,
+    5.2,
+    -19.05
+   ],
+   "max": [
+    21.033,
+    5.3,
+    -19
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    19.583,
+    3.92,
+    -19.14
+   ],
+   "max": [
+    21.083,
+    4,
+    -19
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    18,
+    0,
+    -11
+   ],
+   "max": [
+    18.1,
+    2.4,
+    -10.95
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    19.9,
+    0,
+    -11
+   ],
+   "max": [
+    20,
+    2.4,
+    -10.95
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    18,
+    2.4,
+    -11
+   ],
+   "max": [
+    20,
+    2.5,
+    -10.95
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    16.967,
+    4,
+    -11
+   ],
+   "max": [
+    17.067,
+    5.2,
+    -10.95
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    18.267,
+    4,
+    -11
+   ],
+   "max": [
+    18.367,
+    5.2,
+    -10.95
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    16.967,
+    5.2,
+    -11
+   ],
+   "max": [
+    18.367,
+    5.3,
+    -10.95
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    16.917,
+    3.92,
+    -11
+   ],
+   "max": [
+    18.417,
+    4,
+    -10.86
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    19.633,
+    4,
+    -11
+   ],
+   "max": [
+    19.733,
+    5.2,
+    -10.95
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    20.933,
+    4,
+    -11
+   ],
+   "max": [
+    21.033,
+    5.2,
+    -10.95
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    19.633,
+    5.2,
+    -11
+   ],
+   "max": [
+    21.033,
+    5.3,
+    -10.95
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    19.583,
+    3.92,
+    -11
+   ],
+   "max": [
+    21.083,
+    4,
+    -10.86
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.95,
+    0,
+    -16
+   ],
+   "max": [
+    15,
+    2.4,
+    -15.9
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.95,
+    0,
+    -14.1
+   ],
+   "max": [
+    15,
+    2.4,
+    -14
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.95,
+    2.4,
+    -16
+   ],
+   "max": [
+    15,
+    2.5,
+    -14
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.95,
+    4,
+    -17.033
+   ],
+   "max": [
+    15,
+    5.2,
+    -16.933
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.95,
+    4,
+    -15.733
+   ],
+   "max": [
+    15,
+    5.2,
+    -15.633
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.95,
+    5.2,
+    -17.033
+   ],
+   "max": [
+    15,
+    5.3,
+    -15.633
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.86,
+    3.92,
+    -17.083
+   ],
+   "max": [
+    15,
+    4,
+    -15.583
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.95,
+    4,
+    -14.367
+   ],
+   "max": [
+    15,
+    5.2,
+    -14.267
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.95,
+    4,
+    -13.067
+   ],
+   "max": [
+    15,
+    5.2,
+    -12.967
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.95,
+    5.2,
+    -14.367
+   ],
+   "max": [
+    15,
+    5.3,
+    -12.967
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.86,
+    3.92,
+    -14.417
+   ],
+   "max": [
+    15,
+    4,
+    -12.917
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    4,
+    -17.033
+   ],
+   "max": [
+    23.05,
+    5.2,
+    -16.933
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    4,
+    -15.733
+   ],
+   "max": [
+    23.05,
+    5.2,
+    -15.633
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    5.2,
+    -17.033
+   ],
+   "max": [
+    23.05,
+    5.3,
+    -15.633
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    3.92,
+    -17.083
+   ],
+   "max": [
+    23.14,
+    4,
+    -15.583
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    4,
+    -14.367
+   ],
+   "max": [
+    23.05,
+    5.2,
+    -14.267
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    4,
+    -13.067
+   ],
+   "max": [
+    23.05,
+    5.2,
+    -12.967
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    5.2,
+    -14.367
+   ],
+   "max": [
+    23.05,
+    5.3,
+    -12.967
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    3.92,
+    -14.417
+   ],
+   "max": [
+    23.14,
+    4,
+    -12.917
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.96,
+    0,
+    -19.04
+   ],
+   "max": [
+    23.04,
+    0.5,
+    -19
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.9,
+    3.15,
+    -19.1
+   ],
+   "max": [
+    23.1,
+    3.35,
+    -19
+   ],
+   "color": "#f1ebdf",
+   "look": "putz"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.94,
+    3.35,
+    -19.06
+   ],
+   "max": [
+    23.06,
+    3.55,
+    -19
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.94,
+    5.75,
+    -19.06
+   ],
+   "max": [
+    23.06,
+    5.95,
+    -19
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    15,
+    3.55,
+    -19.06
+   ],
+   "max": [
+    15.07,
+    5.75,
+    -19
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    16.263,
+    3.55,
+    -19.06
+   ],
+   "max": [
+    16.403,
+    5.75,
+    -19
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    18.93,
+    3.55,
+    -19.06
+   ],
+   "max": [
+    19.07,
+    5.75,
+    -19
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    21.597,
+    3.55,
+    -19.06
+   ],
+   "max": [
+    21.737,
+    5.75,
+    -19
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    22.93,
+    3.55,
+    -19.06
+   ],
+   "max": [
+    23,
+    5.75,
+    -19
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.96,
+    0,
+    -11
+   ],
+   "max": [
+    18,
+    0.5,
+    -10.96
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    20,
+    0,
+    -11
+   ],
+   "max": [
+    23.04,
+    0.5,
+    -10.96
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.9,
+    3.15,
+    -11
+   ],
+   "max": [
+    23.1,
+    3.35,
+    -10.9
+   ],
+   "color": "#f1ebdf",
+   "look": "putz"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.94,
+    3.35,
+    -11
+   ],
+   "max": [
+    23.06,
+    3.55,
+    -10.94
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.94,
+    5.75,
+    -11
+   ],
+   "max": [
+    23.06,
+    5.95,
+    -10.94
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    15,
+    3.55,
+    -11
+   ],
+   "max": [
+    15.07,
+    5.75,
+    -10.94
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    16.263,
+    3.55,
+    -11
+   ],
+   "max": [
+    16.403,
+    5.75,
+    -10.94
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    18.93,
+    3.55,
+    -11
+   ],
+   "max": [
+    19.07,
+    5.75,
+    -10.94
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    21.597,
+    3.55,
+    -11
+   ],
+   "max": [
+    21.737,
+    5.75,
+    -10.94
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    22.93,
+    3.55,
+    -11
+   ],
+   "max": [
+    23,
+    5.75,
+    -10.94
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.96,
+    0,
+    -19
+   ],
+   "max": [
+    15,
+    0.5,
+    -16
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.96,
+    0,
+    -14
+   ],
+   "max": [
+    15,
+    0.5,
+    -11
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.9,
+    3.15,
+    -19
+   ],
+   "max": [
+    15,
+    3.35,
+    -11
+   ],
+   "color": "#f1ebdf",
+   "look": "putz"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.94,
+    3.35,
+    -19
+   ],
+   "max": [
+    15,
+    3.55,
+    -11
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.94,
+    5.75,
+    -19
+   ],
+   "max": [
+    15,
+    5.95,
+    -11
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.94,
+    3.55,
+    -19
+   ],
+   "max": [
+    15,
+    5.75,
+    -18.93
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.94,
+    3.55,
+    -17.737
+   ],
+   "max": [
+    15,
+    5.75,
+    -17.597
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.94,
+    3.55,
+    -15.07
+   ],
+   "max": [
+    15,
+    5.75,
+    -14.93
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.94,
+    3.55,
+    -12.403
+   ],
+   "max": [
+    15,
+    5.75,
+    -12.263
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.94,
+    3.55,
+    -11.07
+   ],
+   "max": [
+    15,
+    5.75,
+    -11
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    0,
+    -19
+   ],
+   "max": [
+    23.04,
+    0.5,
+    -11
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    3.15,
+    -19
+   ],
+   "max": [
+    23.1,
+    3.35,
+    -11
+   ],
+   "color": "#f1ebdf",
+   "look": "putz"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    3.35,
+    -19
+   ],
+   "max": [
+    23.06,
+    3.55,
+    -11
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    5.75,
+    -19
+   ],
+   "max": [
+    23.06,
+    5.95,
+    -11
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    3.55,
+    -19
+   ],
+   "max": [
+    23.06,
+    5.75,
+    -18.93
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    3.55,
+    -17.737
+   ],
+   "max": [
+    23.06,
+    5.75,
+    -17.597
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    3.55,
+    -15.07
+   ],
+   "max": [
+    23.06,
+    5.75,
+    -14.93
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    3.55,
+    -12.403
+   ],
+   "max": [
+    23.06,
+    5.75,
+    -12.263
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    3.55,
+    -11.07
+   ],
+   "max": [
+    23.06,
+    5.75,
+    -11
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    16.5,
+    0,
+    -7.05
+   ],
+   "max": [
+    16.6,
+    2.4,
+    -7
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    18.4,
+    0,
+    -7.05
+   ],
+   "max": [
+    18.5,
+    2.4,
+    -7
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    16.5,
+    2.4,
+    -7.05
+   ],
+   "max": [
+    18.5,
+    2.5,
+    -7
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    16.967,
+    4,
+    -7.05
+   ],
+   "max": [
+    17.067,
+    5.2,
+    -7
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    18.267,
+    4,
+    -7.05
+   ],
+   "max": [
+    18.367,
+    5.2,
+    -7
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    16.967,
+    5.2,
+    -7.05
+   ],
+   "max": [
+    18.367,
+    5.3,
+    -7
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    16.917,
+    3.92,
+    -7.14
+   ],
+   "max": [
+    18.417,
+    4,
+    -7
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    19.633,
+    4,
+    -7.05
+   ],
+   "max": [
+    19.733,
+    5.2,
+    -7
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    20.933,
+    4,
+    -7.05
+   ],
+   "max": [
+    21.033,
+    5.2,
+    -7
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    19.633,
+    5.2,
+    -7.05
+   ],
+   "max": [
+    21.033,
+    5.3,
+    -7
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    19.583,
+    3.92,
+    -7.14
+   ],
+   "max": [
+    21.083,
+    4,
+    -7
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    18.3,
+    1,
+    1
+   ],
+   "max": [
+    18.4,
+    2.2,
+    1.05
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    19.6,
+    1,
+    1
+   ],
+   "max": [
+    19.7,
+    2.2,
+    1.05
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    18.3,
+    2.2,
+    1
+   ],
+   "max": [
+    19.7,
+    2.3,
+    1.05
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    18.25,
+    0.92,
+    1
+   ],
+   "max": [
+    19.75,
+    1,
+    1.14
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    16.967,
+    4,
+    1
+   ],
+   "max": [
+    17.067,
+    5.2,
+    1.05
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    18.267,
+    4,
+    1
+   ],
+   "max": [
+    18.367,
+    5.2,
+    1.05
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    16.967,
+    5.2,
+    1
+   ],
+   "max": [
+    18.367,
+    5.3,
+    1.05
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    16.917,
+    3.92,
+    1
+   ],
+   "max": [
+    18.417,
+    4,
+    1.14
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    19.633,
+    4,
+    1
+   ],
+   "max": [
+    19.733,
+    5.2,
+    1.05
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    20.933,
+    4,
+    1
+   ],
+   "max": [
+    21.033,
+    5.2,
+    1.05
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    19.633,
+    5.2,
+    1
+   ],
+   "max": [
+    21.033,
+    5.3,
+    1.05
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    19.583,
+    3.92,
+    1
+   ],
+   "max": [
+    21.083,
+    4,
+    1.14
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.95,
+    0,
+    -4
+   ],
+   "max": [
+    15,
+    2.4,
+    -3.9
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.95,
+    0,
+    -2.1
+   ],
+   "max": [
+    15,
+    2.4,
+    -2
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.95,
+    2.4,
+    -4
+   ],
+   "max": [
+    15,
+    2.5,
+    -2
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.95,
+    4,
+    -5.033
+   ],
+   "max": [
+    15,
+    5.2,
+    -4.933
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.95,
+    4,
+    -3.733
+   ],
+   "max": [
+    15,
+    5.2,
+    -3.633
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.95,
+    5.2,
+    -5.033
+   ],
+   "max": [
+    15,
+    5.3,
+    -3.633
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.86,
+    3.92,
+    -5.083
+   ],
+   "max": [
+    15,
+    4,
+    -3.583
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.95,
+    4,
+    -2.367
+   ],
+   "max": [
+    15,
+    5.2,
+    -2.267
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.95,
+    4,
+    -1.067
+   ],
+   "max": [
+    15,
+    5.2,
+    -0.967
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.95,
+    5.2,
+    -2.367
+   ],
+   "max": [
+    15,
+    5.3,
+    -0.967
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.86,
+    3.92,
+    -2.417
+   ],
+   "max": [
+    15,
+    4,
+    -0.917
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    4,
+    -5.033
+   ],
+   "max": [
+    23.05,
+    5.2,
+    -4.933
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    4,
+    -3.733
+   ],
+   "max": [
+    23.05,
+    5.2,
+    -3.633
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    5.2,
+    -5.033
+   ],
+   "max": [
+    23.05,
+    5.3,
+    -3.633
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    3.92,
+    -5.083
+   ],
+   "max": [
+    23.14,
+    4,
+    -3.583
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    4,
+    -2.367
+   ],
+   "max": [
+    23.05,
+    5.2,
+    -2.267
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    4,
+    -1.067
+   ],
+   "max": [
+    23.05,
+    5.2,
+    -0.967
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    5.2,
+    -2.367
+   ],
+   "max": [
+    23.05,
+    5.3,
+    -0.967
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    3.92,
+    -2.417
+   ],
+   "max": [
+    23.14,
+    4,
+    -0.917
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.96,
+    0,
+    -7.04
+   ],
+   "max": [
+    16.5,
+    0.5,
+    -7
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    18.5,
+    0,
+    -7.04
+   ],
+   "max": [
+    23.04,
+    0.5,
+    -7
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.9,
+    3.15,
+    -7.1
+   ],
+   "max": [
+    23.1,
+    3.35,
+    -7
+   ],
+   "color": "#f1ebdf",
+   "look": "putz"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.94,
+    3.35,
+    -7.06
+   ],
+   "max": [
+    23.06,
+    3.55,
+    -7
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.94,
+    5.75,
+    -7.06
+   ],
+   "max": [
+    23.06,
+    5.95,
+    -7
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    15,
+    3.55,
+    -7.06
+   ],
+   "max": [
+    15.07,
+    5.75,
+    -7
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    16.263,
+    3.55,
+    -7.06
+   ],
+   "max": [
+    16.403,
+    5.75,
+    -7
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    18.93,
+    3.55,
+    -7.06
+   ],
+   "max": [
+    19.07,
+    5.75,
+    -7
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    21.597,
+    3.55,
+    -7.06
+   ],
+   "max": [
+    21.737,
+    5.75,
+    -7
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    22.93,
+    3.55,
+    -7.06
+   ],
+   "max": [
+    23,
+    5.75,
+    -7
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.96,
+    0,
+    1
+   ],
+   "max": [
+    23.04,
+    0.5,
+    1.04
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.9,
+    3.15,
+    1
+   ],
+   "max": [
+    23.1,
+    3.35,
+    1.1
+   ],
+   "color": "#f1ebdf",
+   "look": "putz"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.94,
+    3.35,
+    1
+   ],
+   "max": [
+    23.06,
+    3.55,
+    1.06
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.94,
+    5.75,
+    1
+   ],
+   "max": [
+    23.06,
+    5.95,
+    1.06
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    15,
+    3.55,
+    1
+   ],
+   "max": [
+    15.07,
+    5.75,
+    1.06
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    16.263,
+    3.55,
+    1
+   ],
+   "max": [
+    16.403,
+    5.75,
+    1.06
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    18.93,
+    3.55,
+    1
+   ],
+   "max": [
+    19.07,
+    5.75,
+    1.06
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    21.597,
+    3.55,
+    1
+   ],
+   "max": [
+    21.737,
+    5.75,
+    1.06
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    22.93,
+    3.55,
+    1
+   ],
+   "max": [
+    23,
+    5.75,
+    1.06
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.96,
+    0,
+    -7
+   ],
+   "max": [
+    15,
+    0.5,
+    -4
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.96,
+    0,
+    -2
+   ],
+   "max": [
+    15,
+    0.5,
+    1
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.9,
+    3.15,
+    -7
+   ],
+   "max": [
+    15,
+    3.35,
+    1
+   ],
+   "color": "#f1ebdf",
+   "look": "putz"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.94,
+    3.35,
+    -7
+   ],
+   "max": [
+    15,
+    3.55,
+    1
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.94,
+    5.75,
+    -7
+   ],
+   "max": [
+    15,
+    5.95,
+    1
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.94,
+    3.55,
+    -7
+   ],
+   "max": [
+    15,
+    5.75,
+    -6.93
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.94,
+    3.55,
+    -5.737
+   ],
+   "max": [
+    15,
+    5.75,
+    -5.597
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.94,
+    3.55,
+    -3.07
+   ],
+   "max": [
+    15,
+    5.75,
+    -2.93
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.94,
+    3.55,
+    -0.403
+   ],
+   "max": [
+    15,
+    5.75,
+    -0.263
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.94,
+    3.55,
+    0.93
+   ],
+   "max": [
+    15,
+    5.75,
+    1
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    0,
+    -7
+   ],
+   "max": [
+    23.04,
+    0.5,
+    1
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    3.15,
+    -7
+   ],
+   "max": [
+    23.1,
+    3.35,
+    1
+   ],
+   "color": "#f1ebdf",
+   "look": "putz"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    3.35,
+    -7
+   ],
+   "max": [
+    23.06,
+    3.55,
+    1
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    5.75,
+    -7
+   ],
+   "max": [
+    23.06,
+    5.95,
+    1
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    3.55,
+    -7
+   ],
+   "max": [
+    23.06,
+    5.75,
+    -6.93
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    3.55,
+    -5.737
+   ],
+   "max": [
+    23.06,
+    5.75,
+    -5.597
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    3.55,
+    -3.07
+   ],
+   "max": [
+    23.06,
+    5.75,
+    -2.93
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    3.55,
+    -0.403
+   ],
+   "max": [
+    23.06,
+    5.75,
+    -0.263
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    3.55,
+    0.93
+   ],
+   "max": [
+    23.06,
+    5.75,
+    1
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    18,
+    0,
+    4.95
+   ],
+   "max": [
+    18.1,
+    2.4,
+    5
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    19.9,
+    0,
+    4.95
+   ],
+   "max": [
+    20,
+    2.4,
+    5
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    18,
+    2.4,
+    4.95
+   ],
+   "max": [
+    20,
+    2.5,
+    5
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    16.967,
+    4,
+    4.95
+   ],
+   "max": [
+    17.067,
+    5.2,
+    5
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    18.267,
+    4,
+    4.95
+   ],
+   "max": [
+    18.367,
+    5.2,
+    5
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    16.967,
+    5.2,
+    4.95
+   ],
+   "max": [
+    18.367,
+    5.3,
+    5
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    16.917,
+    3.92,
+    4.86
+   ],
+   "max": [
+    18.417,
+    4,
+    5
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    19.633,
+    4,
+    4.95
+   ],
+   "max": [
+    19.733,
+    5.2,
+    5
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    20.933,
+    4,
+    4.95
+   ],
+   "max": [
+    21.033,
+    5.2,
+    5
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    19.633,
+    5.2,
+    4.95
+   ],
+   "max": [
+    21.033,
+    5.3,
+    5
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    19.583,
+    3.92,
+    4.86
+   ],
+   "max": [
+    21.083,
+    4,
+    5
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    16,
+    0,
+    13
+   ],
+   "max": [
+    16.1,
+    2.4,
+    13.05
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    17.9,
+    0,
+    13
+   ],
+   "max": [
+    18,
+    2.4,
+    13.05
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    16,
+    2.4,
+    13
+   ],
+   "max": [
+    18,
+    2.5,
+    13.05
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    18.3,
+    1,
+    13
+   ],
+   "max": [
+    18.4,
+    2.2,
+    13.05
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    19.6,
+    1,
+    13
+   ],
+   "max": [
+    19.7,
+    2.2,
+    13.05
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    18.3,
+    2.2,
+    13
+   ],
+   "max": [
+    19.7,
+    2.3,
+    13.05
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    18.25,
+    0.92,
+    13
+   ],
+   "max": [
+    19.75,
+    1,
+    13.14
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    16.967,
+    4,
+    13
+   ],
+   "max": [
+    17.067,
+    5.2,
+    13.05
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    18.267,
+    4,
+    13
+   ],
+   "max": [
+    18.367,
+    5.2,
+    13.05
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    16.967,
+    5.2,
+    13
+   ],
+   "max": [
+    18.367,
+    5.3,
+    13.05
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    16.917,
+    3.92,
+    13
+   ],
+   "max": [
+    18.417,
+    4,
+    13.14
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    19.633,
+    4,
+    13
+   ],
+   "max": [
+    19.733,
+    5.2,
+    13.05
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    20.933,
+    4,
+    13
+   ],
+   "max": [
+    21.033,
+    5.2,
+    13.05
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    19.633,
+    5.2,
+    13
+   ],
+   "max": [
+    21.033,
+    5.3,
+    13.05
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    19.583,
+    3.92,
+    13
+   ],
+   "max": [
+    21.083,
+    4,
+    13.14
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.95,
+    0,
+    8
+   ],
+   "max": [
+    15,
+    2.4,
+    8.1
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.95,
+    0,
+    9.9
+   ],
+   "max": [
+    15,
+    2.4,
+    10
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.95,
+    2.4,
+    8
+   ],
+   "max": [
+    15,
+    2.5,
+    10
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.95,
+    4,
+    6.967
+   ],
+   "max": [
+    15,
+    5.2,
+    7.067
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.95,
+    4,
+    8.267
+   ],
+   "max": [
+    15,
+    5.2,
+    8.367
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.95,
+    5.2,
+    6.967
+   ],
+   "max": [
+    15,
+    5.3,
+    8.367
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.86,
+    3.92,
+    6.917
+   ],
+   "max": [
+    15,
+    4,
+    8.417
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.95,
+    4,
+    9.633
+   ],
+   "max": [
+    15,
+    5.2,
+    9.733
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.95,
+    4,
+    10.933
+   ],
+   "max": [
+    15,
+    5.2,
+    11.033
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.95,
+    5.2,
+    9.633
+   ],
+   "max": [
+    15,
+    5.3,
+    11.033
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.86,
+    3.92,
+    9.583
+   ],
+   "max": [
+    15,
+    4,
+    11.083
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    4,
+    6.967
+   ],
+   "max": [
+    23.05,
+    5.2,
+    7.067
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    4,
+    8.267
+   ],
+   "max": [
+    23.05,
+    5.2,
+    8.367
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    5.2,
+    6.967
+   ],
+   "max": [
+    23.05,
+    5.3,
+    8.367
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    3.92,
+    6.917
+   ],
+   "max": [
+    23.14,
+    4,
+    8.417
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    4,
+    9.633
+   ],
+   "max": [
+    23.05,
+    5.2,
+    9.733
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    4,
+    10.933
+   ],
+   "max": [
+    23.05,
+    5.2,
+    11.033
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    5.2,
+    9.633
+   ],
+   "max": [
+    23.05,
+    5.3,
+    11.033
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    3.92,
+    9.583
+   ],
+   "max": [
+    23.14,
+    4,
+    11.083
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.96,
+    0,
+    4.96
+   ],
+   "max": [
+    18,
+    0.5,
+    5
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    20,
+    0,
+    4.96
+   ],
+   "max": [
+    23.04,
+    0.5,
+    5
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.9,
+    3.15,
+    4.9
+   ],
+   "max": [
+    23.1,
+    3.35,
+    5
+   ],
+   "color": "#f1ebdf",
+   "look": "putz"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.94,
+    3.35,
+    4.94
+   ],
+   "max": [
+    23.06,
+    3.55,
+    5
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.94,
+    5.75,
+    4.94
+   ],
+   "max": [
+    23.06,
+    5.95,
+    5
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    15,
+    3.55,
+    4.94
+   ],
+   "max": [
+    15.07,
+    5.75,
+    5
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    16.263,
+    3.55,
+    4.94
+   ],
+   "max": [
+    16.403,
+    5.75,
+    5
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    18.93,
+    3.55,
+    4.94
+   ],
+   "max": [
+    19.07,
+    5.75,
+    5
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    21.597,
+    3.55,
+    4.94
+   ],
+   "max": [
+    21.737,
+    5.75,
+    5
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    22.93,
+    3.55,
+    4.94
+   ],
+   "max": [
+    23,
+    5.75,
+    5
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.96,
+    0,
+    13
+   ],
+   "max": [
+    16,
+    0.5,
+    13.04
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    18,
+    0,
+    13
+   ],
+   "max": [
+    23.04,
+    0.5,
+    13.04
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.9,
+    3.15,
+    13
+   ],
+   "max": [
+    23.1,
+    3.35,
+    13.1
+   ],
+   "color": "#f1ebdf",
+   "look": "putz"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.94,
+    3.35,
+    13
+   ],
+   "max": [
+    23.06,
+    3.55,
+    13.06
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.94,
+    5.75,
+    13
+   ],
+   "max": [
+    23.06,
+    5.95,
+    13.06
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    15,
+    3.55,
+    13
+   ],
+   "max": [
+    15.07,
+    5.75,
+    13.06
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    16.263,
+    3.55,
+    13
+   ],
+   "max": [
+    16.403,
+    5.75,
+    13.06
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    18.93,
+    3.55,
+    13
+   ],
+   "max": [
+    19.07,
+    5.75,
+    13.06
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    21.597,
+    3.55,
+    13
+   ],
+   "max": [
+    21.737,
+    5.75,
+    13.06
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    22.93,
+    3.55,
+    13
+   ],
+   "max": [
+    23,
+    5.75,
+    13.06
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.96,
+    0,
+    5
+   ],
+   "max": [
+    15,
+    0.5,
+    8
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.96,
+    0,
+    10
+   ],
+   "max": [
+    15,
+    0.5,
+    13
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.9,
+    3.15,
+    5
+   ],
+   "max": [
+    15,
+    3.35,
+    13
+   ],
+   "color": "#f1ebdf",
+   "look": "putz"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.94,
+    3.35,
+    5
+   ],
+   "max": [
+    15,
+    3.55,
+    13
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.94,
+    5.75,
+    5
+   ],
+   "max": [
+    15,
+    5.95,
+    13
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.94,
+    3.55,
+    5
+   ],
+   "max": [
+    15,
+    5.75,
+    5.07
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.94,
+    3.55,
+    6.263
+   ],
+   "max": [
+    15,
+    5.75,
+    6.403
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.94,
+    3.55,
+    8.93
+   ],
+   "max": [
+    15,
+    5.75,
+    9.07
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.94,
+    3.55,
+    11.597
+   ],
+   "max": [
+    15,
+    5.75,
+    11.737
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    14.94,
+    3.55,
+    12.93
+   ],
+   "max": [
+    15,
+    5.75,
+    13
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    0,
+    5
+   ],
+   "max": [
+    23.04,
+    0.5,
+    13
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    3.15,
+    5
+   ],
+   "max": [
+    23.1,
+    3.35,
+    13
+   ],
+   "color": "#f1ebdf",
+   "look": "putz"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    3.35,
+    5
+   ],
+   "max": [
+    23.06,
+    3.55,
+    13
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    5.75,
+    5
+   ],
+   "max": [
+    23.06,
+    5.95,
+    13
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    3.55,
+    5
+   ],
+   "max": [
+    23.06,
+    5.75,
+    5.07
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    3.55,
+    6.263
+   ],
+   "max": [
+    23.06,
+    5.75,
+    6.403
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    3.55,
+    8.93
+   ],
+   "max": [
+    23.06,
+    5.75,
+    9.07
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    3.55,
+    11.597
+   ],
+   "max": [
+    23.06,
+    5.75,
+    11.737
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    23,
+    3.55,
+    12.93
+   ],
+   "max": [
+    23.06,
+    5.75,
+    13
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -3.1,
+    4,
+    -22.05
+   ],
+   "max": [
+    -3,
+    6,
+    -22
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -2,
+    4,
+    -22.05
+   ],
+   "max": [
+    -1.9,
+    6,
+    -22
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -3.1,
+    6,
+    -22.05
+   ],
+   "max": [
+    -1.9,
+    6.1,
+    -22
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -3.15,
+    3.92,
+    -22.14
+   ],
+   "max": [
+    -1.85,
+    4,
+    -22
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    1.9,
+    4,
+    -22.05
+   ],
+   "max": [
+    2,
+    6,
+    -22
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    3,
+    4,
+    -22.05
+   ],
+   "max": [
+    3.1,
+    6,
+    -22
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    1.9,
+    6,
+    -22.05
+   ],
+   "max": [
+    3.1,
+    6.1,
+    -22
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    1.85,
+    3.92,
+    -22.14
+   ],
+   "max": [
+    3.15,
+    4,
+    -22
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -6.05,
+    0,
+    -18.3
+   ],
+   "max": [
+    -6,
+    3,
+    -18.2
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -6.05,
+    0,
+    -16.4
+   ],
+   "max": [
+    -6,
+    3,
+    -16.3
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -6.05,
+    3,
+    -18.3
+   ],
+   "max": [
+    -6,
+    3.1,
+    -16.3
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -6.05,
+    4,
+    -14.6
+   ],
+   "max": [
+    -6,
+    6,
+    -14.5
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -6.05,
+    4,
+    -13.5
+   ],
+   "max": [
+    -6,
+    6,
+    -13.4
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -6.05,
+    6,
+    -14.6
+   ],
+   "max": [
+    -6,
+    6.1,
+    -13.4
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -6.14,
+    3.92,
+    -14.65
+   ],
+   "max": [
+    -6,
+    4,
+    -13.35
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -6.05,
+    4,
+    -20.6
+   ],
+   "max": [
+    -6,
+    6,
+    -20.5
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -6.05,
+    4,
+    -19.5
+   ],
+   "max": [
+    -6,
+    6,
+    -19.4
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -6.05,
+    6,
+    -20.6
+   ],
+   "max": [
+    -6,
+    6.1,
+    -19.4
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -6.14,
+    3.92,
+    -20.65
+   ],
+   "max": [
+    -6,
+    4,
+    -19.35
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -6.06,
+    0,
+    -21.5
+   ],
+   "max": [
+    -6,
+    0.6,
+    -18.4
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -6.06,
+    0,
+    -16.2
+   ],
+   "max": [
+    -6,
+    0.6,
+    -11.5
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    6,
+    0,
+    -18.3
+   ],
+   "max": [
+    6.05,
+    3,
+    -18.2
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    6,
+    0,
+    -16.4
+   ],
+   "max": [
+    6.05,
+    3,
+    -16.3
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    6,
+    3,
+    -18.3
+   ],
+   "max": [
+    6.05,
+    3.1,
+    -16.3
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    6,
+    4,
+    -14.6
+   ],
+   "max": [
+    6.05,
+    6,
+    -14.5
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    6,
+    4,
+    -13.5
+   ],
+   "max": [
+    6.05,
+    6,
+    -13.4
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    6,
+    6,
+    -14.6
+   ],
+   "max": [
+    6.05,
+    6.1,
+    -13.4
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    6,
+    3.92,
+    -14.65
+   ],
+   "max": [
+    6.14,
+    4,
+    -13.35
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    6,
+    4,
+    -20.6
+   ],
+   "max": [
+    6.05,
+    6,
+    -20.5
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    6,
+    4,
+    -19.5
+   ],
+   "max": [
+    6.05,
+    6,
+    -19.4
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    6,
+    6,
+    -20.6
+   ],
+   "max": [
+    6.05,
+    6.1,
+    -19.4
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    6,
+    3.92,
+    -20.65
+   ],
+   "max": [
+    6.14,
+    4,
+    -19.35
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    6,
+    0,
+    -21.5
+   ],
+   "max": [
+    6.06,
+    0.6,
+    -18.4
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    6,
+    0,
+    -16.2
+   ],
+   "max": [
+    6.06,
+    0.6,
+    -11.5
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -6,
+    0,
+    -22.06
+   ],
+   "max": [
+    6,
+    0.6,
+    -22
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -2.5,
+    8.4,
+    -11.05
+   ],
+   "max": [
+    -2.4,
+    9.8,
+    -11
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    2.4,
+    8.4,
+    -11.05
+   ],
+   "max": [
+    2.5,
+    9.8,
+    -11
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -2.5,
+    9.8,
+    -11.05
+   ],
+   "max": [
+    2.5,
+    9.9,
+    -11
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -2.55,
+    8.32,
+    -11.14
+   ],
+   "max": [
+    2.55,
+    8.4,
+    -11
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -1.1,
+    0,
+    -3.3
+   ],
+   "max": [
+    -1,
+    2.6,
+    -3.25
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    1,
+    0,
+    -3.3
+   ],
+   "max": [
+    1.1,
+    2.6,
+    -3.25
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -1.1,
+    2.6,
+    -3.3
+   ],
+   "max": [
+    1.1,
+    2.7,
+    -3.25
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -2.5,
+    8.4,
+    -3.3
+   ],
+   "max": [
+    -2.4,
+    9.8,
+    -3.25
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    2.4,
+    8.4,
+    -3.3
+   ],
+   "max": [
+    2.5,
+    9.8,
+    -3.25
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -2.5,
+    9.8,
+    -3.3
+   ],
+   "max": [
+    2.5,
+    9.9,
+    -3.25
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -2.55,
+    8.32,
+    -3.3
+   ],
+   "max": [
+    2.55,
+    8.4,
+    -3.16
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -3.9,
+    8.4,
+    -9.3
+   ],
+   "max": [
+    -3.85,
+    9.8,
+    -9.2
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -3.9,
+    8.4,
+    -5.1
+   ],
+   "max": [
+    -3.85,
+    9.8,
+    -5
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -3.9,
+    9.8,
+    -9.3
+   ],
+   "max": [
+    -3.85,
+    9.9,
+    -5
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -3.99,
+    8.32,
+    -9.35
+   ],
+   "max": [
+    -3.85,
+    8.4,
+    -4.95
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    3.85,
+    8.4,
+    -9.3
+   ],
+   "max": [
+    3.9,
+    9.8,
+    -9.2
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    3.85,
+    8.4,
+    -5.1
+   ],
+   "max": [
+    3.9,
+    9.8,
+    -5
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    3.85,
+    9.8,
+    -9.3
+   ],
+   "max": [
+    3.9,
+    9.9,
+    -5
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    3.85,
+    8.32,
+    -9.35
+   ],
+   "max": [
+    3.99,
+    8.4,
+    -4.95
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -3.85,
+    0,
+    -3.3
+   ],
+   "max": [
+    -1.2,
+    0.6,
+    -3.24
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    1.2,
+    0,
+    -3.3
+   ],
+   "max": [
+    3.85,
+    0.6,
+    -3.24
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -3.91,
+    0,
+    -10.6
+   ],
+   "max": [
+    -3.85,
+    0.6,
+    -3.3
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    3.85,
+    0,
+    -10.6
+   ],
+   "max": [
+    3.91,
+    0.6,
+    -3.3
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -0.9,
+    5.3,
+    -3.3
+   ],
+   "max": [
+    0.9,
+    7.1,
+    -3.22
+   ],
+   "color": "#f1ebdf",
+   "look": "glatt"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -0.04,
+    6.2,
+    -3.22
+   ],
+   "max": [
+    0.04,
+    6.95,
+    -3.19
+   ],
+   "color": "#2b2d30",
+   "look": "glatt"
+  },
+  {
+   "type": "deko",
+   "min": [
+    0,
+    6.16,
+    -3.22
+   ],
+   "max": [
+    0.5,
+    6.24,
+    -3.19
+   ],
+   "color": "#2b2d30",
+   "look": "glatt"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -0.05,
+    16.7,
+    -7.2
+   ],
+   "max": [
+    0.05,
+    18.2,
+    -7.1
+   ],
+   "color": "#d9a92e",
+   "look": "stahl"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -0.4,
+    17.6,
+    -7.2
+   ],
+   "max": [
+    0.4,
+    17.7,
+    -7.1
+   ],
+   "color": "#d9a92e",
+   "look": "stahl"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -1.1,
+    0,
+    14.95
+   ],
+   "max": [
+    -1,
+    2.4,
+    15
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    1,
+    0,
+    14.95
+   ],
+   "max": [
+    1.1,
+    2.4,
+    15
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -1.1,
+    2.4,
+    14.95
+   ],
+   "max": [
+    1.1,
+    2.5,
+    15
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -4.7,
+    1,
+    14.95
+   ],
+   "max": [
+    -4.6,
+    2.2,
+    15
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -3.4,
+    1,
+    14.95
+   ],
+   "max": [
+    -3.3,
+    2.2,
+    15
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -4.7,
+    2.2,
+    14.95
+   ],
+   "max": [
+    -3.3,
+    2.3,
+    15
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -4.75,
+    0.92,
+    14.86
+   ],
+   "max": [
+    -3.25,
+    1,
+    15
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    3.3,
+    1,
+    14.95
+   ],
+   "max": [
+    3.4,
+    2.2,
+    15
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    4.6,
+    1,
+    14.95
+   ],
+   "max": [
+    4.7,
+    2.2,
+    15
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    3.3,
+    2.2,
+    14.95
+   ],
+   "max": [
+    4.7,
+    2.3,
+    15
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    3.25,
+    0.92,
+    14.86
+   ],
+   "max": [
+    4.75,
+    1,
+    15
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -2.7,
+    1,
+    22
+   ],
+   "max": [
+    -2.6,
+    2.2,
+    22.05
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -1.4,
+    1,
+    22
+   ],
+   "max": [
+    -1.3,
+    2.2,
+    22.05
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -2.7,
+    2.2,
+    22
+   ],
+   "max": [
+    -1.3,
+    2.3,
+    22.05
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -2.75,
+    0.92,
+    22
+   ],
+   "max": [
+    -1.25,
+    1,
+    22.14
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    1.3,
+    1,
+    22
+   ],
+   "max": [
+    1.4,
+    2.2,
+    22.05
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    2.6,
+    1,
+    22
+   ],
+   "max": [
+    2.7,
+    2.2,
+    22.05
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    1.3,
+    2.2,
+    22
+   ],
+   "max": [
+    2.7,
+    2.3,
+    22.05
+   ],
+   "color": "#f1ebdf",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    1.25,
+    0.92,
+    22
+   ],
+   "max": [
+    2.75,
+    1,
+    22.14
+   ],
+   "color": "#c9c2b4",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -6.05,
+    0,
+    17.9
+   ],
+   "max": [
+    -6,
+    2.4,
+    18
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -6.05,
+    0,
+    19.4
+   ],
+   "max": [
+    -6,
+    2.4,
+    19.5
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -6.05,
+    2.4,
+    17.9
+   ],
+   "max": [
+    -6,
+    2.5,
+    19.5
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    6,
+    0,
+    17.9
+   ],
+   "max": [
+    6.05,
+    2.4,
+    18
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    6,
+    0,
+    19.4
+   ],
+   "max": [
+    6.05,
+    2.4,
+    19.5
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    6,
+    2.4,
+    17.9
+   ],
+   "max": [
+    6.05,
+    2.5,
+    19.5
+   ],
+   "color": "#4a3220",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -6,
+    0,
+    14.96
+   ],
+   "max": [
+    -1.1,
+    0.5,
+    15
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    1.1,
+    0,
+    14.96
+   ],
+   "max": [
+    6,
+    0.5,
+    15
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -6,
+    0,
+    22
+   ],
+   "max": [
+    6,
+    0.5,
+    22.04
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -6.04,
+    0,
+    15
+   ],
+   "max": [
+    -6,
+    0.5,
+    17.9
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -6.04,
+    0,
+    19.5
+   ],
+   "max": [
+    -6,
+    0.5,
+    22
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    6,
+    0,
+    15
+   ],
+   "max": [
+    6.04,
+    0.5,
+    17.9
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    6,
+    0,
+    19.5
+   ],
+   "max": [
+    6.04,
+    0.5,
+    22
+   ],
+   "color": "#8a8176",
+   "look": "stein"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -0.7,
+    2.6,
+    14.6
+   ],
+   "max": [
+    0.7,
+    3.3,
+    14.66
+   ],
+   "color": "#7a5532",
+   "look": "bretter"
+  },
+  {
+   "type": "deko",
+   "min": [
+    -0.04,
+    3.3,
+    14.6
+   ],
+   "max": [
+    0.04,
+    3.4,
+    15
+   ],
+   "color": "#5a3b22",
+   "look": "bretter"
+  }
  ],
  "waypoints": {
   "nodes": [

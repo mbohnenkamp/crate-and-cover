@@ -2,7 +2,10 @@ import * as THREE from 'three';
 import { VIEW, MATCH } from '../config.js';
 import { createViewmodel, loadWeapons } from './viewmodel.js';
 import { createEffects } from './effects.js';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { TEAM_COLORS, createFigure, updateFigure, updateBar, createTargetFigure, removeFigure, loadSoldier } from './figures.js';
+import { textureFor, lookFor } from './textures.js';
+import { createSky } from './sky.js';
 
 const COLORS = {
   container: 0x8c8f93,
@@ -29,16 +32,17 @@ export function createRenderer(canvas, world) {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.15;
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xa9c7e0);
-  scene.fog = new THREE.Fog(0xa9c7e0, 40, 90);
+  scene.fog = new THREE.Fog(0xc3d9ea, 45, 140);
 
-  const camera = new THREE.PerspectiveCamera(VIEW.fov, 1, 0.05, 200);
+  const camera = new THREE.PerspectiveCamera(VIEW.fov, 1, 0.05, 1000);
   camera.rotation.order = 'YXZ';
 
-  scene.add(new THREE.HemisphereLight(0xdde8f5, 0x6b6253, 1.4));
-  const sun = new THREE.DirectionalLight(0xfff3e0, 2.2);
+  scene.add(new THREE.HemisphereLight(0xdde8f5, 0x6b6253, 1.5));
+  const sun = new THREE.DirectionalLight(0xfff3e0, 2.6);
   sun.position.set(18, 30, 10);
   sun.castShadow = true;
   sun.shadow.mapSize.set(2048, 2048);
@@ -46,12 +50,14 @@ export function createRenderer(canvas, world) {
   sun.shadow.bias = -0.0005;
   scene.add(sun);
 
-  const grid = gridTexture();
-  const ribs = ribTexture();
+  const sky = createSky(sun.position);
+  scene.add(sky);
+
   let mapGroup = null;
   let worldName = null;
 
-  // Blöcke nach Typ und eigener Farbe, Container mit Rippen. Schatten der Sonne über die ganze Karte.
+  // Blöcke und Schmuckblöcke nach Oberfläche zusammengefasst (ein Mesh je Oberfläche). Farbe je Block als
+  // Vertexfarbe mit leichter Abweichung, damit nicht jede Wand gleich aussieht. Schatten der Sonne über die ganze Karte.
   function setWorld(world) {
     if (worldName === world.name) return;
     worldName = world.name;
@@ -60,15 +66,19 @@ export function createRenderer(canvas, world) {
       mapGroup.traverse(o => { o.geometry?.dispose(); o.material?.dispose(); });
     }
     mapGroup = new THREE.Group();
-    const materials = {};
-    for (const b of world.boxes) {
-      const key = `${b.type}${b.color ?? ''}`;
-      materials[key] ??= new THREE.MeshLambertMaterial({
-        color: b.color ? new THREE.Color(b.color) : COLORS[b.type] ?? 0xff00ff,
-        map: b.type === 'container' ? ribs : grid,
-      });
-      const mesh = new THREE.Mesh(boxGeometry(b), materials[key]);
-      mesh.castShadow = b.type !== 'boden';
+    const groups = {};
+    for (const b of [...world.boxes, ...world.deko]) {
+      const look = lookFor(b, world);
+      const cast = b.type !== 'boden';
+      const geo = boxGeometry(b, look === 'kiste');
+      tint(geo, new THREE.Color(b.color ?? COLORS[b.type] ?? 0xff00ff), variation(b));
+      (groups[look + (cast ? '+' : '-')] ??= { look, cast, geos: [] }).geos.push(geo);
+    }
+    for (const g of Object.values(groups)) {
+      const merged = mergeGeometries(g.geos);
+      for (const geo of g.geos) geo.dispose();
+      const mesh = new THREE.Mesh(merged, new THREE.MeshLambertMaterial({ map: textureFor(g.look), vertexColors: true }));
+      mesh.castShadow = g.cast;
       mesh.receiveShadow = true;
       mapGroup.add(mesh);
     }
@@ -163,6 +173,7 @@ export function createRenderer(canvas, world) {
     render(view, positions, dt) {
       camera.position.set(view.x, view.y, view.z);
       camera.rotation.set(view.pitch, view.yaw, 0);
+      sky.position.copy(camera.position);
       if (camera.fov !== view.fov) {
         camera.fov = view.fov;
         camera.updateProjectionMatrix();
@@ -189,13 +200,15 @@ export function createRenderer(canvas, world) {
   };
 }
 
-// Box mit Texturkoordinaten in Metern, damit das Raster überall 1 m groß ist
-function boxGeometry(b) {
+// Box mit Texturkoordinaten in Metern, damit die Oberfläche überall gleich groß ist.
+// perFace: ein Bild je Seite (Kisten, damit der Rahmen am Rand jeder Kiste liegt)
+function boxGeometry(b, perFace = false) {
   const w = b.max[0] - b.min[0];
   const h = b.max[1] - b.min[1];
   const d = b.max[2] - b.min[2];
   const geo = new THREE.BoxGeometry(w, h, d);
   geo.translate((b.min[0] + b.max[0]) / 2, (b.min[1] + b.max[1]) / 2, (b.min[2] + b.max[2]) / 2);
+  if (perFace) return geo;
   const uv = geo.attributes.uv;
   const faceSize = [[d, h], [d, h], [w, d], [w, d], [w, h], [w, h]];
   for (let f = 0; f < 6; f++) {
@@ -207,42 +220,24 @@ function boxGeometry(b) {
   return geo;
 }
 
-// Wellblech: senkrechte Rippen, 4 je Meter
-function ribTexture() {
-  const c = document.createElement('canvas');
-  c.width = c.height = 64;
-  const g = c.getContext('2d');
-  g.fillStyle = '#ffffff';
-  g.fillRect(0, 0, 64, 64);
-  for (let i = 0; i < 4; i++) {
-    g.fillStyle = '#d6d6d6';
-    g.fillRect(i * 16 + 10, 0, 4, 64);
-    g.fillStyle = '#f4f4f4';
-    g.fillRect(i * 16 + 2, 0, 4, 64);
+// Farbe als Vertexfarbe auf alle Ecken, k hellt auf oder dunkelt ab
+function tint(geo, color, k) {
+  const n = geo.attributes.position.count;
+  const arr = new Float32Array(n * 3);
+  for (let i = 0; i < n; i++) {
+    arr[i * 3] = color.r * k;
+    arr[i * 3 + 1] = color.g * k;
+    arr[i * 3 + 2] = color.b * k;
   }
-  const tex = new THREE.CanvasTexture(c);
-  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-  tex.colorSpace = THREE.SRGBColorSpace;
-  tex.anisotropy = 8;
-  return tex;
+  geo.setAttribute('color', new THREE.BufferAttribute(arr, 3));
 }
 
-function gridTexture() {
-  const size = 128;
-  const c = document.createElement('canvas');
-  c.width = c.height = size;
-  const g = c.getContext('2d');
-  g.fillStyle = '#ffffff';
-  g.fillRect(0, 0, size, size);
-  g.fillStyle = '#f1f1f1';
-  g.fillRect(0, 0, size / 2, size / 2);
-  g.fillRect(size / 2, size / 2, size / 2, size / 2);
-  g.strokeStyle = '#c4c4c4';
-  g.lineWidth = 2;
-  g.strokeRect(0, 0, size, size);
-  const tex = new THREE.CanvasTexture(c);
-  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-  tex.colorSpace = THREE.SRGBColorSpace;
-  tex.anisotropy = 8;
-  return tex;
+// Leichte Helligkeitsabweichung je Block, aus der Lage berechnet, damit sie bei jedem Laden gleich ist
+function variation(b) {
+  let h = 2166136261;
+  for (const v of [...b.min, ...b.max]) {
+    h ^= Math.round(v * 100) & 0xffff;
+    h = Math.imul(h, 16777619) >>> 0;
+  }
+  return 0.93 + ((h % 1000) / 1000) * 0.14;
 }
