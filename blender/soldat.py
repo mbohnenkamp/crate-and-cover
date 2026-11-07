@@ -135,12 +135,19 @@ def kopf(get):
 def arm(sx):
     def build(get):
         x = sx * 0.25
-        # Oberarm mit Schulter
-        block(get(STOFF), x, 0, 1.12, 1.43, 0.12, 0.13, 0.14, 0.15)
+        # Oberarm mit Schulter, bis zum Ellbogen in 1,10 m
+        block(get(STOFF), x, 0, 1.10, 1.43, 0.12, 0.13, 0.14, 0.15)
         block(get(STOFF), x + sx * 0.005, -0.005, 1.25, 1.34, 0.145, 0.155)  # Tasche am Ärmel
-        block(get(DUNKEL), x, 0, 1.08, 1.14, 0.125, 0.135)  # hochgekrempelter Ärmel
-        # Unterarm, Handschuh, Daumen
-        block(get(HAUT), x, 0, 0.88, 1.09, 0.095, 0.1, 0.105, 0.11)
+        block(get(DUNKEL), x, 0, 1.10, 1.14, 0.125, 0.135)  # hochgekrempelter Ärmel, obere Hälfte
+    return build
+
+
+# Unterarm ab dem Ellbogen (Drehpunkt 1,10 m): Ärmelrest, Haut, Handschuh, Daumen. Handmitte bei 0,815 m.
+def unterarm(sx):
+    def build(get):
+        x = sx * 0.25
+        block(get(DUNKEL), x, 0, 1.06, 1.10, 0.125, 0.135)
+        block(get(HAUT), x, 0, 0.88, 1.07, 0.095, 0.1, 0.105, 0.11)
         block(get(SCHWARZ), x, 0, 0.74, 0.89, 0.1, 0.11, 0.11, 0.115)
         block(get(SCHWARZ), x - sx * 0.045, -0.04, 0.79, 0.86, 0.035, 0.04)
     return build
@@ -173,7 +180,8 @@ rumpf_node = part('soldat_rumpf', (0, 0, 0.95), root, rumpf)
 part('soldat_kopf', (0, 0, 1.46), rumpf_node, kopf)
 # Vorderseite −Y: die rechte Körperseite der Figur liegt bei −X
 for side, sx in (('r', -1), ('l', 1)):
-    part(f'soldat_arm_{side}', (sx * 0.25, 0, 1.40), rumpf_node, arm(sx))
+    arm_node = part(f'soldat_arm_{side}', (sx * 0.25, 0, 1.40), rumpf_node, arm(sx))
+    part(f'soldat_unterarm_{side}', (sx * 0.25, 0, 1.10), arm_node, unterarm(sx))
     bein_node = part(f'soldat_bein_{side}', (sx * 0.105, 0, 0.93), root, bein(sx))
     part(f'soldat_unterbein_{side}', (sx * 0.105, 0, 0.50), bein_node, unterbein(sx))
 

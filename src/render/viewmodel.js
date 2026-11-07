@@ -61,6 +61,45 @@ const BUILD = {
   },
 };
 
+// Wo die Hände je Waffe sitzen (Waffenraum, vorn −Z): rechte Hand am Griff, linke am Vorderschaft oder unter dem
+// Griff, mag = wohin die linke Hand beim Nachladen greift, bolt = Kammerstängel (rechte Hand nach dem Schuss)
+export const HANDS = {
+  gewehr: { right: [0, -0.11, 0.09], left: [0, -0.05, -0.2], mag: [0, -0.21, -0.12] },
+  pistole: { right: [0, -0.08, 0.03], left: [0, -0.115, 0.01], mag: [0, -0.2, 0.0] },
+  messer: { right: [0, 0, 0.045], left: null },
+  scharf: { right: [0, -0.1, 0.06], left: [0, -0.06, -0.22], mag: [0, -0.16, -0.05], bolt: [0.06, 0.04, -0.02] },
+};
+
+const GLOVE = 0x17181a;
+const SKIN = 0xd9c2a5;
+const SLEEVE = 0x2c2e33;
+const CLOTH = 0x4a4d53;
+
+// Arm für die Ego-Ansicht: Ursprung in der Handmitte, +Z zeigt zum Ellbogen. Handschuh mit Fingern und Daumen,
+// Unterarm bis zum Ellbogen, hochgekrempelter Ärmel, Oberarm läuft aus dem Bild.
+function buildArm(side) {
+  const g = new THREE.Group();
+  const sx = side === 'r' ? 1 : -1;
+  part(g, GLOVE, [0.09, 0.08, 0.1], [0, 0, 0]);
+  part(g, GLOVE, [0.09, 0.05, 0.06], [0, -0.055, -0.03]); // Finger um den Griff
+  part(g, GLOVE, [0.035, 0.035, 0.06], [-sx * 0.05, 0.01, -0.03]); // Daumen innen
+  part(g, SKIN, [0.065, 0.06, 0.18], [0, 0.005, 0.13]); // Unterarm
+  part(g, SLEEVE, [0.085, 0.08, 0.05], [0, 0.01, 0.24]); // hochgekrempelter Ärmel
+  part(g, CLOTH, [0.095, 0.09, 0.4], [0, 0.015, 0.46]); // Oberarm, läuft aus dem Bild
+  return g;
+}
+
+const _elbow = new THREE.Vector3();
+function placeArm(arm, hand, elbow) {
+  arm.position.set(hand[0], hand[1], hand[2]);
+  arm.lookAt(_elbow.set(elbow[0], elbow[1], elbow[2]));
+}
+
+const lerp3 = (a, b, k) => [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k];
+
+// Ellbogen im Waffenraum: rechts unten hinten, links unten außen — die Arme laufen unten aus dem Bild
+const ELBOW = { r: [0.26, -0.6, 0.45], l: [-0.3, -0.65, 0.1] };
+
 let flashMap = null;
 
 // Mündungsfeuer: leuchtender Stern, dreht sich je Schuss (setzt die Waffe über material.rotation)
@@ -133,6 +172,9 @@ export function createViewmodel() {
     }
   }
   fill();
+  const armR = buildArm('r');
+  const armL = buildArm('l');
+  holder.add(armR, armL);
 
   let swingTime = 99;
   let time = 0;
@@ -146,11 +188,23 @@ export function createViewmodel() {
       time += dt;
       swingTime += dt;
       const w = WEAPONS[arms.current];
-      for (const [id, g] of Object.entries(models)) g.visible = alive && id === arms.current && !arms.scoped;
+      const shown = alive && !arms.scoped;
+      for (const [id, g] of Object.entries(models)) g.visible = shown && id === arms.current;
       const g = models[arms.current];
 
-      let x = 0.25, y = -0.24, z = -0.55, rx = 0, ry = 0.02, rz = 0;
-      if (arms.current === 'messer') { x = 0.24; y = -0.22; z = -0.45; ry = 0.25; }
+      // Hände: rechte am Griff (nach dem Schuss kurz am Kammerstängel), linke am Vorderschaft, beim Nachladen am Magazin
+      const h = HANDS[arms.current];
+      const reloadK = arms.reload > 0 ? Math.sin((1 - arms.reload / w.reload) * Math.PI) : 0;
+      const boltK = h.bolt && arms.sinceShot > 0.15 && arms.sinceShot < 0.9 ? Math.sin(((arms.sinceShot - 0.15) / 0.75) * Math.PI) : 0;
+      armR.visible = shown;
+      placeArm(armR, boltK ? lerp3(h.right, h.bolt, boltK) : h.right, ELBOW.r);
+      armL.visible = shown && !!h.left;
+      if (h.left) placeArm(armL, reloadK ? lerp3(h.left, h.mag, reloadK) : h.left, ELBOW.l);
+
+      let x = 0.25, y = -0.21, z = -0.55, rx = 0, ry = 0.02, rz = 0;
+      if (arms.current === 'messer') { x = 0.24; y = -0.2; z = -0.45; ry = 0.25; }
+      // Atmen im Stand
+      y += Math.sin(time * 1.6) * 0.003;
 
       // Wippen beim Laufen
       const bob = Math.min(1, info.speed / 5.6) * (info.onGround ? 1 : 0);

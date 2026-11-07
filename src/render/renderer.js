@@ -184,6 +184,7 @@ export function createRenderer(canvas, world) {
           if (own) viewmodel.swing();
           if (e.hit === 'wall') effects.impact(e.end, e.normal, e.surface, true);
         }
+        if (e.type === 'reload' && figures[e.player]) Object.assign(figures[e.player], { reloadLeft: e.time, reloadTime: e.time });
         if (e.type === 'hit' && e.target !== null) targets[e.target].flash = 0.09;
         if (e.type === 'hit' && e.player !== null && figures[e.player]) figures[e.player].flash = 0.09;
         // Gegner zeigen ihren Lebensbalken 3 s nach jedem Schaden

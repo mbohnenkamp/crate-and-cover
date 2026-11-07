@@ -4,7 +4,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { hitboxes } from '../game/hitbox.js';
-import { buildWeapon, createMuzzleFlash } from './viewmodel.js';
+import { buildWeapon, createMuzzleFlash, HANDS } from './viewmodel.js';
 import { WEAPONS } from '../config.js';
 
 let soldier = null;
@@ -92,20 +92,65 @@ function soldierFigure(scene, team) {
     head: body.getObjectByName('soldat_kopf'),
     armR: body.getObjectByName('soldat_arm_r'),
     armL: body.getObjectByName('soldat_arm_l'),
+    foreR: body.getObjectByName('soldat_unterarm_r'),
+    foreL: body.getObjectByName('soldat_unterarm_l'),
     legR: body.getObjectByName('soldat_bein_r'),
     legL: body.getObjectByName('soldat_bein_l'),
     shinR: body.getObjectByName('soldat_unterbein_r'),
     shinL: body.getObjectByName('soldat_unterbein_l'),
   };
-  parts.armR.rotation.order = parts.armL.rotation.order = 'YXZ';
-  // Waffe hängt am Oberkörper, 32 cm über der Hüfte, vor der Brust
+  // Oberkörper dreht zuerst mit dem Blick (y), dann neigt er sich (x)
+  parts.torso.rotation.order = 'YXZ';
+  // Waffe hängt am Oberkörper, 30 cm über der Hüfte, vor der Brust, leicht nach rechts
   const gunHolder = new THREE.Group();
-  gunHolder.position.set(-0.07, 0.32, 0.32);
+  gunHolder.position.set(-0.05, 0.3, 0.24);
   gunHolder.rotation.y = Math.PI;
   parts.torso.add(gunHolder);
   scene.add(group);
-  return { group, pivot, body, mats, flash: 0, fall: 0, parts, gunHolder, weapon: null, muzzle: 0, muzzleMesh: null, walk: 0, kneel: 0, last: null };
+  return { group, pivot, body, mats, flash: 0, fall: 0, parts, gunHolder, weapon: null, muzzle: 0, muzzleMesh: null, walk: 0, kneel: 0, last: null, bodyYaw: null, reloadLeft: 0, reloadTime: 1 };
 }
+
+// Arm mit zwei Knochen (Oberarm, Unterarm) so stellen, dass die Hand den Zielpunkt erreicht (Oberkörper-Raum).
+// Ruhelage beider Knochen zeigt nach −Y (Arm hängt herab). Der Ellbogen weicht in Richtung hint aus.
+const ARM = { upper: 0.3, lower: 0.285 };
+const SHOULDER = { r: new THREE.Vector3(-0.25, 0.45, 0), l: new THREE.Vector3(0.25, 0.45, 0) };
+const ELBOW_HINT = { r: new THREE.Vector3(-0.7, -0.5, -0.25), l: new THREE.Vector3(0.7, -0.5, -0.25) };
+const DOWN = new THREE.Vector3(0, -1, 0);
+const _d = new THREE.Vector3();
+const _axis = new THREE.Vector3();
+const _u = new THREE.Vector3();
+const _e = new THREE.Vector3();
+const _f = new THREE.Vector3();
+const _q = new THREE.Quaternion();
+
+function aimArm(parts, side, target) {
+  const upper = side === 'r' ? parts.armR : parts.armL;
+  const lower = side === 'r' ? parts.foreR : parts.foreL;
+  const S = SHOULDER[side];
+  _d.subVectors(target, S);
+  const dist = Math.max(0.05, Math.min(ARM.upper + ARM.lower - 0.005, _d.length()));
+  _d.normalize();
+  const cosA = (ARM.upper ** 2 + dist ** 2 - ARM.lower ** 2) / (2 * ARM.upper * dist);
+  const a = Math.acos(Math.max(-1, Math.min(1, cosA)));
+  _axis.crossVectors(_d, ELBOW_HINT[side]);
+  if (_axis.lengthSq() < 1e-6) _axis.set(1, 0, 0);
+  _axis.normalize();
+  _u.copy(_d).applyAxisAngle(_axis, a);
+  _e.copy(S).addScaledVector(_u, ARM.upper);
+  _f.subVectors(target, _e).normalize();
+  upper.quaternion.setFromUnitVectors(DOWN, _u);
+  _q.setFromUnitVectors(DOWN, _f);
+  lower.quaternion.copy(upper.quaternion).invert().multiply(_q);
+}
+
+const _target = new THREE.Vector3();
+const _rest = new THREE.Vector3();
+// Punkt aus dem Waffenraum in den Oberkörper-Raum
+function gunPoint(f, p, out) {
+  return out.set(p[0], p[1], p[2]).applyMatrix4(f.gunHolder.matrix);
+}
+
+const wrapAngle = a => Math.atan2(Math.sin(a), Math.cos(a));
 
 
 function setWeapon(f, id) {
@@ -153,10 +198,10 @@ function blockFigure(scene, team) {
 }
 
 export function updateFigure(f, pos, yaw, crouched, alive, dt, weapon = null, pitch = 0) {
-  if (f.parts) animateSoldier(f, pos, crouched, alive, dt, weapon, pitch);
+  if (f.parts) animateSoldier(f, pos, yaw, crouched, alive, dt, weapon, pitch);
   else f.pivot.scale.y = crouched ? 1.2 / 1.8 : 1;
   f.group.position.set(pos.x, pos.y, pos.z);
-  f.group.rotation.y = yaw;
+  f.group.rotation.y = f.parts ? f.bodyYaw : yaw;
   f.flash = Math.max(0, f.flash - dt);
   for (const m of f.mats) m.emissive.setScalar(f.flash > 0 ? 0.9 : 0);
   if (alive) {
@@ -205,13 +250,21 @@ const KNEEL = { legR: -0.95, shinR: Math.PI / 2 + 0.95, legL: -2.0, shinL: 2.0 }
 
 // Beine schwingen mit der gelaufenen Strecke, Ausschlag nach Tempo. Blick hoch und runter: Oberkörper ein wenig,
 // Arme mit Waffe mehr, Kopf am meisten.
-function animateSoldier(f, pos, crouched, alive, dt, weapon, pitch) {
+function animateSoldier(f, pos, yaw, crouched, alive, dt, weapon, pitch) {
   if (f.weapon !== weapon) setWeapon(f, weapon);
   const p = f.parts;
   const moved = f.last && alive ? Math.hypot(pos.x - f.last.x, pos.z - f.last.z) : 0;
   f.last = { x: pos.x, z: pos.z };
   const speed = dt > 0 ? moved / dt : 0;
   const k = Math.min(1, dt * 10);
+
+  // Beine folgen dem Blick nur beim Gehen oder wenn der Oberkörper zu weit verdreht wäre; im Stand dreht
+  // nur der Oberkörper mit Kopf, Armen und Waffe
+  if (f.bodyYaw === null) f.bodyYaw = yaw;
+  let twist = wrapAngle(yaw - f.bodyYaw);
+  if (speed > 0.5 || Math.abs(twist) > 1.0 || !alive) f.bodyYaw += twist * Math.min(1, dt * 12);
+  twist = wrapAngle(yaw - f.bodyYaw);
+  p.torso.rotation.y = twist;
   f.kneel += ((crouched ? 1 : 0) - f.kneel) * Math.min(1, dt * 14);
   const c = f.kneel;
   const amount = Math.min(1, speed / 5) * 0.6 * (1 - c);
@@ -228,10 +281,27 @@ function animateSoldier(f, pos, crouched, alive, dt, weapon, pitch) {
   const look = alive ? pitch : 0;
   p.torso.rotation.x = -look * 0.3;
   p.head.rotation.x = -look * 0.5;
-  // Nach vorn heben, dann nach innen zur Waffe schwenken (rechte Hand am Griff, linke vorn am Lauf)
-  p.armR.rotation.set(-1.3 - look * 0.45, 0.3, 0);
-  p.armL.rotation.set(-1.25 - look * 0.45, -0.5, 0);
   f.gunHolder.rotation.x = -look * 0.45;
+  f.gunHolder.updateMatrix();
+
+  // Hände an die Waffe: rechte am Griff, linke am Vorderschaft, beim Nachladen greift die linke zum Magazin.
+  // Ohne Waffe oder beim Messer hängt der linke Arm locker.
+  const h = HANDS[weapon] ?? null;
+  f.reloadLeft = Math.max(0, f.reloadLeft - dt);
+  const reloadK = f.reloadLeft > 0 ? Math.sin((1 - f.reloadLeft / f.reloadTime) * Math.PI) : 0;
+  if (h) {
+    aimArm(p, 'r', gunPoint(f, h.right, _target));
+    if (h.left) {
+      gunPoint(f, h.left, _target);
+      if (reloadK && h.mag) _target.lerp(gunPoint(f, h.mag, _rest), reloadK);
+      aimArm(p, 'l', _target);
+    } else {
+      aimArm(p, 'l', _rest.set(0.3, -0.1, 0.12));
+    }
+  } else {
+    aimArm(p, 'r', _rest.set(-0.3, -0.1, 0.12));
+    aimArm(p, 'l', _rest.set(0.3, -0.1, 0.12));
+  }
 
   f.muzzle = Math.max(0, f.muzzle - dt);
   if (f.muzzleMesh) {
