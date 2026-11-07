@@ -122,6 +122,40 @@ export function createEffects(scene, camera) {
     return v.add(n).normalize().multiplyScalar(speed * (0.5 + Math.random()));
   }
 
+  // Eine Staub- oder Rauchwolke an einem Punkt
+  function spawnPuff(pos, hex, size, life, vel) {
+    const puff = puffs[nextPuff];
+    nextPuff = (nextPuff + 1) % MAX_PUFFS;
+    puff.sprite.position.copy(pos);
+    puff.sprite.material.color.setHex(hex);
+    puff.vel.copy(vel);
+    puff.size = size;
+    puff.life = life;
+    puff.age = 0;
+    puff.sprite.visible = true;
+  }
+
+  // Staub unter den Füßen bei Schritt und Landung
+  const dustVel = new THREE.Vector3(0, 0.3, 0);
+  function dust(pos, strength = 1) {
+    const p = new THREE.Vector3(pos.x, pos.y + 0.05, pos.z);
+    if (p.distanceTo(camera.position) > 30) return;
+    spawnPuff(p, 0xc9bfae, 0.22 * strength, 0.45, dustVel);
+  }
+
+  // Rauch aus dem Lauf, sobald eine Waffe heiß ist (mehrere Schüsse kurz hintereinander)
+  const heat = {};
+  function smoke(shooter, muzzle, dir) {
+    const now = performance.now() / 1000;
+    const h = heat[shooter] ?? { h: 0, t: now };
+    h.h = h.h * Math.exp(-(now - h.t) * 1.5) + 1;
+    h.t = now;
+    heat[shooter] = h;
+    if (h.h < 3) return;
+    const vel = new THREE.Vector3(0, 0.35, 0).addScaledVector(dir, 0.3);
+    spawnPuff(muzzle, 0xd0d3d6, 0.05 + 0.015 * Math.min(h.h, 8), 0.9, vel);
+  }
+
   function burst(point, n, look, strength = 1) {
     const p = new THREE.Vector3(point.x, point.y, point.z).addScaledVector(n, 0.02);
     // weit weg lohnt sich nur die Staubwolke
@@ -195,6 +229,10 @@ export function createEffects(scene, camera) {
         ? new THREE.Vector3(0.22, -0.12, -0.35).applyQuaternion(camera.quaternion).add(camera.position)
         : new THREE.Vector3(e.origin.x, e.origin.y - 0.3, e.origin.z).addScaledVector(right, 0.2);
       casing(from, right, UP, dir.clone().negate());
+      const muzzle = own
+        ? new THREE.Vector3(0.2, -0.12, -0.95).applyQuaternion(camera.quaternion).add(camera.position)
+        : new THREE.Vector3(e.origin.x, e.origin.y - 0.3, e.origin.z).addScaledVector(dir, 0.6);
+      smoke(e.shooter, muzzle, dir);
     }
     const geo = new THREE.BufferGeometry().setFromPoints([start, new THREE.Vector3(e.end.x, e.end.y, e.end.z)]);
     const line = new THREE.Line(geo, tracerMat.clone());
@@ -303,5 +341,5 @@ export function createEffects(scene, camera) {
     for (const p of puffs) p.sprite.visible = false;
   }
 
-  return { shot, impact, update, clear };
+  return { shot, impact, dust, update, clear };
 }

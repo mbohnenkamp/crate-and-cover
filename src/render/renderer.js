@@ -211,6 +211,8 @@ export function createRenderer(canvas, world) {
           else if (!e.kill) figures[e.player].flinch = 0.25;
         }
         if (e.type === 'reload' && figures[e.player]) Object.assign(figures[e.player], { reloadLeft: e.time, reloadTime: e.time });
+        if (e.type === 'step') effects.dust(e.pos, e.player === game.player?.id ? 0.7 : 1);
+        if (e.type === 'land') effects.dust(e.pos, 2);
         if (e.type === 'hit' && e.target !== null) targets[e.target].flash = 0.09;
         if (e.type === 'hit' && e.player !== null && figures[e.player]) figures[e.player].flash = 0.09;
         // Gegner zeigen ihren Lebensbalken 3 s nach jedem Schaden
