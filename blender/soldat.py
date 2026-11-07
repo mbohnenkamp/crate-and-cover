@@ -35,6 +35,8 @@ DUNKEL = mat('soldat_dunkel', '#2c2e33')
 SCHWARZ = mat('soldat_schwarz', '#17181a')
 HAUT = mat('soldat_haut', '#d9c2a5')
 GLAS = mat('soldat_brille', '#101214')
+BART = mat('soldat_bart', '#3a2a1e')  # das Spiel blendet den Bart je Figur ein oder aus
+MUND = mat('soldat_mund', '#8a5a4a')
 
 
 def hull(bm, pts):
@@ -117,6 +119,12 @@ def kopf(get):
     c = Vector((0, 0.005, 0))
     hull(get(HAUT), ring(c, 0.075, 0.085, 1.50) + ring(c, 0.098, 0.11, 1.58) + ring(c, 0.1, 0.11, 1.70))
     block(get(HAUT), 0, -0.105, 1.57, 1.62, 0.03, 0.03)  # Nase
+    # Mund als schmaler Spalt, Kinn etwas vor; Bart (Kinn und Wangen) als eigenes Material zum Ein- und Ausblenden
+    block(get(MUND), 0, -0.097, 1.537, 1.547, 0.045, 0.012)
+    block(get(HAUT), 0, -0.093, 1.50, 1.53, 0.07, 0.02, 0.08, 0.02)
+    block(get(BART), 0, -0.085, 1.498, 1.532, 0.13, 0.045, 0.15, 0.05)
+    for sx in (-1, 1):
+        block(get(BART), sx * 0.08, -0.03, 1.5, 1.6, 0.045, 0.1, 0.05, 0.1)
     # Schutzbrille mit Band
     block(get(GLAS), 0, -0.1, 1.615, 1.665, 0.2, 0.03, 0.21, 0.03)
     hull(get(SCHWARZ), ring(c, 0.104, 0.114, 1.62) + ring(c, 0.104, 0.114, 1.645))

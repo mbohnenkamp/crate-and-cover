@@ -29,8 +29,11 @@ function block(parent, color, size, pos, mats) {
 }
 
 // Vorderseite −Z, wie die Blickrichtung bei yaw 0
-export function createFigure(scene, team) {
-  const f = soldier ? soldierFigure(scene, team) : blockFigure(scene, team);
+// Hautfarben, je Spieler eine aus der Reihe; Bart bei jedem zweiten
+const SKINS = [0xd9c2a5, 0xc69c7a, 0x9c6b4a, 0xe8d2b8, 0x6f4a32, 0xb8865f];
+
+export function createFigure(scene, team, id = 0) {
+  const f = soldier ? soldierFigure(scene, team, id) : blockFigure(scene, team);
   f.bar = createBar();
   f.group.add(f.bar.group);
   return f;
@@ -71,7 +74,7 @@ export function updateBar(f, health, max, alive, show, dt) {
 
 // Soldat: Arme nach vorn zur Waffe, Beine schwingen beim Laufen, kniet geduckt, Oberkörper und Kopf folgen dem Blick.
 // Das Modell schaut nach +Z.
-function soldierFigure(scene, team) {
+function soldierFigure(scene, team, id) {
   const group = new THREE.Group();
   const pivot = new THREE.Group();
   group.add(pivot);
@@ -83,6 +86,8 @@ function soldierFigure(scene, team) {
     if (!o.isMesh) return;
     o.material = o.material.clone();
     if (o.material.name === 'soldat_team') o.material.color.setHex(TEAM_COLORS[team]);
+    if (o.material.name === 'soldat_haut') o.material.color.setHex(SKINS[id % SKINS.length]);
+    if (o.material.name === 'soldat_bart') o.visible = id % 2 === 1;
     o.material.transparent = true;
     o.castShadow = true;
     mats.push(o.material);

@@ -171,7 +171,7 @@ export function createRenderer(canvas, world) {
 
   function buildFigures() {
     for (const f of [...figures, ...targets]) if (f) removeFigure(scene, f);
-    figures = game.players.map(p => (p === game.player ? null : createFigure(scene, p.team)));
+    figures = game.players.map(p => (p === game.player ? null : createFigure(scene, p.team, p.id)));
     targets = game.targets.map(() => createTargetFigure(scene));
   }
 
