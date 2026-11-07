@@ -199,8 +199,21 @@ export function createViewmodel() {
   }
   fillArms();
 
+  // Magazin in der linken Hand beim Nachladen (die Waffenmodelle sind je Material verschmolzen, darum ein eigenes)
+  const MAG = { gewehr: [0.05, 0.16, 0.07], pistole: [0.03, 0.1, 0.04], scharf: [0.05, 0.1, 0.06] };
+  const mags = {};
+  for (const [id, size] of Object.entries(MAG)) {
+    const m = part(armL, DARK, size, [0, -0.07 - size[1] / 2 + 0.03, -0.06]);
+    m.visible = false;
+    mags[id] = m;
+  }
+
   let swingTime = 99;
   let time = 0;
+  let sprintK = 0;
+  let wasGround = true;
+  let jumpK = 0;
+  let landK = 0;
 
   return {
     scene,
@@ -223,6 +236,8 @@ export function createViewmodel() {
       placeArm(armR, boltK ? lerp3(h.right, h.bolt, boltK) : h.right, ELBOW.r);
       armL.visible = shown && !!h.left;
       if (h.left) placeArm(armL, reloadK ? lerp3(h.left, h.mag, reloadK) : h.left, ELBOW.l);
+      // Magazin sichtbar, solange die linke Hand unterwegs ist (ab einem Drittel des Wegs)
+      for (const [id, m] of Object.entries(mags)) m.visible = id === arms.current && reloadK > 0.35;
 
       let x = 0.25, y = -0.21, z = -0.55, rx = 0, ry = 0.02, rz = 0;
       if (arms.current === 'messer') { x = 0.24; y = -0.2; z = -0.45; ry = 0.25; }
@@ -233,6 +248,23 @@ export function createViewmodel() {
       const bob = Math.min(1, info.speed / 5.6) * (info.onGround ? 1 : 0);
       x += Math.cos(time * 9) * 0.008 * bob;
       y += Math.abs(Math.sin(time * 9)) * 0.01 * bob;
+
+      // Sprinten: Waffe sinkt und dreht nach innen; Sprung: Waffe hebt sich leicht; Landung: sackt kurz ab
+      const sprintTarget = info.onGround && !arms.scoped && arms.reload === 0 ? Math.max(0, Math.min(1, (info.speed - 3.6) / 1.8)) : 0;
+      sprintK += (sprintTarget - sprintK) * Math.min(1, dt * 8);
+      y -= 0.07 * sprintK;
+      x += 0.03 * sprintK;
+      rx += 0.4 * sprintK;
+      ry -= 0.3 * sprintK;
+      if (wasGround && !info.onGround) jumpK = 1;
+      if (!wasGround && info.onGround) landK = 1;
+      wasGround = info.onGround;
+      jumpK = Math.max(0, jumpK - dt * 3);
+      landK = Math.max(0, landK - dt * 4);
+      y += 0.03 * Math.sin(jumpK * Math.PI);
+      rx -= 0.08 * Math.sin(jumpK * Math.PI);
+      y -= 0.06 * Math.sin(landK * Math.PI);
+      rx += 0.1 * Math.sin(landK * Math.PI);
 
       // Ziehen: kommt von unten
       if (arms.draw > 0) {

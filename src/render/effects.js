@@ -9,6 +9,8 @@ const TRACER_LIFE = 0.06;
 const MAX_BITS = 400;
 const MAX_SPARKS = 200;
 const MAX_PUFFS = 48;
+const MAX_CASINGS = 120;
+const CASING_LIFE = 0.8;
 const GRAVITY = 9.8;
 
 // Kartenblöcke nach Material
@@ -80,6 +82,26 @@ export function createEffects(scene, camera) {
   const bits = [];
   const sparks = [];
 
+  // Patronenhülsen: kleine Messingstäbchen, fliegen nach rechts oben aus der Waffe und fallen
+  const casingMesh = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshLambertMaterial({ color: 0xc9a24a }), MAX_CASINGS);
+  casingMesh.count = 0;
+  casingMesh.frustumCulled = false;
+  casingMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+  scene.add(casingMesh);
+  const casings = [];
+
+  function casing(pos, right, up, back) {
+    if (casings.length >= MAX_CASINGS) casings.shift();
+    const vel = new THREE.Vector3()
+      .addScaledVector(right, 1.4 + Math.random() * 1.2)
+      .addScaledVector(up, 1.6 + Math.random() * 1.0)
+      .addScaledVector(back, 0.3 + Math.random() * 0.4);
+    casings.push({
+      pos: pos.clone(), vel, age: 0, life: CASING_LIFE,
+      rot: new THREE.Euler(Math.random() * 6, Math.random() * 6, 0), spin: 10 + Math.random() * 15,
+    });
+  }
+
   const puffMap = puffTexture();
   const puffs = Array.from({ length: MAX_PUFFS }, () => {
     const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: puffMap, transparent: true, depthWrite: false }));
@@ -92,6 +114,7 @@ export function createEffects(scene, camera) {
   const tmp = new THREE.Object3D();
   const color = new THREE.Color();
   const forward = new THREE.Vector3(0, 0, 1);
+  const UP = new THREE.Vector3(0, 1, 0);
 
   // Zufällige Richtung um die Normale, nach außen gestreut
   function scatter(n, speed, spread) {
@@ -164,6 +187,15 @@ export function createEffects(scene, camera) {
     const start = own
       ? new THREE.Vector3(0.2, -0.15, -0.6).applyQuaternion(camera.quaternion).add(camera.position)
       : new THREE.Vector3(e.origin.x, e.origin.y - 0.35, e.origin.z);
+    // Hülse: eigene aus der Waffe rechts neben der Kamera, fremde rechts neben der Figur, quer zur Schussrichtung
+    if (e.weapon !== 'messer') {
+      const dir = new THREE.Vector3(e.end.x - e.origin.x, e.end.y - e.origin.y, e.end.z - e.origin.z).normalize();
+      const right = new THREE.Vector3().crossVectors(dir, UP).normalize();
+      const from = own
+        ? new THREE.Vector3(0.22, -0.12, -0.35).applyQuaternion(camera.quaternion).add(camera.position)
+        : new THREE.Vector3(e.origin.x, e.origin.y - 0.3, e.origin.z).addScaledVector(right, 0.2);
+      casing(from, right, UP, dir.clone().negate());
+    }
     const geo = new THREE.BufferGeometry().setFromPoints([start, new THREE.Vector3(e.end.x, e.end.y, e.end.z)]);
     const line = new THREE.Line(geo, tracerMat.clone());
     scene.add(line);
@@ -211,6 +243,27 @@ export function createEffects(scene, camera) {
     bitMesh.instanceMatrix.needsUpdate = true;
     if (bitMesh.instanceColor) bitMesh.instanceColor.needsUpdate = true;
 
+    // Hülsen fliegen im Bogen, drehen sich, verblassen am Ende
+    for (let i = casings.length - 1; i >= 0; i--) {
+      const c = casings[i];
+      c.age += dt;
+      if (c.age >= c.life) { casings.splice(i, 1); continue; }
+      c.vel.y -= GRAVITY * dt;
+      c.pos.addScaledVector(c.vel, dt);
+      c.rot.x += c.spin * dt;
+      c.rot.z += c.spin * 0.6 * dt;
+    }
+    casings.forEach((c, i) => {
+      const s = Math.min(1, (c.life - c.age) / 0.15);
+      tmp.position.copy(c.pos);
+      tmp.rotation.copy(c.rot);
+      tmp.scale.set(0.009 * s, 0.009 * s, 0.028 * s);
+      tmp.updateMatrix();
+      casingMesh.setMatrixAt(i, tmp.matrix);
+    });
+    casingMesh.count = casings.length;
+    casingMesh.instanceMatrix.needsUpdate = true;
+
     // Funken fliegen schnell, gestreckt in Flugrichtung
     for (let i = sparks.length - 1; i >= 0; i--) {
       const s = sparks[i];
@@ -246,7 +299,7 @@ export function createEffects(scene, camera) {
     for (const t of tracers) scene.remove(t.line);
     tracers.length = 0;
     for (const h of holes) { h.age = HOLE_LIFE; h.mesh.visible = false; }
-    bits.length = sparks.length = 0;
+    bits.length = sparks.length = casings.length = 0;
     for (const p of puffs) p.sprite.visible = false;
   }
 
