@@ -4,7 +4,7 @@ import { createViewmodel, loadWeapons, loadHands } from './viewmodel.js';
 import { createEffects } from './effects.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { TEAM_COLORS, createFigure, updateFigure, updateBar, createTargetFigure, removeFigure, loadSoldier } from './figures.js';
+import { TEAM_COLORS, createFigure, updateFigure, updateBar, createTargetFigure, removeFigure, loadSoldier, updateCorpses, clearCorpses } from './figures.js';
 import { textureFor, lookFor } from './textures.js';
 import { createSky, DAYTIMES } from './sky.js';
 
@@ -187,6 +187,7 @@ export function createRenderer(canvas, world) {
     setGame(g) {
       game = g;
       buildFigures();
+      clearCorpses();
       effects.clear();
     },
     events(list) {
@@ -206,6 +207,8 @@ export function createRenderer(canvas, world) {
           const a = game.players[e.by].pos;
           const b = game.players[e.player].pos;
           figures[e.player].hitFrom = { x: b.x - a.x, z: b.z - a.z };
+          if (e.kill && e.part === 'head') figures[e.player].headshot = true;
+          else if (!e.kill) figures[e.player].flinch = 0.25;
         }
         if (e.type === 'reload' && figures[e.player]) Object.assign(figures[e.player], { reloadLeft: e.time, reloadTime: e.time });
         if (e.type === 'hit' && e.target !== null) targets[e.target].flash = 0.09;
@@ -231,6 +234,7 @@ export function createRenderer(canvas, world) {
         if (figures[i].hurtShow) figures[i].hurtShow = 0;
       });
       game.targets.forEach((t, i) => updateFigure(targets[i], t.pos, 0, false, t.alive, dt));
+      updateCorpses(dt);
       effects.update(dt);
       const me = game.player;
       viewmodel.update(me.arms, view, dt, me.alive);

@@ -111,6 +111,7 @@ function soldierFigure(scene, team) {
     group, pivot, body, mats, flash: 0, fall: 0, parts, gunHolder, weapon: null, muzzle: 0, muzzleMesh: null,
     walk: 0, kneel: 0, last: null, bodyYaw: null, reloadLeft: 0, reloadTime: 1,
     time: 0, air: 0, wasAir: false, land: 0, stab: 0, hitFrom: null, torsoY: parts.torso.position.y,
+    flinch: 0, headshot: false, dead: false,
   };
 }
 
@@ -203,6 +204,15 @@ function blockFigure(scene, team) {
 
 const _fallAxis = new THREE.Vector3(1, 0, 0);
 
+// Richtung des letzten Treffers im Raum der Figur (x quer, z nach vorn); ohne Treffer nach hinten
+function hitDir(f) {
+  const d = f.hitFrom;
+  const by = f.group.rotation.y;
+  if (!d || (!d.x && !d.z)) return [0, 1];
+  const len = Math.hypot(d.x, d.z);
+  return [(d.x * Math.cos(by) - d.z * Math.sin(by)) / len, (d.x * Math.sin(by) + d.z * Math.cos(by)) / len];
+}
+
 export function updateFigure(f, pos, yaw, crouched, alive, dt, weapon = null, pitch = 0, airborne = false) {
   if (f.parts) animateSoldier(f, pos, yaw, crouched, alive, dt, weapon, pitch, airborne);
   else f.pivot.scale.y = crouched ? 1.2 / 1.8 : 1;
@@ -212,31 +222,122 @@ export function updateFigure(f, pos, yaw, crouched, alive, dt, weapon = null, pi
   for (const m of f.mats) m.emissive.setScalar(f.flash > 0 ? 0.9 : 0);
   if (alive) {
     f.fall = 0;
+    f.dead = false;
     f.group.visible = true;
     f.pivot.quaternion.identity();
     for (const m of f.mats) m.opacity = 1;
     return;
   }
   // Fallen: vom Schützen weg (Richtung des letzten Treffers), sonst nach hinten. Achse quer zur Fallrichtung.
-  if (f.fall === 0) {
-    const d = f.hitFrom;
-    const by = f.group.rotation.y;
-    let dx = 0, dz = 1;
-    if (d && (d.x || d.z)) {
-      const len = Math.hypot(d.x, d.z);
-      // Weltrichtung in den Raum der Figur drehen
-      dx = (d.x * Math.cos(by) - d.z * Math.sin(by)) / len;
-      dz = (d.x * Math.sin(by) + d.z * Math.cos(by)) / len;
+  const [dx, dz] = hitDir(f);
+  _fallAxis.set(dz, 0, -dx);
+  if (f.parts) {
+    // Soldat: eine Kopie bleibt als Gefallener liegen, die Figur selbst wartet unsichtbar auf den Wiedereinstieg
+    if (!f.dead) {
+      spawnCorpse(f, _fallAxis);
+      f.dead = true;
+      f.headshot = false;
     }
-    _fallAxis.set(dz, 0, -dx);
-    f.fallAxis = _fallAxis.clone();
+    f.group.visible = false;
+    return;
   }
+  if (f.fall === 0) f.fallAxis = _fallAxis.clone();
   f.fall += dt;
   const k = Math.min(1, f.fall / 0.35);
   f.pivot.quaternion.setFromAxisAngle(f.fallAxis ?? _fallAxis, (Math.PI / 2) * k * k);
   const fade = Math.max(0, 1 - (f.fall - 0.6) / 0.4);
   for (const m of f.mats) m.opacity = fade;
   f.group.visible = fade > 0;
+}
+
+// Gefallene: Kopie der Figur in ihrer letzten Haltung, kippt um, bleibt liegen, verblasst nach CORPSE_LIE Sekunden.
+// Bei einem Kopftreffer fliegt der Helm weg und bleibt am Boden liegen.
+const corpses = [];
+const CORPSE_LIE = 6;
+const _hv = new THREE.Vector3();
+
+function spawnCorpse(f, axis) {
+  const scene = f.group.parent;
+  if (!scene) return;
+  const group = new THREE.Group();
+  group.position.copy(f.group.position);
+  group.rotation.y = f.group.rotation.y;
+  const pivot = new THREE.Group();
+  group.add(pivot);
+  const body = f.body.clone(true);
+  const mats = [];
+  body.traverse(o => {
+    if (o.isSprite) { o.visible = false; return; }
+    if (!o.isMesh) return;
+    o.material = o.material.clone();
+    o.material.transparent = true;
+    o.material.emissive.setScalar(0);
+    mats.push(o.material);
+  });
+  pivot.add(body);
+  scene.add(group);
+  const c = { group, pivot, mats, axis: axis.clone(), age: 0, helmet: null, hvel: new THREE.Vector3(), hspin: 0 };
+  if (f.headshot) {
+    const headName = f.parts.head.name;
+    const original = f.parts.head.children.find(o => o.isMesh && o.material.name === 'soldat_team');
+    const copy = body.getObjectByName(headName)?.children.find(o => o.isMesh && o.material.name === 'soldat_team');
+    if (original && copy) {
+      copy.visible = false;
+      const helmet = new THREE.Mesh(original.geometry, copy.material);
+      original.getWorldPosition(helmet.position);
+      original.getWorldQuaternion(helmet.quaternion);
+      helmet.castShadow = true;
+      scene.add(helmet);
+      const [dx, dz] = hitDir(f);
+      // vom Schützen weg und nach oben, in Weltrichtung gedreht
+      const by = f.group.rotation.y;
+      _hv.set(dx * Math.cos(by) + dz * Math.sin(by), 0, -dx * Math.sin(by) + dz * Math.cos(by));
+      c.hvel.copy(_hv).multiplyScalar(2 + Math.random()).setY(3 + Math.random());
+      c.hspin = 6 + Math.random() * 6;
+      c.helmet = helmet;
+    }
+  }
+  corpses.push(c);
+}
+
+export function updateCorpses(dt) {
+  for (let i = corpses.length - 1; i >= 0; i--) {
+    const c = corpses[i];
+    c.age += dt;
+    const k = Math.min(1, c.age / 0.35);
+    c.pivot.quaternion.setFromAxisAngle(c.axis, (Math.PI / 2) * k * k);
+    const fade = Math.max(0, Math.min(1, 1 - (c.age - CORPSE_LIE)));
+    for (const m of c.mats) m.opacity = fade;
+    if (c.helmet) {
+      c.hvel.y -= 9.8 * dt;
+      c.helmet.position.addScaledVector(c.hvel, dt);
+      c.helmet.rotation.x += c.hspin * dt;
+      c.helmet.rotation.z += c.hspin * 0.7 * dt;
+      const floor = c.group.position.y + 0.1;
+      if (c.helmet.position.y < floor) {
+        c.helmet.position.y = floor;
+        c.hvel.set(0, 0, 0);
+        c.hspin = 0;
+      }
+      c.helmet.material.opacity = fade;
+    }
+    if (fade <= 0) {
+      removeCorpse(c);
+      corpses.splice(i, 1);
+    }
+  }
+}
+
+// Geometrie gehört dem Soldatenmodell, nur die Materialien sind Kopien
+function removeCorpse(c) {
+  c.group.parent?.remove(c.group);
+  c.helmet?.parent?.remove(c.helmet);
+  for (const m of c.mats) m.dispose();
+}
+
+export function clearCorpses() {
+  for (const c of corpses) removeCorpse(c);
+  corpses.length = 0;
 }
 
 // Zielscheibe für den Schießstand: rote Figur mit hellem Kopf und weißem Ring
@@ -316,6 +417,14 @@ function animateSoldier(f, pos, yaw, crouched, alive, dt, weapon, pitch, airborn
 
   const look = alive ? pitch : 0;
   p.torso.rotation.x = -look * 0.3 + 0.25 * air;
+  // Treffer: Oberkörper zuckt kurz vom Schützen weg
+  f.flinch = Math.max(0, f.flinch - dt);
+  if (f.flinch > 0) {
+    const [dx, dz] = hitDir(f);
+    const kf = Math.sin((f.flinch / 0.25) * Math.PI) * 0.22;
+    p.torso.rotation.x += kf * dz;
+    p.torso.rotation.z -= kf * dx;
+  }
   p.head.rotation.x = -look * 0.5;
   f.gunHolder.rotation.x = -look * 0.45;
   f.gunHolder.updateMatrix();
