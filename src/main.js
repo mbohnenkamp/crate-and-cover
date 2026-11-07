@@ -140,7 +140,7 @@ function newGame() {
   minimap.setGame(game);
   input.yaw = game.player.yaw;
   input.pitch = 0;
-  prev = game.players.map(p => ({ ...p.pos }));
+  prev = game.players.map(p => ({ ...p.pos, eye: p.eye }));
 }
 
 function startMatch() {
@@ -220,9 +220,12 @@ function frame(now) {
   input.sensitivityScale = settings.sensitivity * Math.tan((fov * Math.PI) / 360) / Math.tan((VIEW.fov * Math.PI) / 360);
 
   const t = acc / DT;
+  // Auch die Augenhöhe interpolieren: beim Stufensteigen springt pos.y hoch und eye gleich weit runter;
+  // nur eines davon zu glätten ließ die Kamera je Stufe kurz einsacken (Ruckeln auf Treppen)
   const lerp = (p, i) => {
-    const q = prev[i] ?? p.pos;
-    return { x: q.x + (p.pos.x - q.x) * t, y: q.y + (p.pos.y - q.y) * t, z: q.z + (p.pos.z - q.z) * t };
+    const q = prev[i] ?? { ...p.pos, eye: p.eye };
+    const qe = q.eye ?? p.eye;
+    return { x: q.x + (p.pos.x - q.x) * t, y: q.y + (p.pos.y - q.y) * t, z: q.z + (p.pos.z - q.z) * t, eye: qe + (p.eye - qe) * t };
   };
   const positions = game.players.map(lerp);
   const mine = positions[me.id];
@@ -237,7 +240,7 @@ function frame(now) {
   } else {
     camera = {
       x: mine.x,
-      y: mine.y + (me.alive ? me.eye : 0.5),
+      y: mine.y + (me.alive ? mine.eye : 0.5),
       z: mine.z,
       yaw: input.yaw + a.punch.yaw,
       pitch: Math.max(-limit, Math.min(limit, input.pitch + a.punch.pitch)),
