@@ -3,6 +3,7 @@ import { VIEW, MATCH } from '../config.js';
 import { createViewmodel, loadWeapons } from './viewmodel.js';
 import { createEffects } from './effects.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { TEAM_COLORS, createFigure, updateFigure, updateBar, createTargetFigure, removeFigure, loadSoldier } from './figures.js';
 import { textureFor, lookFor } from './textures.js';
 import { createSky } from './sky.js';
@@ -68,6 +69,7 @@ export function createRenderer(canvas, world) {
     mapGroup = new THREE.Group();
     const groups = {};
     for (const b of [...world.boxes, ...world.deko]) {
+      if (b.hidden) continue; // an seiner Stelle steht ein Blender-Modell
       const look = lookFor(b, world);
       const cast = b.type !== 'boden';
       const geo = boxGeometry(b, look === 'kiste');
@@ -81,6 +83,25 @@ export function createRenderer(canvas, world) {
       mesh.castShadow = g.cast;
       mesh.receiveShadow = true;
       mapGroup.add(mesh);
+    }
+    // Blender-Modelle (Baum, Brunnen, Marktstand …) an ihre Plätze; Modelle laden einmal, dann Kopien
+    const group = mapGroup;
+    for (const p of world.props) {
+      loadProp(p.model).then(model => {
+        if (!model || mapGroup !== group) return;
+        const inst = model.clone(true);
+        inst.position.set(p.pos[0], p.pos[1], p.pos[2]);
+        inst.rotation.y = p.yaw ?? 0;
+        inst.traverse(o => {
+          if (!o.isMesh) return;
+          o.castShadow = o.receiveShadow = true;
+          if (p.color && o.material.name === `${p.model}_stoff`) {
+            o.material = o.material.clone();
+            o.material.color.set(p.color);
+          }
+        });
+        group.add(inst);
+      });
     }
     for (const s of world.spawns) {
       const mark = new THREE.Mesh(
@@ -218,6 +239,15 @@ function boxGeometry(b, perFace = false) {
     }
   }
   return geo;
+}
+
+const propCache = {};
+function loadProp(name) {
+  propCache[name] ??= new GLTFLoader()
+    .loadAsync(`${import.meta.env.BASE_URL}models/custom/${name}.glb`)
+    .then(gltf => gltf.scene)
+    .catch(() => null); // fehlt das Modell, bleibt die Stelle leer (Kollision bleibt)
+  return propCache[name];
 }
 
 // Farbe als Vertexfarbe auf alle Ecken, k hellt auf oder dunkelt ab

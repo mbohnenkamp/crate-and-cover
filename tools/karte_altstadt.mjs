@@ -20,6 +20,10 @@ function entry(type, min, max, color, look) {
 }
 const box = (type, min, max, color, look) => boxes.push(entry(type, min, max, color, look));
 const trim = (min, max, color, look) => deko.push(entry('deko', min, max, color, look));
+// Block bleibt Kollision, wird aber nicht gezeichnet: an seiner Stelle steht ein Blender-Modell (props)
+const hiddenBox = (type, min, max, color) => { box(type, min, max, color); boxes[boxes.length - 1].hidden = true; };
+const props = [];
+const prop = (model, x, z, yaw = 0, color) => props.push({ model, pos: [+x.toFixed(3), 0, +z.toFixed(3)], yaw, ...(color ? { color } : {}) });
 
 const RAHMEN = '#f1ebdf';
 const TUER = '#4a3220';
@@ -165,13 +169,14 @@ both((X, s) => {
   house({ x0, x1, z0: -7, z1: 1, doors: { N: [X(17.5)], [inSide]: [-3] }, stair: outSide, color: PUTZ[1], roof: ZIEGEL[1] });
   house({ x0, x1, z0: 5, z1: 13, doors: { N: [X(19)], S: [X(17)], [inSide]: [9] }, stair: outSide, color: PUTZ[2], roof: ZIEGEL[2] });
 
-  // Marktstände: Tisch, vier Pfosten, Stoffdach
+  // Marktstände: Tisch, vier Pfosten, Stoffdach als Kollision, gezeichnet wird das Blender-Modell (Dach in Standfarbe)
   for (const [c, cloth] of [[-0.5, '#b33a3a'], [9, '#d8c690']]) {
     [x0, x1] = xr(4.7, 7.3);
-    box('kiste', [x0, 0, c - 0.5], [x1, 1, c + 0.5]);
-    for (const a of [4.8, 7.2]) for (const z of [c - 0.4, c + 0.4]) box('pfosten', [X(a) - 0.05, 0, z - 0.05], [X(a) + 0.05, 2.3, z + 0.05]);
+    hiddenBox('kiste', [x0, 0, c - 0.5], [x1, 1, c + 0.5]);
+    for (const a of [4.8, 7.2]) for (const z of [c - 0.4, c + 0.4]) hiddenBox('pfosten', [X(a) - 0.05, 0, z - 0.05], [X(a) + 0.05, 2.3, z + 0.05]);
     [x0, x1] = xr(4.5, 7.5);
-    box('stoff', [x0, 2.3, c - 1.2], [x1, 2.4, c + 1.2], cloth);
+    hiddenBox('stoff', [x0, 2.3, c - 1.2], [x1, 2.4, c + 1.2], cloth);
+    prop('marktstand', X(6), c, 0, cloth);
   }
   // Fässer und Kisten am Markt, ein Karren
   box('kiste', [X(9.5) - 0.5, 0, 3], [X(9.5) + 0.5, 1, 4]);
@@ -186,8 +191,9 @@ both((X, s) => {
   [x0, x1] = xr(8, 9);
   box('hecke', [x0, 0, -21], [x1, 1.2, -17.5], '#3f6b38');
   for (const [a, z] of [[11, -19], [12.5, -6]]) {
-    box('stamm', [X(a) - 0.25, 0, z - 0.25], [X(a) + 0.25, 3, z + 0.25], '#6b4a2f');
-    box('laub', [X(a) - 1.5, 2.6, z - 1.5], [X(a) + 1.5, 5, z + 1.5], '#4f7d3f');
+    hiddenBox('stamm', [X(a) - 0.25, 0, z - 0.25], [X(a) + 0.25, 3, z + 0.25], '#6b4a2f');
+    hiddenBox('laub', [X(a) - 1.5, 2.6, z - 1.5], [X(a) + 1.5, 5, z + 1.5], '#4f7d3f');
+    prop('baum', X(a), z, s < 0 ? 0.7 : 2.3);
   }
 
   // Gasthaus: Außentreppe aufs Dach
@@ -245,9 +251,10 @@ trim([-0.05, 16.7, -7.2], [0.05, 18.2, -7.1], '#d9a92e', 'stahl');
 trim([-0.4, 17.6, -7.2], [0.4, 17.7, -7.1], '#d9a92e', 'stahl');
 
 // Marktplatz: Brunnen mit Säule und kleinem Dach
-box('brunnen', [-1.5, 0, 3], [1.5, 0.9, 6], '#9a958c');
-box('brunnen', [-0.25, 0.9, 4.25], [0.25, 2.6, 4.75], '#9a958c');
-box('dach', [-0.9, 2.6, 3.6], [0.9, 2.8, 5.4], ZIEGEL[0]);
+hiddenBox('brunnen', [-1.5, 0, 3], [1.5, 0.9, 6], '#9a958c');
+hiddenBox('brunnen', [-0.25, 0.9, 4.25], [0.25, 2.6, 4.75], '#9a958c');
+hiddenBox('dach', [-0.9, 2.6, 3.6], [0.9, 2.8, 5.4], ZIEGEL[0]);
+prop('brunnen', 0, 4.5);
 
 // Gasthaus mit begehbarem Dach und Brüstung, Lücken an den Treppen
 const G = PUTZ[1];
@@ -279,6 +286,7 @@ const map = {
   navHints: hints.map(h => h.map(v => +v.toFixed(2))),
   looks: { boden: 'pflaster', treppe: 'bretter' },
   deko,
+  props,
 };
 writeFileSync(new URL('../src/maps/altstadt.json', import.meta.url), JSON.stringify(map, null, 1));
-console.log(`Altstadt: ${boxes.length} Blöcke, ${deko.length} Schmuckblöcke, ${stairs.length} Treppen`);
+console.log(`Altstadt: ${boxes.length} Blöcke, ${deko.length} Schmuckblöcke, ${props.length} Modelle, ${stairs.length} Treppen`);

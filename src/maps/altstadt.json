@@ -1781,7 +1781,8 @@
     -4.7,
     1,
     0
-   ]
+   ],
+   "hidden": true
   },
   {
    "type": "pfosten",
@@ -1794,7 +1795,8 @@
     -4.75,
     2.3,
     -0.85
-   ]
+   ],
+   "hidden": true
   },
   {
    "type": "pfosten",
@@ -1807,7 +1809,8 @@
     -4.75,
     2.3,
     -0.05
-   ]
+   ],
+   "hidden": true
   },
   {
    "type": "pfosten",
@@ -1820,7 +1823,8 @@
     -7.15,
     2.3,
     -0.85
-   ]
+   ],
+   "hidden": true
   },
   {
    "type": "pfosten",
@@ -1833,7 +1837,8 @@
     -7.15,
     2.3,
     -0.05
-   ]
+   ],
+   "hidden": true
   },
   {
    "type": "stoff",
@@ -1847,7 +1852,8 @@
     2.4,
     0.7
    ],
-   "color": "#b33a3a"
+   "color": "#b33a3a",
+   "hidden": true
   },
   {
    "type": "kiste",
@@ -1860,7 +1866,8 @@
     -4.7,
     1,
     9.5
-   ]
+   ],
+   "hidden": true
   },
   {
    "type": "pfosten",
@@ -1873,7 +1880,8 @@
     -4.75,
     2.3,
     8.65
-   ]
+   ],
+   "hidden": true
   },
   {
    "type": "pfosten",
@@ -1886,7 +1894,8 @@
     -4.75,
     2.3,
     9.45
-   ]
+   ],
+   "hidden": true
   },
   {
    "type": "pfosten",
@@ -1899,7 +1908,8 @@
     -7.15,
     2.3,
     8.65
-   ]
+   ],
+   "hidden": true
   },
   {
    "type": "pfosten",
@@ -1912,7 +1922,8 @@
     -7.15,
     2.3,
     9.45
-   ]
+   ],
+   "hidden": true
   },
   {
    "type": "stoff",
@@ -1926,7 +1937,8 @@
     2.4,
     10.2
    ],
-   "color": "#d8c690"
+   "color": "#d8c690",
+   "hidden": true
   },
   {
    "type": "kiste",
@@ -2008,7 +2020,8 @@
     3,
     -18.75
    ],
-   "color": "#6b4a2f"
+   "color": "#6b4a2f",
+   "hidden": true
   },
   {
    "type": "laub",
@@ -2022,7 +2035,8 @@
     5,
     -17.5
    ],
-   "color": "#4f7d3f"
+   "color": "#4f7d3f",
+   "hidden": true
   },
   {
    "type": "stamm",
@@ -2036,7 +2050,8 @@
     3,
     -5.75
    ],
-   "color": "#6b4a2f"
+   "color": "#6b4a2f",
+   "hidden": true
   },
   {
    "type": "laub",
@@ -2050,7 +2065,8 @@
     5,
     -4.5
    ],
-   "color": "#4f7d3f"
+   "color": "#4f7d3f",
+   "hidden": true
   },
   {
    "type": "wand",
@@ -3771,7 +3787,8 @@
     7.3,
     1,
     0
-   ]
+   ],
+   "hidden": true
   },
   {
    "type": "pfosten",
@@ -3784,7 +3801,8 @@
     4.85,
     2.3,
     -0.85
-   ]
+   ],
+   "hidden": true
   },
   {
    "type": "pfosten",
@@ -3797,7 +3815,8 @@
     4.85,
     2.3,
     -0.05
-   ]
+   ],
+   "hidden": true
   },
   {
    "type": "pfosten",
@@ -3810,7 +3829,8 @@
     7.25,
     2.3,
     -0.85
-   ]
+   ],
+   "hidden": true
   },
   {
    "type": "pfosten",
@@ -3823,7 +3843,8 @@
     7.25,
     2.3,
     -0.05
-   ]
+   ],
+   "hidden": true
   },
   {
    "type": "stoff",
@@ -3837,7 +3858,8 @@
     2.4,
     0.7
    ],
-   "color": "#b33a3a"
+   "color": "#b33a3a",
+   "hidden": true
   },
   {
    "type": "kiste",
@@ -3850,7 +3872,8 @@
     7.3,
     1,
     9.5
-   ]
+   ],
+   "hidden": true
   },
   {
    "type": "pfosten",
@@ -3863,7 +3886,8 @@
     4.85,
     2.3,
     8.65
-   ]
+   ],
+   "hidden": true
   },
   {
    "type": "pfosten",
@@ -3876,7 +3900,8 @@
     4.85,
     2.3,
     9.45
-   ]
+   ],
+   "hidden": true
   },
   {
    "type": "pfosten",
@@ -3889,7 +3914,8 @@
     7.25,
     2.3,
     8.65
-   ]
+   ],
+   "hidden": true
   },
   {
    "type": "pfosten",
@@ -3902,7 +3928,8 @@
     7.25,
     2.3,
     9.45
-   ]
+   ],
+   "hidden": true
   },
   {
    "type": "stoff",
@@ -3916,7 +3943,8 @@
     2.4,
     10.2
    ],
-   "color": "#d8c690"
+   "color": "#d8c690",
+   "hidden": true
   },
   {
    "type": "kiste",
@@ -3998,7 +4026,8 @@
     3,
     -18.75
    ],
-   "color": "#6b4a2f"
+   "color": "#6b4a2f",
+   "hidden": true
   },
   {
    "type": "laub",
@@ -4012,7 +4041,8 @@
     5,
     -17.5
    ],
-   "color": "#4f7d3f"
+   "color": "#4f7d3f",
+   "hidden": true
   },
   {
    "type": "stamm",
@@ -4026,7 +4056,8 @@
     3,
     -5.75
    ],
-   "color": "#6b4a2f"
+   "color": "#6b4a2f",
+   "hidden": true
   },
   {
    "type": "laub",
@@ -4040,7 +4071,8 @@
     5,
     -4.5
    ],
-   "color": "#4f7d3f"
+   "color": "#4f7d3f",
+   "hidden": true
   },
   {
    "type": "wand",
@@ -4964,7 +4996,8 @@
     0.9,
     6
    ],
-   "color": "#9a958c"
+   "color": "#9a958c",
+   "hidden": true
   },
   {
    "type": "brunnen",
@@ -4978,7 +5011,8 @@
     2.6,
     4.75
    ],
-   "color": "#9a958c"
+   "color": "#9a958c",
+   "hidden": true
   },
   {
    "type": "dach",
@@ -4992,7 +5026,8 @@
     2.8,
     5.4
    ],
-   "color": "#8e4a3a"
+   "color": "#8e4a3a",
+   "hidden": true
   },
   {
    "type": "wand",
@@ -16644,6 +16679,93 @@
    ],
    "color": "#5a3b22",
    "look": "bretter"
+  }
+ ],
+ "props": [
+  {
+   "model": "marktstand",
+   "pos": [
+    -6,
+    0,
+    -0.5
+   ],
+   "yaw": 0,
+   "color": "#b33a3a"
+  },
+  {
+   "model": "marktstand",
+   "pos": [
+    -6,
+    0,
+    9
+   ],
+   "yaw": 0,
+   "color": "#d8c690"
+  },
+  {
+   "model": "baum",
+   "pos": [
+    -11,
+    0,
+    -19
+   ],
+   "yaw": 0.7
+  },
+  {
+   "model": "baum",
+   "pos": [
+    -12.5,
+    0,
+    -6
+   ],
+   "yaw": 0.7
+  },
+  {
+   "model": "marktstand",
+   "pos": [
+    6,
+    0,
+    -0.5
+   ],
+   "yaw": 0,
+   "color": "#b33a3a"
+  },
+  {
+   "model": "marktstand",
+   "pos": [
+    6,
+    0,
+    9
+   ],
+   "yaw": 0,
+   "color": "#d8c690"
+  },
+  {
+   "model": "baum",
+   "pos": [
+    11,
+    0,
+    -19
+   ],
+   "yaw": 2.3
+  },
+  {
+   "model": "baum",
+   "pos": [
+    12.5,
+    0,
+    -6
+   ],
+   "yaw": 2.3
+  },
+  {
+   "model": "brunnen",
+   "pos": [
+    0,
+    0,
+    4.5
+   ],
+   "yaw": 0
   }
  ],
  "waypoints": {
