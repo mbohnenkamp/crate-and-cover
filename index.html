@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Crate &amp; Cover</title>
+  <style>html,body{background:#1c1f24;height:100%;margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Noto Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif;overflow:hidden}#game{width:100%;height:100%;display:block}#crosshair,#hitmark{pointer-events:none;width:0;height:0;position:fixed;top:50%;left:50%}#crosshair i{background:#7dff8a;position:absolute;box-shadow:0 0 0 1px #0000008c}#hitmark i{background:#fff;width:2px;height:18px;position:absolute;top:-9px;left:-1px;box-shadow:0 0 0 1px #0006}#hitmark i:first-child{transform:rotate(45deg)translateY(-12px)}#hitmark i:nth-child(2){transform:rotate(45deg)translateY(12px)}#hitmark i:nth-child(3){transform:rotate(-45deg)translateY(-12px)}#hitmark i:nth-child(4){transform:rotate(-45deg)translateY(12px)}#hitmark.kill i{background:#ff5a4a}#scope{pointer-events:none;background:radial-gradient(circle,#0000 0 38vmin,#000 38.3vmin);position:fixed;top:0;bottom:0;left:0;right:0}#scope:before,#scope:after{content:"";background:#000;position:fixed}#scope:before{height:1px;top:50%;left:0;right:0}#scope:after{width:1px;top:0;bottom:0;left:50%}#hud{text-align:right;color:#fff;text-shadow:0 1px 3px #000;pointer-events:none;position:fixed;bottom:18px;right:22px}#slots{color:#c8ced6;margin-bottom:6px;font-size:12px}#slots span{opacity:.55;margin-left:12px}#slots span.active{opacity:1;color:#ffd27a}#weapon-name{font-size:14px}#ammo{font-size:38px;font-weight:700;line-height:1.1}#ammo small{color:#c8ced6;font-size:18px;font-weight:400}#ammo .empty{color:#ff5a4a}#reload{pointer-events:none;background:#00000073;width:120px;height:4px;margin-left:-60px;position:fixed;top:58%;left:50%}#reload-bar{background:#ffd27a;height:100%}#feed{text-align:right;color:#fff;text-shadow:0 1px 2px #000;pointer-events:none;font-size:13px;position:fixed;top:14px;right:22px}#feed .head{color:#ffd27a}#info{color:#fff;text-shadow:0 1px 2px #000;pointer-events:none;font-size:13px;position:fixed;top:10px;left:12px}#overlay{color:#eef1f5;background:#14181e99;justify-content:center;align-items:center;display:flex;position:fixed;top:0;bottom:0;left:0;right:0}#overlay .box{background:#1e232cf2;border-radius:10px;max-width:680px;max-height:92vh;padding:28px 32px;overflow:auto}#overlay h1{margin:0 0 4px;font-size:26px}#overlay p{color:#aab4c0;margin:0 0 18px}#overlay table{border-collapse:collapse;font-size:14px}#overlay td{padding:3px 14px 3px 0}#overlay td:first-child{color:#ffd27a;white-space:nowrap}#score{text-align:center;color:#fff;text-shadow:0 1px 3px #000;pointer-events:none;font-size:22px;font-weight:700;position:fixed;top:10px;left:50%;transform:translate(-50%)}#score small{color:#dfe4ea;font-size:13px;font-weight:400;display:block}.tA{color:#6fa8ff}.tB{color:#ffa45c}#feed .mine{background:#00000059;border-radius:3px;padding:1px 6px}#feed small{color:#c8ced6;margin:0 4px}#vitals{color:#fff;text-shadow:0 1px 3px #000;pointer-events:none;position:fixed;bottom:18px;left:22px}#vitals small{color:#c8ced6;font-size:12px;display:block}#health{font-size:38px;font-weight:700}#health.low{color:#ff5a4a}#damage{pointer-events:none;opacity:0;background:radial-gradient(circle,#0000 45%,#c8140abf 100%);position:fixed;top:0;bottom:0;left:0;right:0}#death{text-align:center;color:#fff;text-shadow:0 2px 4px #000;pointer-events:none;font-size:26px;font-weight:700;position:fixed;top:38%;left:50%;transform:translate(-50%)}#death small{margin-top:6px;font-size:15px;font-weight:400;display:block}#board{pointer-events:none;background:#14181ee0;border-radius:10px;gap:18px;padding:16px;display:flex;position:fixed;top:18%;left:50%;transform:translate(-50%)}#board table,#end-board table{border-collapse:collapse;color:#eef1f5;min-width:300px;font-size:14px}#board th,#board td,#end-board th,#end-board td{text-align:right;padding:4px 10px}#board th:first-child,#board td:first-child,#end-board th:first-child,#end-board td:first-child{text-align:left}.team-A th:first-child{color:#6fa8ff}.team-B th:first-child{color:#ffa45c}tr.me td{color:#ffd27a;font-weight:600}#end-board{gap:18px;margin:14px 0 18px;display:flex}.opt{gap:6px;margin:4px 0 12px;display:flex}.label{color:#aab4c0;font-size:13px}.opt button,.actions button{color:#eef1f5;font:inherit;cursor:pointer;background:#262d38;border:1px solid #3c4655;border-radius:6px;flex:1;padding:8px 10px;font-size:14px}.opt button.on{background:#3d7bd9;border-color:#3d7bd9}.actions{gap:8px;margin-top:8px;display:flex}.actions button.primary{background:#e0832f;border-color:#e0832f;font-weight:600}#overlay details{color:#aab4c0;margin-top:16px;font-size:13px}#overlay summary{cursor:pointer}body.in-menu #hud,body.in-menu #vitals,body.in-menu #crosshair,body.in-menu #score,body.in-menu #feed,body.in-menu #death,body.in-menu #damage,body.in-menu #scope{display:none!important}#minimap{pointer-events:none;border-radius:50%;position:fixed;top:14px;left:14px}#info{bottom:92px;top:auto!important;left:22px!important}#hurtdir{pointer-events:none;width:0;height:0;position:fixed;top:50%;left:50%}#hurtdir i{box-sizing:border-box;opacity:0;border-top:7px solid #ff321ee6;border-radius:50%;width:180px;height:180px;position:absolute;top:-90px;left:-90px;-webkit-mask:linear-gradient(90deg,#0000 30%,#000 42% 58%,#0000 70%);mask:linear-gradient(90deg,#0000 30%,#000 42% 58%,#0000 70%)}.settings{grid-template-columns:auto 1fr 52px;align-items:center;gap:8px 12px;margin:4px 0 12px;font-size:14px;display:grid}.settings input{accent-color:#3d7bd9;width:100%}.settings output{text-align:right;color:#ffd27a}.settings .demo{color:#eef1f5;font:inherit;cursor:pointer;background:#262d38;border:1px solid #3c4655;border-radius:6px;padding:6px 10px;font-size:13px}#best table{width:100%}#best td{color:#eef1f5;padding:3px 10px 3px 0}#best td:first-child{color:#aab4c0}#end-record{color:#ffd27a;margin:-6px 0 10px;font-weight:600}body.in-menu #minimap,body.in-menu #hurtdir,.hidden{display:none!important}</style>
+  <script type="module" crossorigin src="./assets/index-Be0pNq9S.js"></script>
+</head>
+<body>
+  <canvas id="game"></canvas>
+  <canvas id="minimap"></canvas>
+  <div id="hurtdir"><i></i><i></i><i></i><i></i></div>
+  <div id="scope" class="hidden"></div>
+  <div id="crosshair"><i></i><i></i><i></i><i></i></div>
+  <div id="hitmark" class="hidden"><i></i><i></i><i></i><i></i></div>
+  <div id="reload" class="hidden"><div id="reload-bar"></div></div>
+  <div id="damage"></div>
+  <div id="score" class="hidden"></div>
+  <div id="feed"></div>
+  <div id="death" class="hidden"></div>
+  <div id="board" class="hidden"></div>
+  <div id="vitals"><small>Leben</small><div id="health">100</div></div>
+  <div id="hud">
+    <div id="slots"></div>
+    <div id="weapon-name"></div>
+    <div id="ammo"></div>
+  </div>
+  <div id="info"></div>
+  <div id="overlay">
+    <div class="box" id="menu">
+      <h1>Crate &amp; Cover</h1>
+      <p>Team Blau gegen Team Orange, je vier Spieler</p>
+      <div class="label">Modus</div>
+      <div class="opt" data-key="mode"><button data-v="deathmatch">Team-Deathmatch</button><button data-v="schiessstand">Schießstand</button></div>
+      <div class="label">Karte (Team-Deathmatch)</div>
+      <div class="opt" data-key="map"><button data-v="hafen">Hafen</button><button data-v="altstadt">Altstadt</button><button data-v="baustelle">Baustelle</button><button data-v="testkarte">Testkarte</button></div>
+      <div class="label">Bots</div>
+      <div class="opt" data-key="difficulty"><button data-v="leicht">Leicht</button><button data-v="mittel">Mittel</button><button data-v="schwer">Schwer</button></div>
+      <div class="label">Abschuss-Ziel je Team</div>
+      <div class="opt" data-key="killGoal"><button data-v="25">25</button><button data-v="50">50</button></div>
+      <div class="label">Zeit</div>
+      <div class="opt" data-key="timeLimit"><button data-v="5">5 Minuten</button><button data-v="10">10 Minuten</button></div>
+      <div class="label">Einstellungen</div>
+      <div class="settings">
+        <span>Maus</span><input type="range" min="0.3" max="3" step="0.05" data-setting="sensitivity"><output data-for="sensitivity"></output>
+        <span>Lautstärke</span><input type="range" min="0" max="100" step="5" data-setting="volume"><output data-for="volume"></output>
+        <span></span><button type="button" class="demo">Probehören</button><span></span>
+      </div>
+      <div class="actions"><button class="primary" id="btn-start">Starten</button></div>
+      <details id="best-box">
+        <summary>Bestenliste</summary>
+        <div id="best"></div>
+      </details>
+      <details>
+        <summary>Tastenbelegung</summary>
+        <table>
+          <tr><td>W A S D</td><td>Laufen</td></tr>
+          <tr><td>Maus</td><td>Umsehen</td></tr>
+          <tr><td>Leertaste</td><td>Springen</td></tr>
+          <tr><td>C oder Strg</td><td>Ducken (in der Luft: Ducksprung)</td></tr>
+          <tr><td>Shift</td><td>Schleichen</td></tr>
+          <tr><td>Linke Maustaste</td><td>Schießen</td></tr>
+          <tr><td>Rechte Maustaste</td><td>Zielfernrohr (Scharfschütze)</td></tr>
+          <tr><td>1 2 3 4</td><td>Sturmgewehr, Pistole, Messer, Scharfschütze</td></tr>
+          <tr><td>Mausrad · Q</td><td>Waffe wechseln · letzte Waffe</td></tr>
+          <tr><td>R</td><td>Nachladen</td></tr>
+          <tr><td>F</td><td>Vollbild (dann ist auch Strg+W sicher)</td></tr>
+          <tr><td>Tab</td><td>Anzeigetafel</td></tr>
+          <tr><td>Rücktaste</td><td>Schießstand: zurück zum Start, Munition voll</td></tr>
+          <tr><td>F3</td><td>Anzeige oben links an/aus</td></tr>
+          <tr><td>Esc</td><td>Pause</td></tr>
+        </table>
+      </details>
+    </div>
+    <div class="box hidden" id="pause">
+      <h1>Pause</h1>
+      <div class="label">Einstellungen</div>
+      <div class="settings">
+        <span>Maus</span><input type="range" min="0.3" max="3" step="0.05" data-setting="sensitivity"><output data-for="sensitivity"></output>
+        <span>Lautstärke</span><input type="range" min="0" max="100" step="5" data-setting="volume"><output data-for="volume"></output>
+        <span></span><button type="button" class="demo">Probehören</button><span></span>
+      </div>
+      <div class="actions"><button class="primary" id="btn-resume">Weiter</button><button id="btn-quit">Partie beenden</button></div>
+    </div>
+    <div class="box hidden" id="end">
+      <h1 id="end-title"></h1>
+      <div id="end-record"></div>
+      <div id="end-board"></div>
+      <div class="actions"><button class="primary" id="btn-again">Nochmal</button><button id="btn-menu">Startmenü</button></div>
+    </div>
+  </div>
+</body>
+</html>
