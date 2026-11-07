@@ -219,6 +219,6 @@ for (const [team, s, yaw] of [['A', -1, -Math.PI / 2], ['B', 1, Math.PI / 2]]) {
   for (const z of [-3, 0, 3, 6]) spawns.push({ team, pos: [s * 28, 0, z], yaw: +yaw.toFixed(5) });
 }
 
-const map = { name: 'Baustelle', killY: -20, boxes, stairs, spawns, looks: { boden: 'erde' }, deko };
+const map = { name: 'Baustelle', killY: -20, boxes, stairs, spawns, looks: { boden: 'erde' }, licht: 'mittag', deko };
 writeFileSync(new URL('../src/maps/baustelle.json', import.meta.url), JSON.stringify(map, null, 1));
 console.log(`Baustelle: ${boxes.length} Blöcke, ${deko.length} Schmuckblöcke, ${stairs.length} Treppen`);

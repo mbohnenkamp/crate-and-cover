@@ -6,7 +6,7 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { TEAM_COLORS, createFigure, updateFigure, updateBar, createTargetFigure, removeFigure, loadSoldier } from './figures.js';
 import { textureFor, lookFor } from './textures.js';
-import { createSky } from './sky.js';
+import { createSky, DAYTIMES } from './sky.js';
 
 const COLORS = {
   container: 0x8c8f93,
@@ -42,7 +42,8 @@ export function createRenderer(canvas, world) {
   const camera = new THREE.PerspectiveCamera(VIEW.fov, 1, 0.05, 1000);
   camera.rotation.order = 'YXZ';
 
-  scene.add(new THREE.HemisphereLight(0xdde8f5, 0x6b6253, 1.5));
+  const hemi = new THREE.HemisphereLight(0xdde8f5, 0x6b6253, 1.5);
+  scene.add(hemi);
   const sun = new THREE.DirectionalLight(0xfff3e0, 2.6);
   sun.position.set(18, 30, 10);
   sun.castShadow = true;
@@ -51,8 +52,22 @@ export function createRenderer(canvas, world) {
   sun.shadow.bias = -0.0005;
   scene.add(sun);
 
-  const sky = createSky(sun.position);
-  scene.add(sky);
+  const sky = createSky();
+  scene.add(sky.dome);
+  const clock = new THREE.Clock();
+
+  // Tageszeit der Karte: Sonne, Streulicht, Himmel, Nebel, Belichtung
+  function applyDaytime(t) {
+    sun.position.set(...t.sun);
+    sun.color.setHex(t.sunColor);
+    sun.intensity = t.sunIntensity;
+    hemi.color.setHex(t.hemi[0]);
+    hemi.groundColor.setHex(t.hemi[1]);
+    hemi.intensity = t.hemi[2];
+    scene.fog.color.setHex(t.fog);
+    renderer.toneMappingExposure = t.exposure;
+    sky.set(t);
+  }
 
   let mapGroup = null;
   let worldName = null;
@@ -62,6 +77,7 @@ export function createRenderer(canvas, world) {
   function setWorld(world) {
     if (worldName === world.name) return;
     worldName = world.name;
+    applyDaytime(DAYTIMES[world.licht] ?? DAYTIMES.mittag);
     if (mapGroup) {
       scene.remove(mapGroup);
       mapGroup.traverse(o => { o.geometry?.dispose(); o.material?.dispose(); });
@@ -202,7 +218,7 @@ export function createRenderer(canvas, world) {
     render(view, positions, dt) {
       camera.position.set(view.x, view.y, view.z);
       camera.rotation.set(view.pitch, view.yaw, 0);
-      sky.position.copy(camera.position);
+      sky.update(clock.getDelta(), camera.position);
       if (camera.fov !== view.fov) {
         camera.fov = view.fov;
         camera.updateProjectionMatrix();

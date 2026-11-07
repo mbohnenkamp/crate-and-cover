@@ -2427,6 +2427,7 @@
  "looks": {
   "boden": "erde"
  },
+ "licht": "mittag",
  "deko": [
   {
    "type": "deko",

@@ -15,6 +15,7 @@ export function createWorld(map) {
     fallText: map.fallText ?? 'abgestürzt',
     // Nur fürs Aussehen: Oberfläche je Blockart und Schmuckblöcke ohne Kollision (Rahmen, Gesimse, Zinnen)
     looks: map.looks ?? null,
+    licht: map.licht ?? 'mittag',
     deko: map.deko ?? [],
     // Blender-Modelle an Stelle von Blöcken (die Blöcke bleiben als Kollision, hidden: nicht gezeichnet)
     props: map.props ?? [],

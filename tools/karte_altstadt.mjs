@@ -285,6 +285,7 @@ const map = {
   name: 'Altstadt', killY: -20, boxes, stairs, spawns,
   navHints: hints.map(h => h.map(v => +v.toFixed(2))),
   looks: { boden: 'pflaster', treppe: 'bretter' },
+  licht: 'abend',
   deko,
   props,
 };

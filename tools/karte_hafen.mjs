@@ -169,6 +169,7 @@ const map = {
   // Wegpunkte vor und hinter den Toren der Lagerhalle, damit die Bots hinein- und hinausfinden
   navHints: [-1, 1].flatMap(s => [[s * 5.5, 0, 13], [s * 5.5, 0, 15.6], [s * 8.4, 0, 19.75], [s * 11.2, 0, 19.75]]),
   looks: { boden: 'beton', wand: 'beton', dach: 'wellblech', treppe: 'stahl' },
+  licht: 'morgen',
   deko,
 };
 writeFileSync(new URL('../src/maps/hafen.json', import.meta.url), JSON.stringify(map, null, 1));
