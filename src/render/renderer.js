@@ -183,6 +183,13 @@ export function createRenderer(canvas, world) {
         if (e.type === 'swing') {
           if (own) viewmodel.swing();
           if (e.hit === 'wall') effects.impact(e.end, e.normal, e.surface, true);
+          if (figures[e.shooter]) figures[e.shooter].stab = 0.3;
+        }
+        // Richtung des Treffers merken: die Figur fällt vom Schützen weg
+        if (e.type === 'hit' && e.player !== null && figures[e.player] && e.by !== undefined) {
+          const a = game.players[e.by].pos;
+          const b = game.players[e.player].pos;
+          figures[e.player].hitFrom = { x: b.x - a.x, z: b.z - a.z };
         }
         if (e.type === 'reload' && figures[e.player]) Object.assign(figures[e.player], { reloadLeft: e.time, reloadTime: e.time });
         if (e.type === 'hit' && e.target !== null) targets[e.target].flash = 0.09;
@@ -202,7 +209,7 @@ export function createRenderer(canvas, world) {
       }
       game.players.forEach((p, i) => {
         if (!figures[i]) return;
-        updateFigure(figures[i], positions[i], p.yaw, p.crouched, p.alive, dt, p.arms.current, p.pitch);
+        updateFigure(figures[i], positions[i], p.yaw, p.crouched, p.alive, dt, p.arms.current, p.pitch, !p.onGround);
         const mate = p.team === game.player.team;
         updateBar(figures[i], p.health, MATCH.health, p.alive, mate ? 1 : figures[i].hurtShow ?? 0, dt);
         if (figures[i].hurtShow) figures[i].hurtShow = 0;

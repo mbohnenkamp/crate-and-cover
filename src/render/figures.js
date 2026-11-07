@@ -107,7 +107,11 @@ function soldierFigure(scene, team) {
   gunHolder.rotation.y = Math.PI;
   parts.torso.add(gunHolder);
   scene.add(group);
-  return { group, pivot, body, mats, flash: 0, fall: 0, parts, gunHolder, weapon: null, muzzle: 0, muzzleMesh: null, walk: 0, kneel: 0, last: null, bodyYaw: null, reloadLeft: 0, reloadTime: 1 };
+  return {
+    group, pivot, body, mats, flash: 0, fall: 0, parts, gunHolder, weapon: null, muzzle: 0, muzzleMesh: null,
+    walk: 0, kneel: 0, last: null, bodyYaw: null, reloadLeft: 0, reloadTime: 1,
+    time: 0, air: 0, wasAir: false, land: 0, stab: 0, hitFrom: null, torsoY: parts.torso.position.y,
+  };
 }
 
 // Arm mit zwei Knochen (Oberarm, Unterarm) so stellen, dass die Hand den Zielpunkt erreicht (Oberkörper-Raum).
@@ -197,8 +201,10 @@ function blockFigure(scene, team) {
   return { group, pivot, mats, flash: 0, fall: 0 };
 }
 
-export function updateFigure(f, pos, yaw, crouched, alive, dt, weapon = null, pitch = 0) {
-  if (f.parts) animateSoldier(f, pos, yaw, crouched, alive, dt, weapon, pitch);
+const _fallAxis = new THREE.Vector3(1, 0, 0);
+
+export function updateFigure(f, pos, yaw, crouched, alive, dt, weapon = null, pitch = 0, airborne = false) {
+  if (f.parts) animateSoldier(f, pos, yaw, crouched, alive, dt, weapon, pitch, airborne);
   else f.pivot.scale.y = crouched ? 1.2 / 1.8 : 1;
   f.group.position.set(pos.x, pos.y, pos.z);
   f.group.rotation.y = f.parts ? f.bodyYaw : yaw;
@@ -207,13 +213,27 @@ export function updateFigure(f, pos, yaw, crouched, alive, dt, weapon = null, pi
   if (alive) {
     f.fall = 0;
     f.group.visible = true;
-    f.pivot.rotation.x = 0;
+    f.pivot.quaternion.identity();
     for (const m of f.mats) m.opacity = 1;
     return;
   }
+  // Fallen: vom Schützen weg (Richtung des letzten Treffers), sonst nach hinten. Achse quer zur Fallrichtung.
+  if (f.fall === 0) {
+    const d = f.hitFrom;
+    const by = f.group.rotation.y;
+    let dx = 0, dz = 1;
+    if (d && (d.x || d.z)) {
+      const len = Math.hypot(d.x, d.z);
+      // Weltrichtung in den Raum der Figur drehen
+      dx = (d.x * Math.cos(by) - d.z * Math.sin(by)) / len;
+      dz = (d.x * Math.sin(by) + d.z * Math.cos(by)) / len;
+    }
+    _fallAxis.set(dz, 0, -dx);
+    f.fallAxis = _fallAxis.clone();
+  }
   f.fall += dt;
   const k = Math.min(1, f.fall / 0.35);
-  f.pivot.rotation.x = (Math.PI / 2) * k * k;
+  f.pivot.quaternion.setFromAxisAngle(f.fallAxis ?? _fallAxis, (Math.PI / 2) * k * k);
   const fade = Math.max(0, 1 - (f.fall - 0.6) / 0.4);
   for (const m of f.mats) m.opacity = fade;
   f.group.visible = fade > 0;
@@ -250,9 +270,10 @@ const KNEEL = { legR: -0.95, shinR: Math.PI / 2 + 0.95, legL: -2.0, shinL: 2.0 }
 
 // Beine schwingen mit der gelaufenen Strecke, Ausschlag nach Tempo. Blick hoch und runter: Oberkörper ein wenig,
 // Arme mit Waffe mehr, Kopf am meisten.
-function animateSoldier(f, pos, yaw, crouched, alive, dt, weapon, pitch) {
+function animateSoldier(f, pos, yaw, crouched, alive, dt, weapon, pitch, airborne) {
   if (f.weapon !== weapon) setWeapon(f, weapon);
   const p = f.parts;
+  f.time += dt;
   const moved = f.last && alive ? Math.hypot(pos.x - f.last.x, pos.z - f.last.z) : 0;
   f.last = { x: pos.x, z: pos.z };
   const speed = dt > 0 ? moved / dt : 0;
@@ -272,14 +293,29 @@ function animateSoldier(f, pos, yaw, crouched, alive, dt, weapon, pitch) {
   const swing = Math.sin(f.walk) * amount;
   // ohne Bewegung langsam zurück in die Ruhe
   f.swing = (f.swing ?? 0) + (swing - (f.swing ?? 0)) * k;
-  p.legR.rotation.x = f.swing * (1 - c) + KNEEL.legR * c;
-  p.legL.rotation.x = -f.swing * (1 - c) + KNEEL.legL * c;
-  p.shinR.rotation.x = Math.max(0, f.swing) * 0.5 * (1 - c) + KNEEL.shinR * c;
-  p.shinL.rotation.x = Math.max(0, -f.swing) * 0.5 * (1 - c) + KNEEL.shinL * c;
-  f.body.position.y = -HIP_DROP * c;
+  // Sprung: Beine anziehen, Oberkörper leicht nach vorn; Landung: kurz in die Knie
+  const inAir = airborne && alive ? 1 : 0;
+  f.air += (inAir - f.air) * Math.min(1, dt * 14);
+  if (f.wasAir && !airborne && alive) f.land = 1;
+  f.wasAir = airborne;
+  f.land = Math.max(0, f.land - dt * 4);
+  const air = f.air * (1 - c);
+  const squat = Math.sin(f.land * Math.PI) * (1 - c);
+  p.legR.rotation.x = f.swing * (1 - c) + KNEEL.legR * c - 0.7 * air - 0.3 * squat;
+  p.legL.rotation.x = -f.swing * (1 - c) + KNEEL.legL * c - 0.55 * air - 0.3 * squat;
+  p.shinR.rotation.x = Math.max(0, f.swing) * 0.5 * (1 - c) + KNEEL.shinR * c + 1.3 * air + 0.6 * squat;
+  p.shinL.rotation.x = Math.max(0, -f.swing) * 0.5 * (1 - c) + KNEEL.shinL * c + 1.1 * air + 0.6 * squat;
+  f.body.position.y = -HIP_DROP * c - 0.1 * squat;
+
+  // Oberkörper wippt beim Laufen (hoch bei jedem Schritt, leicht seitlich), atmet im Stand
+  const bob = Math.abs(Math.sin(f.walk)) * 0.025 * amount;
+  const breath = Math.sin(f.time * 1.6) * 0.004 * (1 - amount);
+  p.torso.position.y = f.torsoY + bob + breath - 0.04 * squat;
+  p.torso.rotation.z = Math.sin(f.walk) * 0.05 * amount;
+  p.head.rotation.z = -Math.sin(f.walk) * 0.03 * amount;
 
   const look = alive ? pitch : 0;
-  p.torso.rotation.x = -look * 0.3;
+  p.torso.rotation.x = -look * 0.3 + 0.25 * air;
   p.head.rotation.x = -look * 0.5;
   f.gunHolder.rotation.x = -look * 0.45;
   f.gunHolder.updateMatrix();
@@ -289,8 +325,13 @@ function animateSoldier(f, pos, yaw, crouched, alive, dt, weapon, pitch) {
   const h = HANDS[weapon] ?? null;
   f.reloadLeft = Math.max(0, f.reloadLeft - dt);
   const reloadK = f.reloadLeft > 0 ? Math.sin((1 - f.reloadLeft / f.reloadTime) * Math.PI) : 0;
+  // Messerhieb: rechte Hand stößt nach vorn
+  f.stab = Math.max(0, f.stab - dt);
+  const stabK = f.stab > 0 && WEAPONS[weapon]?.melee ? Math.sin((f.stab / 0.3) * Math.PI) : 0;
   if (h) {
-    aimArm(p, 'r', gunPoint(f, h.right, _target));
+    gunPoint(f, h.right, _target);
+    if (stabK) { _target.z += 0.35 * stabK; _target.y += 0.05 * stabK; }
+    aimArm(p, 'r', _target);
     if (h.left) {
       gunPoint(f, h.left, _target);
       if (reloadK && h.mag) _target.lerp(gunPoint(f, h.mag, _rest), reloadK);
