@@ -7,7 +7,7 @@ import { WEAPONS } from '../config.js';
 let loaded = null;
 let hands = null;
 
-// KI-Modelle (Meshy über Higgsfield, public/models/ki): Probe, nur lokal. Sie haben Vorrang vor den Blender-Modellen,
+// KI-Modelle (Meshy über Higgsfield, public/models/ki). Sie haben Vorrang vor den Blender-Modellen,
 // wenn ihre Datei da ist; ?soldat=alt in der Adresse zeigt zum Vergleich alles aus Blender.
 export const KI = new URLSearchParams(location.search).get('soldat') !== 'alt';
 const KI_WEAPONS = ['gewehr', 'pistole', 'messer', 'scharf'];

@@ -1,7 +1,7 @@
 // KI-Soldat (Meshy über Higgsfield, public/models/ki/soldat.glb): ein Körper mit Skelett und fertigen Bewegungen
 // für Beine und Rumpf. Blick, Waffe und Hände kommen wie beim Blender-Soldaten aus dem Code: Die Wirbelsäule dreht
 // und neigt sich mit dem Blick, die Arme greifen per Zwei-Knochen-Rechnung an die Waffe.
-// Probe, nur lokal: Fehlt die Datei, bleibt der Blender-Soldat.
+// Fehlt die Datei, bleibt der Blender-Soldat.
 
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';

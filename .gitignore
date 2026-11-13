@@ -7,5 +7,3 @@ entwuerfe/
 # Geschnittene Fassungen lizenzierter Töne (MotionElements) — nicht in Git, nicht veröffentlichen
 public/sounds/
 blender/__pycache__/
-# KI-Modelle (Meshy über Higgsfield): Probe, nur lokal, bis die Nutzungsbedingungen geklärt sind
-public/models/ki/

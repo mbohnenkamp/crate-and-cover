@@ -10,7 +10,7 @@ import { loadKiSoldier, hasKiSoldier, kiFigure, animateKi, spawnKiCorpse, update
 
 let soldier = null;
 
-// Der KI-Soldat (Probe, nur lokal) hat Vorrang, wenn seine Datei da ist; ?soldat=alt zeigt den Blender-Soldaten
+// Der KI-Soldat hat Vorrang, wenn seine Datei da ist; ?soldat=alt zeigt den Blender-Soldaten
 export function loadSoldier() {
   return Promise.all([
     new GLTFLoader()
