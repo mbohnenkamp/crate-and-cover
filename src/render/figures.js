@@ -6,14 +6,20 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { hitboxes } from '../game/hitbox.js';
 import { buildWeapon, createMuzzleFlash, HANDS } from './viewmodel.js';
 import { WEAPONS } from '../config.js';
+import { loadKiSoldier, hasKiSoldier, kiFigure, animateKi, spawnKiCorpse, updateKiCorpses, clearKiCorpses } from './kifigur.js';
 
 let soldier = null;
 
+// Der KI-Soldat (Probe, nur lokal) hat Vorrang, wenn seine Datei da ist; ?soldat=alt zeigt den Blender-Soldaten
 export function loadSoldier() {
-  return new GLTFLoader()
-    .loadAsync(`${import.meta.env.BASE_URL}models/custom/soldat.glb`)
-    .then(gltf => { soldier = gltf.scene; return true; })
-    .catch(() => false);
+  const old = new URLSearchParams(location.search).get('soldat') === 'alt';
+  return Promise.all([
+    new GLTFLoader()
+      .loadAsync(`${import.meta.env.BASE_URL}models/custom/soldat.glb`)
+      .then(gltf => { soldier = gltf.scene; return true; })
+      .catch(() => false),
+    old ? false : loadKiSoldier(),
+  ]);
 }
 
 export const TEAM_COLORS = { A: 0x3d7bd9, B: 0xe0832f };
@@ -33,7 +39,7 @@ function block(parent, color, size, pos, mats) {
 const SKINS = [0xd9c2a5, 0xc69c7a, 0x9c6b4a, 0xe8d2b8, 0x6f4a32, 0xb8865f];
 
 export function createFigure(scene, team, id = 0) {
-  const f = soldier ? soldierFigure(scene, team, id) : blockFigure(scene, team);
+  const f = hasKiSoldier() ? kiFigure(scene, team) : soldier ? soldierFigure(scene, team, id) : blockFigure(scene, team);
   f.bar = createBar();
   f.group.add(f.bar.group);
   return f;
@@ -219,10 +225,11 @@ function hitDir(f) {
 }
 
 export function updateFigure(f, pos, yaw, crouched, alive, dt, weapon = null, pitch = 0, airborne = false) {
-  if (f.parts) animateSoldier(f, pos, yaw, crouched, alive, dt, weapon, pitch, airborne);
+  if (f.ki) animateKi(f, pos, yaw, crouched, alive, dt, weapon, pitch, airborne, setWeapon, hitDir);
+  else if (f.parts) animateSoldier(f, pos, yaw, crouched, alive, dt, weapon, pitch, airborne);
   else f.pivot.scale.y = crouched ? 1.2 / 1.8 : 1;
   f.group.position.set(pos.x, pos.y, pos.z);
-  f.group.rotation.y = f.parts ? f.bodyYaw : yaw;
+  f.group.rotation.y = f.parts || f.ki ? f.bodyYaw : yaw;
   f.flash = Math.max(0, f.flash - dt);
   for (const m of f.mats) m.emissive.setScalar(f.flash > 0 ? 0.9 : 0);
   if (alive) {
@@ -236,10 +243,11 @@ export function updateFigure(f, pos, yaw, crouched, alive, dt, weapon = null, pi
   // Fallen: vom Schützen weg (Richtung des letzten Treffers), sonst nach hinten. Achse quer zur Fallrichtung.
   const [dx, dz] = hitDir(f);
   _fallAxis.set(dz, 0, -dx);
-  if (f.parts) {
+  if (f.parts || f.ki) {
     // Soldat: eine Kopie bleibt als Gefallener liegen, die Figur selbst wartet unsichtbar auf den Wiedereinstieg
     if (!f.dead) {
-      spawnCorpse(f, _fallAxis);
+      if (f.ki) spawnKiCorpse(f);
+      else spawnCorpse(f, _fallAxis);
       f.dead = true;
       f.headshot = false;
     }
@@ -306,6 +314,7 @@ function spawnCorpse(f, axis) {
 }
 
 export function updateCorpses(dt) {
+  updateKiCorpses(dt);
   for (let i = corpses.length - 1; i >= 0; i--) {
     const c = corpses[i];
     c.age += dt;
@@ -341,6 +350,7 @@ function removeCorpse(c) {
 }
 
 export function clearCorpses() {
+  clearKiCorpses();
   for (const c of corpses) removeCorpse(c);
   corpses.length = 0;
 }
