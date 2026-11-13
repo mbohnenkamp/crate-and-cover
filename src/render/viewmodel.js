@@ -10,7 +10,7 @@ let hands = null;
 // KI-Modelle (Meshy über Higgsfield, public/models/ki): Probe, nur lokal. Sie haben Vorrang vor den Blender-Modellen,
 // wenn ihre Datei da ist; ?soldat=alt in der Adresse zeigt zum Vergleich alles aus Blender.
 export const KI = new URLSearchParams(location.search).get('soldat') !== 'alt';
-const KI_WEAPONS = ['gewehr', 'pistole', 'messer'];
+const KI_WEAPONS = ['gewehr', 'pistole', 'messer', 'scharf'];
 const kiWeapons = {};
 let kiArms = null;
 
@@ -96,6 +96,7 @@ const KI_HANDS = {
   gewehr: { right: [0, -0.09, 0.085], left: [0, -0.035, -0.3], mag: [0, -0.2, -0.17] },
   pistole: { right: [0, -0.065, 0.012], left: [-0.03, -0.085, -0.01], mag: [0, -0.2, 0.0] },
   messer: { right: [0, 0, 0.005], left: null },
+  scharf: { right: [0, -0.07, 0.058], left: [0, -0.035, -0.3], mag: [0, -0.15, -0.13], bolt: [0.045, -0.02, -0.04] },
 };
 
 const GLOVE = 0x17181a;
