@@ -4,7 +4,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { hitboxes } from '../game/hitbox.js';
-import { buildWeapon, createMuzzleFlash, HANDS } from './viewmodel.js';
+import { buildWeapon, createMuzzleFlash, HANDS, KI } from './viewmodel.js';
 import { WEAPONS } from '../config.js';
 import { loadKiSoldier, hasKiSoldier, kiFigure, animateKi, spawnKiCorpse, updateKiCorpses, clearKiCorpses } from './kifigur.js';
 
@@ -12,13 +12,12 @@ let soldier = null;
 
 // Der KI-Soldat (Probe, nur lokal) hat Vorrang, wenn seine Datei da ist; ?soldat=alt zeigt den Blender-Soldaten
 export function loadSoldier() {
-  const old = new URLSearchParams(location.search).get('soldat') === 'alt';
   return Promise.all([
     new GLTFLoader()
       .loadAsync(`${import.meta.env.BASE_URL}models/custom/soldat.glb`)
       .then(gltf => { soldier = gltf.scene; return true; })
       .catch(() => false),
-    old ? false : loadKiSoldier(),
+    KI ? loadKiSoldier() : false,
   ]);
 }
 

@@ -7,20 +7,32 @@ import { WEAPONS } from '../config.js';
 let loaded = null;
 let hands = null;
 
+// KI-Modelle (Meshy über Higgsfield, public/models/ki): Probe, nur lokal. Sie haben Vorrang vor den Blender-Modellen,
+// wenn ihre Datei da ist; ?soldat=alt in der Adresse zeigt zum Vergleich alles aus Blender.
+export const KI = new URLSearchParams(location.search).get('soldat') !== 'alt';
+const KI_WEAPONS = ['gewehr'];
+const kiWeapons = {};
+let kiArms = null;
+
+const load = file => new GLTFLoader().loadAsync(`${import.meta.env.BASE_URL}models/${file}`).then(gltf => gltf.scene);
+
 // Waffen aus Blender (public/models/custom/waffen.glb, nach entwuerfe/Waffen.webp); fehlt die Datei, bleiben die Blöcke
 export function loadWeapons() {
-  return new GLTFLoader()
-    .loadAsync(`${import.meta.env.BASE_URL}models/custom/waffen.glb`)
-    .then(gltf => { loaded = gltf.scene; return true; })
-    .catch(() => false);
+  return Promise.all([
+    load('custom/waffen.glb').then(scene => { loaded = scene; }).catch(() => {}),
+    ...(KI ? KI_WEAPONS : []).map(id => load(`ki/${id}.glb`).then(scene => {
+      kiWeapons[id] = scene.getObjectByName(`waffe_${id}`);
+      Object.assign(HANDS[id], KI_HANDS[id]); // Griff und Vorderschaft sitzen am KI-Modell etwas anders
+    }).catch(() => {})),
+  ]);
 }
 
 // Hände und Arme für die Ego-Ansicht aus Blender (haende.glb, dieselbe Hand wie am Soldaten); sonst Blöcke
 export function loadHands() {
-  return new GLTFLoader()
-    .loadAsync(`${import.meta.env.BASE_URL}models/custom/haende.glb`)
-    .then(gltf => { hands = gltf.scene; return true; })
-    .catch(() => false);
+  return Promise.all([
+    load('custom/haende.glb').then(scene => { hands = scene; }).catch(() => {}),
+    KI ? load('ki/arm.glb').then(scene => { kiArms = scene; }).catch(() => {}) : null,
+  ]);
 }
 
 const METAL = 0x2f3236;
@@ -79,6 +91,11 @@ export const HANDS = {
   scharf: { right: [0, -0.1, 0.06], left: [0, -0.06, -0.22], mag: [0, -0.16, -0.05], bolt: [0.06, 0.04, -0.02] },
 };
 
+// Griffpunkte der KI-Waffen, ersetzen die Werte oben, sobald das Modell geladen ist
+const KI_HANDS = {
+  gewehr: { right: [0, -0.09, 0.085], left: [0, -0.035, -0.3], mag: [0, -0.2, -0.17] },
+};
+
 const GLOVE = 0x17181a;
 const SKIN = 0xd9c2a5;
 const SLEEVE = 0x2c2e33;
@@ -87,10 +104,12 @@ const CLOTH = 0x4a4d53;
 // Arm für die Ego-Ansicht: Ursprung im Handgelenk, +Z zeigt zum Ellbogen. Aus Blender (Hand mit Fingern,
 // Unterarm, Ärmel, Oberarm) oder aus Blöcken, wenn das Modell fehlt.
 function buildArm(side) {
-  const model = hands?.getObjectByName(`hand_${side}`);
+  const kiModel = kiArms?.getObjectByName(`hand_${side}`);
+  const model = kiModel ?? hands?.getObjectByName(`hand_${side}`);
   if (model) {
     const g = model.clone(true);
     g.position.set(0, 0, 0);
+    if (kiModel) g.userData.roll = KI_ROLL[side];
     g.traverse(o => { if (o.isMesh) o.material = o.material.clone(); });
     return g;
   }
@@ -105,10 +124,14 @@ function buildArm(side) {
   return g;
 }
 
+// KI-Arm: Faust mit dem Handrücken nach außen. Die linke Hand dreht um den Unterarm, damit sie von unten greift.
+const KI_ROLL = { r: 0, l: 1.2 };
+
 const _elbow = new THREE.Vector3();
 function placeArm(arm, hand, elbow) {
   arm.position.set(hand[0], hand[1], hand[2]);
   arm.lookAt(_elbow.set(elbow[0], elbow[1], elbow[2]));
+  if (arm.userData.roll) arm.rotateZ(arm.userData.roll);
 }
 
 const lerp3 = (a, b, k) => [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k];
@@ -147,7 +170,7 @@ export function createMuzzleFlash(size) {
 
 // Waffe, Vorderseite −Z — auch für die Figuren der anderen Spieler. Jede bekommt eigene Materialien.
 export function buildWeapon(id) {
-  const model = loaded?.getObjectByName(`waffe_${id}`);
+  const model = kiWeapons[id] ?? loaded?.getObjectByName(`waffe_${id}`);
   if (!model) {
     const g = new THREE.Group();
     g.userData.muzzleZ = BUILD[id](g);
