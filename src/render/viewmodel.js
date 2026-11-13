@@ -10,7 +10,7 @@ let hands = null;
 // KI-Modelle (Meshy über Higgsfield, public/models/ki): Probe, nur lokal. Sie haben Vorrang vor den Blender-Modellen,
 // wenn ihre Datei da ist; ?soldat=alt in der Adresse zeigt zum Vergleich alles aus Blender.
 export const KI = new URLSearchParams(location.search).get('soldat') !== 'alt';
-const KI_WEAPONS = ['gewehr'];
+const KI_WEAPONS = ['gewehr', 'pistole', 'messer'];
 const kiWeapons = {};
 let kiArms = null;
 
@@ -94,6 +94,8 @@ export const HANDS = {
 // Griffpunkte der KI-Waffen, ersetzen die Werte oben, sobald das Modell geladen ist
 const KI_HANDS = {
   gewehr: { right: [0, -0.09, 0.085], left: [0, -0.035, -0.3], mag: [0, -0.2, -0.17] },
+  pistole: { right: [0, -0.065, 0.012], left: [-0.03, -0.085, -0.01], mag: [0, -0.2, 0.0] },
+  messer: { right: [0, 0, 0.005], left: null },
 };
 
 const GLOVE = 0x17181a;
@@ -109,7 +111,7 @@ function buildArm(side) {
   if (model) {
     const g = model.clone(true);
     g.position.set(0, 0, 0);
-    if (kiModel) g.userData.roll = KI_ROLL[side];
+    g.userData.ki = !!kiModel;
     g.traverse(o => { if (o.isMesh) o.material = o.material.clone(); });
     return g;
   }
@@ -124,14 +126,15 @@ function buildArm(side) {
   return g;
 }
 
-// KI-Arm: Faust mit dem Handrücken nach außen. Die linke Hand dreht um den Unterarm, damit sie von unten greift.
-const KI_ROLL = { r: 0, l: 1.2 };
+// KI-Arm: Faust mit dem Handrücken nach außen. Die linke Hand dreht um den Unterarm: am Vorderschaft greift sie
+// von unten, an der Pistole legt sie sich seitlich um die rechte.
+const KI_ROLL = { gewehr: 1.2, scharf: 1.2, pistole: 0.35 };
 
 const _elbow = new THREE.Vector3();
-function placeArm(arm, hand, elbow) {
+function placeArm(arm, hand, elbow, roll = 0) {
   arm.position.set(hand[0], hand[1], hand[2]);
   arm.lookAt(_elbow.set(elbow[0], elbow[1], elbow[2]));
-  if (arm.userData.roll) arm.rotateZ(arm.userData.roll);
+  if (roll) arm.rotateZ(roll);
 }
 
 const lerp3 = (a, b, k) => [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k];
@@ -258,7 +261,7 @@ export function createViewmodel() {
       armR.visible = shown;
       placeArm(armR, boltK ? lerp3(h.right, h.bolt, boltK) : h.right, ELBOW.r);
       armL.visible = shown && !!h.left;
-      if (h.left) placeArm(armL, reloadK ? lerp3(h.left, h.mag, reloadK) : h.left, ELBOW.l);
+      if (h.left) placeArm(armL, reloadK ? lerp3(h.left, h.mag, reloadK) : h.left, ELBOW.l, armL.userData.ki ? KI_ROLL[arms.current] ?? 0 : 0);
       // Magazin sichtbar, solange die linke Hand unterwegs ist (ab einem Drittel des Wegs)
       for (const [id, m] of Object.entries(mags)) m.visible = id === arms.current && reloadK > 0.35;
 
