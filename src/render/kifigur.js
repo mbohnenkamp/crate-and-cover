@@ -11,8 +11,16 @@ import { WEAPONS } from '../config.js';
 
 let model = null; // { scene, clips: { stehen, gehen, rennen, ducken, tod }, maps: { A, B } }
 
-// Tempo, mit dem die Bewegungen von sich aus laufen (m/s, in Blender gemessen: blender/ki_schritt.py)
-const PACE = { gehen: 1.2, rennen: 5.5, ducken: 1.25 };
+// Bei diesem Tempo (m/s) laufen die Bewegungen in ihrer eigenen Geschwindigkeit. Von sich aus (in Blender gemessen)
+// passt Rennen zu 5,5 m/s und Ducken zu 1,24 m/s, macht dann aber 4 Schritte je Sekunde und wirkt gehetzt. Mit
+// diesen Werten sind es beim Rennen (5,6 m/s) gut 3 und geduckt (1,9 m/s) knapp 2 Schritte je Sekunde; die Füße
+// gleiten dafür etwas.
+const PACE = { gehen: 1.2, rennen: 7, ducken: 1.9 };
+
+// Trefferzonen (game/hitbox.js): Kopf ±0,15 m um den Fußpunkt, Scheitel bei 1,8 m, geduckt bei 1,2 m. Die fertigen
+// Bewegungen halten sich nicht daran (Rennen: Kopf 0,3 m vorn; Ducken: 0,4 m vorn und Scheitel bei 1,42 m), also
+// richtet der Code den Oberkörper ein Stück auf, senkt geduckt die Hüfte und schiebt den Körper unter den Kopf.
+const FIT = { straighten: 0.6, crouchTop: 1.2 };
 
 export function loadKiSoldier() {
   return new GLTFLoader()
@@ -68,7 +76,8 @@ function recolor(map) {
 const GUN = [0.1, 0.14, -0.3];
 
 const BONES = {
-  hips: 'Hips', spine: ['Spine02', 'Spine01', 'Spine'], neck: 'neck', head: 'Head',
+  hips: 'Hips', spine: ['Spine02', 'Spine01', 'Spine'], neck: 'neck', head: 'Head', headEnd: 'head_end',
+  footR: 'RightFoot', footL: 'LeftFoot',
   armR: 'RightArm', foreR: 'RightForeArm', handR: 'RightHand',
   armL: 'LeftArm', foreL: 'LeftForeArm', handL: 'LeftHand',
   legR: 'RightUpLeg', shinR: 'RightLeg', legL: 'LeftUpLeg', shinL: 'LeftLeg',
@@ -120,6 +129,7 @@ export function kiFigure(scene, team) {
     flash: 0, fall: 0, weapon: null, muzzle: 0, muzzleMesh: null,
     kneel: 0, last: null, bodyYaw: null, reloadLeft: 0, reloadTime: 1, w: { stehen: 1, gehen: 0, rennen: 0, ducken: 0 },
     air: 0, stab: 0, hitFrom: null, flinch: 0, headshot: false, dead: false,
+    feet: { r: new THREE.Vector3(), l: new THREE.Vector3(), qr: new THREE.Quaternion(), ql: new THREE.Quaternion() },
   };
 }
 
@@ -128,6 +138,8 @@ const smooth = (a, b, x) => { const t = Math.max(0, Math.min(1, (x - a) / (b - a
 
 const X = new THREE.Vector3(1, 0, 0);
 const Y = new THREE.Vector3(0, 1, 0);
+const Z = new THREE.Vector3(0, 0, 1);
+const _q2 = new THREE.Quaternion();
 const _gq = new THREE.Quaternion();
 const _giq = new THREE.Quaternion();
 const _pq = new THREE.Quaternion();
@@ -166,13 +178,14 @@ function point(bone, dir) {
   bone.updateMatrixWorld(true);
 }
 
-// Arm an einen Weltpunkt: Oberarm und Unterarm über den Kosinussatz, der Ellbogen weicht Richtung hint aus
-function reach(upper, fore, hand, target, hint) {
+// Arm oder Bein an einen Weltpunkt: zwei Knochen über den Kosinussatz, das Gelenk weicht Richtung hint aus.
+// extra verlängert den zweiten Knochen (Arm: bis zur Griffmitte in der Hand).
+function reach(upper, fore, hand, target, hint, extra = 0.07) {
   upper.getWorldPosition(_s);
   fore.getWorldPosition(_v1);
   hand.getWorldPosition(_v2);
   const l1 = _s.distanceTo(_v1);
-  const l2 = _v1.distanceTo(_v2) + 0.07; // bis zur Griffmitte in der Hand
+  const l2 = _v1.distanceTo(_v2) + extra;
   _d.subVectors(target, _s);
   const dist = Math.max(0.05, Math.min(l1 + l2 - 0.005, _d.length()));
   _d.normalize();
@@ -185,6 +198,43 @@ function reach(upper, fore, hand, target, hint) {
   point(upper, _u);
   _u.subVectors(target, _e).normalize();
   point(fore, _u);
+}
+
+// Mitte des Kopfes in der Welt
+function headCenter(b, out) {
+  b.head.getWorldPosition(out);
+  return out.lerp(b.headEnd.getWorldPosition(_e), 0.5);
+}
+
+// Oberkörper aufrichten und geduckt die Hüfte senken, damit Kopf und Rumpf in den Trefferzonen sitzen.
+// c: 0 stehend bis 1 geduckt. gq, giq: Drehung der Gruppe und ihre Umkehrung.
+function fitToHitbox(f, c, gq, giq) {
+  const b = f.bones;
+  // Neigung vom untersten Wirbel zum Kopf, im Raum der Gruppe (x quer, y hoch, −z vorn)
+  b.spine[0].getWorldPosition(_v1);
+  _d.subVectors(headCenter(b, _v2), _v1).applyQuaternion(giq);
+  _dq.setFromAxisAngle(X, Math.atan2(-_d.z, _d.y) * FIT.straighten);
+  _dq.multiply(_q2.setFromAxisAngle(Z, Math.atan2(_d.x, _d.y) * FIT.straighten));
+  turn(b.spine[0], gq, giq, _dq);
+  if (c < 0.01) return;
+  // Geduckt: Scheitel auf die Höhe der Trefferzone. Die Füße bleiben, wo sie waren, die Knie beugen nach vorn.
+  const top = b.headEnd.getWorldPosition(_t).y - f.group.position.y;
+  const drop = top - (1.8 - (1.8 - FIT.crouchTop) * c);
+  if (drop <= 0) return;
+  b.footR.getWorldPosition(f.feet.r);
+  b.footL.getWorldPosition(f.feet.l);
+  b.footR.getWorldQuaternion(f.feet.qr);
+  b.footL.getWorldQuaternion(f.feet.ql);
+  b.hips.getWorldPosition(_v1);
+  _v1.y -= drop;
+  b.hips.position.copy(b.hips.parent.worldToLocal(_v1));
+  b.hips.updateMatrixWorld(true);
+  for (const [leg, shin, foot, pos, q, side] of [[b.legR, b.shinR, b.footR, f.feet.r, f.feet.qr, 1], [b.legL, b.shinL, b.footL, f.feet.l, f.feet.ql, -1]]) {
+    reach(leg, shin, foot, pos, _hint.set(0.2 * side, 0.2, -1).applyQuaternion(gq), 0);
+    foot.parent.getWorldQuaternion(_pq);
+    foot.quaternion.copy(_pq.invert().multiply(q));
+    foot.updateMatrixWorld(true);
+  }
 }
 
 // setWeapon kommt aus figures.js (gleiche Waffen, gleicher Mündungsblitz)
@@ -219,9 +269,11 @@ export function animateKi(f, pos, yaw, crouched, alive, dt, weapon, pitch, airbo
   // Welt-Lage der Gruppe steht erst nach updateFigure fest; hier zählt nur ihre Drehung
   f.group.rotation.y = f.bodyYaw;
   f.group.position.set(pos.x, pos.y, pos.z);
+  f.body.position.set(0, 0, 0);
   f.group.updateMatrixWorld(true);
   f.group.getWorldQuaternion(_gq);
   _giq.copy(_gq).invert();
+  if (alive) fitToHitbox(f, c, _gq, _giq);
 
   // Sprung: Beine anziehen
   const inAir = airborne && alive ? 1 : 0;
@@ -242,13 +294,18 @@ export function animateKi(f, pos, yaw, crouched, alive, dt, weapon, pitch, airbo
     _dq.multiply(_q1.setFromAxisAngle(X, look * 0.15));
     turn(bone, _gq, _giq, _dq);
   }
+  turn(b.head, _gq, _giq, _dq.setFromAxisAngle(X, look * 0.35));
+  // Körper unter den Kopf schieben: Der Kopf sitzt danach genau über dem Fußpunkt, wie die Trefferzone
+  headCenter(b, _v2);
+  f.group.worldToLocal(_v2);
+  f.body.position.set(-_v2.x, 0, -_v2.z);
+  f.body.updateMatrixWorld(true);
   if (f.flinch > 0) {
     // Treffer: Oberkörper zuckt kurz vom Schützen weg
     const [dx, dz] = hitDir(f);
     const kf = Math.sin((f.flinch / 0.25) * Math.PI) * 0.22;
     turn(b.spine[1], _gq, _giq, _dq.setFromAxisAngle(_axis.set(dz, 0, -dx).normalize(), kf));
   }
-  turn(b.head, _gq, _giq, _dq.setFromAxisAngle(X, look * 0.35));
 
   // Zielrahmen an die Brust, Waffe folgt dem Blick
   b.spine[2].getWorldPosition(_v1);
