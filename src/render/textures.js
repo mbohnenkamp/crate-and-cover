@@ -324,12 +324,34 @@ export function textureFor(look) {
   tex.anisotropy = 8;
   cache[look] = tex;
   if (KI[look]) {
-    loader.load(`${import.meta.env.BASE_URL}textures/${look}.webp`, loaded => {
-      tex.dispose(); // andere Bildgröße: Speicher der Grafikkarte neu anlegen
-      tex.image = loaded.image;
-      tex.repeat.set(1 / KI[look], 1 / KI[look]);
-      tex.needsUpdate = true;
-    });
+    loader.load(`${import.meta.env.BASE_URL}textures/${look}.webp`, loaded => swap(tex, loaded, KI[look]));
   }
+  return tex;
+}
+
+// Andere Bildgröße: Speicher der Grafikkarte neu anlegen
+function swap(tex, loaded, tile) {
+  tex.dispose();
+  tex.image = loaded.image;
+  tex.repeat.set(1 / tile, 1 / tile);
+  tex.needsUpdate = true;
+}
+
+const reliefCache = {};
+
+// Reliefkarte (Normal Map) zur Oberfläche: erst eben, dann das Bild aus tools/texturen.py. Ohne KI-Bild keine.
+export function reliefFor(look) {
+  if (!KI[look]) return null;
+  if (reliefCache[look]) return reliefCache[look];
+  const flat = document.createElement('canvas');
+  flat.width = flat.height = 1;
+  const g = flat.getContext('2d');
+  g.fillStyle = 'rgb(128,128,255)';
+  g.fillRect(0, 0, 1, 1);
+  const tex = new THREE.CanvasTexture(flat);
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  tex.anisotropy = 8;
+  reliefCache[look] = tex;
+  loader.load(`${import.meta.env.BASE_URL}textures/${look}_n.webp`, loaded => swap(tex, loaded, KI[look]));
   return tex;
 }

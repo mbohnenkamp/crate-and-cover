@@ -11,7 +11,7 @@ import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
 import { SMAAPass } from 'three/addons/postprocessing/SMAAPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { TEAM_COLORS, createFigure, updateFigure, updateBar, createTargetFigure, removeFigure, loadSoldier, updateCorpses, clearCorpses } from './figures.js';
-import { textureFor, lookFor } from './textures.js';
+import { textureFor, reliefFor, lookFor } from './textures.js';
 import { createSky, DAYTIMES } from './sky.js';
 
 const COLORS = {
@@ -101,7 +101,7 @@ export function createRenderer(canvas, world) {
     for (const g of Object.values(groups)) {
       const merged = mergeGeometries(g.geos);
       for (const geo of g.geos) geo.dispose();
-      const mesh = new THREE.Mesh(merged, new THREE.MeshLambertMaterial({ map: textureFor(g.look), vertexColors: true }));
+      const mesh = new THREE.Mesh(merged, new THREE.MeshLambertMaterial({ map: textureFor(g.look), normalMap: reliefFor(g.look), vertexColors: true }));
       mesh.castShadow = g.cast;
       mesh.receiveShadow = true;
       mapGroup.add(mesh);

@@ -3,6 +3,7 @@
 Je Bild: Naht über die Bildkante glätten (damit es kachelt), die mittlere Farbe herausrechnen (das Bild wird
 fast weiß, die Blockfarbe der Karte tönt es wie bisher) und auf die Helligkeit der alten gemalten Fläche bringen.
 Wellblech entsteht aus dem Stahlbild mit aufgerechneten Rippen.
+Dazu je Bild eine Reliefkarte <name>_n.webp (Normal Map): Helligkeit des Bildes als Höhe, dunkle Fugen liegen tief.
 
 Aufruf: python3 tools/texturen.py [vorschau.jpg]
 """
@@ -32,6 +33,11 @@ LOOKS = {
     'wellblech': ('stahl', 1024, 211, True),
 }
 RIBS = 8  # Wellblech: Rippen je Bild
+# Stärke des Reliefs je Oberfläche (Steigung je Pixel bei 1024 px, Höhe in Standardabweichungen der Helligkeit)
+RELIEF = {
+    'beton': 1.2, 'putz': 1.2, 'erde': 2.0, 'sand': 1.6, 'stein': 2.6, 'ziegel': 2.4, 'pflaster': 2.8,
+    'bretter': 2.2, 'kiste': 2.2, 'dachziegel': 2.6, 'stahl': 0.8, 'laub': 2.0, 'wellblech': 0.5,
+}
 
 
 def close_seam(a, axis, reach=24):
@@ -55,28 +61,55 @@ def to_mean(a, target):
     return np.clip(b, 0, 255)
 
 
+def blur(h, sigma):
+    """Weichzeichnen über die Bildkante hinweg (das Bild kachelt)."""
+    fy = np.fft.fftfreq(h.shape[0])[:, None]
+    fx = np.fft.fftfreq(h.shape[1])[None, :]
+    return np.real(np.fft.ifft2(np.fft.fft2(h) * np.exp(-2 * np.pi**2 * sigma**2 * (fx**2 + fy**2))))
+
+
+def relief(name, a, size):
+    """Normal Map aus der Helligkeit: feine Kanten plus breitere Wölbung. Grün zeigt im Bild nach oben."""
+    lum = a @ np.array([0.3, 0.59, 0.11])
+    h = np.clip((lum - lum.mean()) / lum.std(), -2.5, 2.5)
+    h = 0.6 * blur(h, 1.5) + 0.4 * blur(h, 5)
+    k = RELIEF[name]
+    gx = (np.roll(h, -1, 1) - np.roll(h, 1, 1)) / 2 * k
+    gy = (np.roll(h, -1, 0) - np.roll(h, 1, 0)) / 2 * k
+    if name == 'wellblech':  # Rippen als echte Welle, Steigung bis 0,7
+        x = np.arange(a.shape[1]) / a.shape[1]
+        gx = gx + (0.7 * np.cos(x * 2 * np.pi * RIBS))[None, :]
+    n = np.stack([-gx, gy, np.ones_like(gx)], axis=2)
+    n /= np.linalg.norm(n, axis=2, keepdims=True)
+    return Image.fromarray(((n * 0.5 + 0.5) * 255).round().astype(np.uint8)).resize((size, size), Image.LANCZOS)
+
+
 def build(name):
     src, size, target, tile = LOOKS[name]
     a = np.asarray(Image.open(SRC / f'{src}.png').convert('RGB'), dtype=np.float64).copy()
     if tile:
         a = close_seam(close_seam(a, 1), 0)
+    normal = relief(name, a, size)
     a = a / a.mean(axis=(0, 1))  # mittlere Farbe heraus: Bild wird im Mittel neutral
     if name == 'wellblech':
         x = np.arange(a.shape[1]) / a.shape[1]
         a = a * (0.9 + 0.16 * np.sin(x * 2 * np.pi * RIBS))[None, :, None]
     a = to_mean(a, target)
-    return Image.fromarray(a.round().astype(np.uint8)).resize((size, size), Image.LANCZOS)
+    return Image.fromarray(a.round().astype(np.uint8)).resize((size, size), Image.LANCZOS), normal
 
 
 OUT.mkdir(parents=True, exist_ok=True)
 sheet = Image.new('RGB', (5 * 512, 3 * 512), 'white')
 total = 0
 for i, name in enumerate(LOOKS):
-    im = build(name)
+    im, normal = build(name)
     path = OUT / f'{name}.webp'
     im.save(path, 'WEBP', quality=82, method=6)
-    total += path.stat().st_size
-    print(f'{name:11s} {im.size[0]:5d} px  {path.stat().st_size / 1024:6.0f} KB  Mittel {np.asarray(im).mean():.0f}')
+    npath = OUT / f'{name}_n.webp'
+    normal.save(npath, 'WEBP', quality=85, method=6)
+    total += path.stat().st_size + npath.stat().st_size
+    print(f'{name:11s} {im.size[0]:5d} px  {path.stat().st_size / 1024:6.0f} KB  Relief {npath.stat().st_size / 1024:4.0f} KB'
+          f'  Mittel {np.asarray(im).mean():.0f}')
     if len(sys.argv) > 1:  # Vorschau: jedes Bild 2x2 gekachelt
         t = Image.new('RGB', (im.size[0] * 2, im.size[1] * 2))
         for x in (0, im.size[0]):
