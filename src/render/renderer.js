@@ -293,13 +293,15 @@ function boxGeometry(b, perFace = false) {
   const geo = new THREE.BoxGeometry(w, h, d);
   geo.translate((b.min[0] + b.max[0]) / 2, (b.min[1] + b.max[1]) / 2, (b.min[2] + b.max[2]) / 2);
   if (perFace) return geo;
+  // Texturkoordinaten aus der Lage in der Welt (in Metern), damit Steinreihen und Bretter über
+  // aneinanderstoßende Blöcke weiterlaufen. Seiten: ±x, ±y, ±z je vier Ecken.
   const uv = geo.attributes.uv;
-  const faceSize = [[d, h], [d, h], [w, d], [w, d], [w, h], [w, h]];
-  for (let f = 0; f < 6; f++) {
-    for (let v = 0; v < 4; v++) {
-      const i = f * 4 + v;
-      uv.setXY(i, uv.getX(i) * faceSize[f][0], uv.getY(i) * faceSize[f][1]);
-    }
+  const pos = geo.attributes.position;
+  for (let i = 0; i < uv.count; i++) {
+    const f = i >> 3;
+    if (f === 0) uv.setXY(i, pos.getZ(i), pos.getY(i));
+    else if (f === 1) uv.setXY(i, pos.getX(i), pos.getZ(i));
+    else uv.setXY(i, pos.getX(i), pos.getY(i));
   }
   return geo;
 }

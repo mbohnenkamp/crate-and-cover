@@ -35,3 +35,7 @@ Online fehlen die aufgenommenen Geräusche; das Spiel erzeugt dann eigene.
 Soldaten, Hände und Waffen (`public/models/ki/`) sind 3D-Modelle, die mit KI erzeugt wurden (Meshy über Higgsfield),
 zum Teil nach eigenen Entwürfen. Karten, Requisiten und die älteren Figuren stammen aus Blender-Skripten
 (`blender/`). Mit `?soldat=alt` hinter der Adresse zeigt das Spiel die Blender-Fassung.
+
+Die Oberflächen der Karten (`public/textures/`) sind KI-Bilder (GPT Image über Higgsfield), aufbereitet mit
+`tools/texturen.py`: Naht geglättet, mittlere Farbe herausgerechnet, damit die Blockfarbe der Karte sie tönt.
+Mit `?flaechen=alt` zeigt das Spiel die im Code gemalten Flächen.

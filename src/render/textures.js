@@ -1,5 +1,6 @@
-// Gemalte Oberflächen je Blockart: Putz, Stein, Ziegel, Pflaster, Bretter, Dachziegel, Wellblech, Stahl …
-// Alle Bilder sind fast weiß und werden mit der Blockfarbe getönt. Ein Bild deckt `tile` Meter ab,
+// Oberflächen je Blockart: Putz, Stein, Ziegel, Pflaster, Bretter, Dachziegel, Wellblech, Stahl …
+// Erst im Code gemalt, dann durch ein KI-Bild ersetzt (siehe unten). Alle Bilder sind fast weiß und werden mit
+// der Blockfarbe getönt. Ein Bild deckt `tile` Meter ab,
 // die Texturkoordinaten der Blöcke sind in Metern (siehe boxGeometry im Renderer).
 
 import * as THREE from 'three';
@@ -301,8 +302,17 @@ const PAINTERS = {
   },
 };
 
+// KI-Bilder (tools/texturen.py → public/textures/): Oberfläche → Meter je Bild. Mit ?flaechen=alt bleiben die
+// im Code gemalten Flächen.
+const KI = new URLSearchParams(location.search).get('flaechen') === 'alt' ? {} : {
+  beton: 4, putz: 3, erde: 4, sand: 2.5, stein: 2, ziegel: 1, pflaster: 2, bretter: 1.25, kiste: 1,
+  dachziegel: 1.33, stahl: 3, laub: 1.5, wellblech: 2,
+};
+const loader = new THREE.TextureLoader();
+
 const cache = {};
 
+// Sofort die im Code gemalte Fläche; das KI-Bild ersetzt sie, sobald es geladen ist.
 export function textureFor(look) {
   if (cache[look]) return cache[look];
   const painter = PAINTERS[look] ?? PAINTERS.glatt;
@@ -313,5 +323,13 @@ export function textureFor(look) {
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.anisotropy = 8;
   cache[look] = tex;
+  if (KI[look]) {
+    loader.load(`${import.meta.env.BASE_URL}textures/${look}.webp`, loaded => {
+      tex.dispose(); // andere Bildgröße: Speicher der Grafikkarte neu anlegen
+      tex.image = loaded.image;
+      tex.repeat.set(1 / KI[look], 1 / KI[look]);
+      tex.needsUpdate = true;
+    });
+  }
   return tex;
 }
