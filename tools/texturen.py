@@ -3,7 +3,8 @@
 Je Bild: Naht über die Bildkante glätten (damit es kachelt), die mittlere Farbe herausrechnen (das Bild wird
 fast weiß, die Blockfarbe der Karte tönt es wie bisher) und auf die Helligkeit der alten gemalten Fläche bringen.
 Wellblech entsteht aus dem Stahlbild mit aufgerechneten Rippen.
-Dazu je Bild eine Reliefkarte <name>_n.webp (Normal Map): Helligkeit des Bildes als Höhe, dunkle Fugen liegen tief.
+Dazu je Bild eine Reliefkarte <name>_n.webp: Helligkeit des Bildes als Höhe (dunkle Fugen liegen tief), daraus
+Neigung in Rot/Grün und die Höhe selbst in Blau (für die Tiefenwirkung im Spiel).
 
 Aufruf: python3 tools/texturen.py [vorschau.jpg]
 """
@@ -33,11 +34,16 @@ LOOKS = {
     'wellblech': ('stahl', 1024, 211, True),
 }
 RIBS = 8  # Wellblech: Rippen je Bild
-# Stärke des Reliefs je Oberfläche (Steigung je Pixel bei 1024 px, Höhe in Standardabweichungen der Helligkeit)
+# Relief je Oberfläche: (Tiefe in Metern, Meter je Bild, Prozentrang der Helligkeit, ab dem die Fläche "oben" ist).
+# Tiefe und Meter je Bild stehen auch in src/render/textures.js (KI) und müssen dort gleich sein.
 RELIEF = {
-    'beton': 1.2, 'putz': 1.2, 'erde': 2.0, 'sand': 1.6, 'stein': 2.6, 'ziegel': 2.4, 'pflaster': 2.8,
-    'bretter': 2.2, 'kiste': 2.2, 'dachziegel': 2.6, 'stahl': 0.8, 'laub': 2.0, 'wellblech': 0.5,
+    'beton': (0.008, 4, 97), 'putz': (0.006, 3, 97), 'erde': (0.035, 4, 95), 'sand': (0.03, 2.5, 95),
+    'stein': (0.05, 2, 60), 'ziegel': (0.02, 1, 60), 'pflaster': (0.04, 2, 70), 'bretter': (0.02, 1.25, 70),
+    'kiste': (0.02, 1, 70), 'dachziegel': (0.045, 1.33, 80), 'stahl': (0.003, 3, 97), 'laub': (0.10, 1.5, 90),
+    'wellblech': (0.03, 2, 97),
 }
+FINE = ('beton', 'putz', 'stahl', 'sand', 'wellblech')
+BOOST = 1.5  # Steigungen etwas überhöhen, damit das Relief im Spiel trägt
 
 
 def close_seam(a, axis, reach=24):
@@ -69,19 +75,32 @@ def blur(h, sigma):
 
 
 def relief(name, a, size):
-    """Normal Map aus der Helligkeit: feine Kanten plus breitere Wölbung. Grün zeigt im Bild nach oben."""
+    """Reliefkarte: Rot/Grün = Neigung (Normal Map, Grün zeigt im Bild nach oben), Blau = Höhe (1 = oben).
+
+    Die Höhe kommt aus der Helligkeit: dunkle Fugen liegen tief, alles über dem Prozentrang `top` ist oben.
+    """
+    depth, tile, top = RELIEF[name]
     lum = a @ np.array([0.3, 0.59, 0.11])
-    h = np.clip((lum - lum.mean()) / lum.std(), -2.5, 2.5)
+    if name == 'ziegel':  # Fugen sind hell, aber grau: Höhe aus der Farbsättigung (Ziegel bunt = oben)
+        lum = (a.max(axis=2) - a.min(axis=2)) / a.max(axis=2).clip(1)
+    if name in FINE:  # Flecken sind keine Löcher: nur die feine Körnung zählt
+        lum = lum - blur(lum, 12)
+    h = (lum - lum.mean()) / lum.std()
     h = 0.6 * blur(h, 1.5) + 0.4 * blur(h, 5)
-    k = RELIEF[name]
-    gx = (np.roll(h, -1, 1) - np.roll(h, 1, 1)) / 2 * k
-    gy = (np.roll(h, -1, 0) - np.roll(h, 1, 0)) / 2 * k
-    if name == 'wellblech':  # Rippen als echte Welle, Steigung bis 0,7
+    lo, hi = np.percentile(h, [2, top])
+    h = blur(np.clip((h - lo) / (hi - lo), 0, 1), 1.0)
+    if name == 'wellblech':  # Rippen als echte Welle, Kratzer des Stahls nur leicht
         x = np.arange(a.shape[1]) / a.shape[1]
-        gx = gx + (0.7 * np.cos(x * 2 * np.pi * RIBS))[None, :]
+        h = 0.1 * h + 0.9 * (0.5 + 0.5 * np.sin(x * 2 * np.pi * RIBS))[None, :]
+    k = BOOST * depth / (tile / h.shape[1])  # Höhe 0..1 → Steigung in Metern je Meter
+    gx = np.clip((np.roll(h, -1, 1) - np.roll(h, 1, 1)) / 2 * k, -3, 3)
+    gy = np.clip((np.roll(h, -1, 0) - np.roll(h, 1, 0)) / 2 * k, -3, 3)
     n = np.stack([-gx, gy, np.ones_like(gx)], axis=2)
     n /= np.linalg.norm(n, axis=2, keepdims=True)
-    return Image.fromarray(((n * 0.5 + 0.5) * 255).round().astype(np.uint8)).resize((size, size), Image.LANCZOS)
+    out = np.stack([n[..., 0] * 0.5 + 0.5, n[..., 1] * 0.5 + 0.5, h], axis=2)
+    if name in FINE:  # feine Körnung braucht keine volle Auflösung
+        size = min(size, 512)
+    return Image.fromarray((out * 255).round().astype(np.uint8)).resize((size, size), Image.LANCZOS)
 
 
 def build(name):
@@ -106,7 +125,7 @@ for i, name in enumerate(LOOKS):
     path = OUT / f'{name}.webp'
     im.save(path, 'WEBP', quality=82, method=6)
     npath = OUT / f'{name}_n.webp'
-    normal.save(npath, 'WEBP', quality=85, method=6)
+    normal.save(npath, 'WEBP', quality=86, method=6, use_sharp_yuv=True)
     total += path.stat().st_size + npath.stat().st_size
     print(f'{name:11s} {im.size[0]:5d} px  {path.stat().st_size / 1024:6.0f} KB  Relief {npath.stat().st_size / 1024:4.0f} KB'
           f'  Mittel {np.asarray(im).mean():.0f}')

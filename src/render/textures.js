@@ -302,12 +302,17 @@ const PAINTERS = {
   },
 };
 
-// KI-Bilder (tools/texturen.py → public/textures/): Oberfläche → Meter je Bild. Mit ?flaechen=alt bleiben die
-// im Code gemalten Flächen.
-const KI = new URLSearchParams(location.search).get('flaechen') === 'alt' ? {} : {
-  beton: 4, putz: 3, erde: 4, sand: 2.5, stein: 2, ziegel: 1, pflaster: 2, bretter: 1.25, kiste: 1,
-  dachziegel: 1.33, stahl: 3, laub: 1.5, wellblech: 2,
+// KI-Bilder (tools/texturen.py → public/textures/): Oberfläche → [Meter je Bild, Relieftiefe in Metern].
+// Dieselben Werte stehen in tools/texturen.py (RELIEF). Mit ?flaechen=alt bleiben die im Code gemalten Flächen,
+// mit ?tiefe=aus fällt nur die Tiefenwirkung weg.
+const query = new URLSearchParams(location.search);
+const KI_LOOKS = query.get('flaechen') === 'alt' ? {} : {
+  beton: [4, 0.008], putz: [3, 0.006], erde: [4, 0.035], sand: [2.5, 0.03], stein: [2, 0.05], ziegel: [1, 0.02],
+  pflaster: [2, 0.04], bretter: [1.25, 0.02], kiste: [1, 0], dachziegel: [1.33, 0.045], stahl: [3, 0.003],
+  laub: [1.5, 0.1], wellblech: [2, 0.03],
 };
+const KI = Object.fromEntries(Object.entries(KI_LOOKS).map(([k, v]) => [k, v[0]]));
+const DEPTH = query.get('tiefe') === 'aus' ? 0 : 1;
 const loader = new THREE.TextureLoader();
 
 const cache = {};
@@ -354,4 +359,82 @@ export function reliefFor(look) {
   reliefCache[look] = tex;
   loader.load(`${import.meta.env.BASE_URL}textures/${look}_n.webp`, loaded => swap(tex, loaded, KI[look]));
   return tex;
+}
+
+// Tiefenwirkung (Parallax Occlusion Mapping): Der Blickstrahl wird in Schritten in die Fläche verfolgt, bis er
+// die Höhe aus dem Blaukanal der Reliefkarte trifft; Farbe und Neigung kommen von dieser Stelle. Fugen verschieben
+// sich dadurch beim Vorbeigehen. Die Blöcke liegen an den Weltachsen und ihre Texturkoordinaten sind die Weltlage
+// (boxGeometry im Renderer), deshalb reicht die Flächenrichtung, um den Blick in die Fläche umzurechnen.
+// Ab 18 m klingt die Wirkung aus, ab 30 m wird nichts mehr gerechnet.
+function addDepth(material, tile, depth) {
+  material.onBeforeCompile = shader => {
+    shader.uniforms.reliefTile = { value: tile };
+    shader.uniforms.reliefDepth = { value: depth };
+    shader.vertexShader = shader.vertexShader
+      .replace('void main() {', 'varying vec3 vWPos;\nvarying vec3 vWNrm;\nvoid main() {')
+      .replace('#include <begin_vertex>', '#include <begin_vertex>\nvWPos = ( modelMatrix * vec4( position, 1.0 ) ).xyz;\nvWNrm = normal;');
+    shader.fragmentShader = shader.fragmentShader
+      .replace('void main() {', `
+        varying vec3 vWPos;
+        varying vec3 vWNrm;
+        uniform float reliefTile;
+        uniform float reliefDepth;
+        void main() {
+          vec2 pDx = dFdx( vMapUv );
+          vec2 pDy = dFdy( vMapUv );
+          vec2 pOff = vec2( 0.0 );
+          float pHeight = 1.0;
+          float pFade = 0.0;
+          {
+            vec3 toEye = cameraPosition - vWPos;
+            float dist = length( toEye );
+            toEye /= dist;
+            vec3 an = abs( vWNrm );
+            vec2 along = an.x > 0.5 ? toEye.zy : an.y > 0.5 ? toEye.xz : toEye.xy;
+            float into = an.x > 0.5 ? abs( toEye.x ) : an.y > 0.5 ? abs( toEye.y ) : abs( toEye.z );
+            float fade = 1.0 - smoothstep( 18.0, 30.0, dist );
+            pFade = fade;
+            if ( fade > 0.0 ) {
+              float steps = mix( 20.0, 6.0, into );
+              vec2 full = - along / max( into, 0.3 ) * reliefDepth * fade / reliefTile;
+              vec2 uv = vNormalMapUv;
+              vec2 stepUv = full / steps;
+              float stepD = 1.0 / steps;
+              float d = 0.0;
+              float surf = 1.0 - textureGrad( normalMap, uv, pDx, pDy ).b;
+              float prev = surf;
+              for ( int i = 0; i < 20; i ++ ) {
+                if ( d >= surf ) break;
+                prev = surf;
+                uv += stepUv;
+                d += stepD;
+                surf = 1.0 - textureGrad( normalMap, uv, pDx, pDy ).b;
+              }
+              float after = d - surf;
+              float before = prev - ( d - stepD );
+              float w = after / max( after + before, 0.0001 );
+              pOff = uv - stepUv * w - vNormalMapUv;
+              pHeight = 1.0 - mix( surf, prev, w );
+            }
+          }
+      `)
+      .replace('#include <map_fragment>', `
+        diffuseColor *= textureGrad( map, vMapUv + pOff, pDx, pDy );
+        diffuseColor.rgb *= mix( 1.0, mix( 0.62, 1.0, smoothstep( 0.0, 0.45, pHeight ) ), pFade );
+      `)
+      .replace('#include <normal_fragment_maps>', `
+        vec3 mapN = textureGrad( normalMap, vNormalMapUv + pOff, pDx, pDy ).xyz * 2.0 - 1.0;
+        mapN.z = sqrt( saturate( 1.0 - dot( mapN.xy, mapN.xy ) ) );
+        mapN.xy *= normalScale;
+        normal = normalize( tbn * mapN );
+      `);
+  };
+  material.customProgramCacheKey = () => 'relief';
+}
+
+// Material einer Oberfläche: Farbbild, Reliefkarte und (wo die Texturkoordinaten die Weltlage sind) Tiefenwirkung.
+export function surfaceMaterial(look) {
+  const material = new THREE.MeshLambertMaterial({ map: textureFor(look), normalMap: reliefFor(look), vertexColors: true });
+  if (KI_LOOKS[look]) addDepth(material, KI_LOOKS[look][0], KI_LOOKS[look][1] * DEPTH);
+  return material;
 }
