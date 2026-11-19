@@ -84,16 +84,20 @@ const BONES = {
   legR: 'RightUpLeg', shinR: 'RightLeg', legL: 'LeftUpLeg', shinL: 'LeftLeg',
 };
 
-function buildBody(team) {
+// Nur Gefallene verblassen und brauchen Transparenz. Durchsichtig und doppelseitig zeichnet three.js jede Figur zweimal.
+function buildBody(team, fading = false) {
   const body = cloneSkinned(model.scene);
+  body.updateMatrixWorld(true);
   const mats = [];
   body.traverse(o => {
     if (!o.isMesh) return;
     o.material = o.material.clone();
     if (model.maps[team]) o.material.map = model.maps[team];
-    o.material.transparent = true;
+    o.material.transparent = fading;
     o.castShadow = true;
-    o.frustumCulled = false; // der Hüllkörper eines Skelettmodells folgt der Bewegung nicht
+    // Der Hüllkörper eines Skelettmodells folgt der Bewegung nicht (die Grundform ist winzig, erst die Knochen
+    // skalieren sie). Feste Kugel von 2 m um die Füße, damit three.js Soldaten außerhalb des Bildes weglassen kann.
+    if (o.isSkinnedMesh) o.boundingSphere = new THREE.Sphere(new THREE.Vector3(), 2 / o.matrixWorld.getMaxScaleOnAxis());
     mats.push(o.material);
   });
   return { body, mats };
@@ -354,7 +358,7 @@ export function spawnKiCorpse(f) {
   const group = new THREE.Group();
   group.position.copy(f.group.position);
   group.rotation.y = f.group.rotation.y;
-  const { body, mats } = buildBody(f.team);
+  const { body, mats } = buildBody(f.team, true);
   body.rotation.y = Math.PI;
   group.add(body);
   const mixer = new THREE.AnimationMixer(body);
