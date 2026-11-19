@@ -3,7 +3,8 @@
 
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+const draco = new DRACOLoader();
 import { hitboxes } from '../game/hitbox.js';
 import { buildWeapon, createMuzzleFlash, HANDS, KI } from './viewmodel.js';
 import { WEAPONS } from '../config.js';
@@ -14,7 +15,7 @@ let soldier = null;
 // Der KI-Soldat hat Vorrang, wenn seine Datei da ist; ?soldat=alt zeigt den Blender-Soldaten
 export function loadSoldier() {
   return Promise.all([
-    new GLTFLoader().setMeshoptDecoder(MeshoptDecoder)
+    new GLTFLoader().setDRACOLoader(draco)
       .loadAsync(`${import.meta.env.BASE_URL}models/custom/soldat.glb`)
       .then(gltf => { soldier = gltf.scene; return true; })
       .catch(() => false),

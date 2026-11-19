@@ -2,7 +2,8 @@
 
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+const draco = new DRACOLoader();
 import { WEAPONS } from '../config.js';
 
 let loaded = null;
@@ -15,7 +16,7 @@ const KI_WEAPONS = ['gewehr', 'pistole', 'messer', 'scharf'];
 const kiWeapons = {};
 let kiArms = null;
 
-const load = file => new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).loadAsync(`${import.meta.env.BASE_URL}models/${file}`).then(gltf => gltf.scene);
+const load = file => new GLTFLoader().setDRACOLoader(draco).loadAsync(`${import.meta.env.BASE_URL}models/${file}`).then(gltf => gltf.scene);
 
 // Waffen aus Blender (public/models/custom/waffen.glb, nach entwuerfe/Waffen.webp); fehlt die Datei, bleiben die Blöcke
 export function loadWeapons() {

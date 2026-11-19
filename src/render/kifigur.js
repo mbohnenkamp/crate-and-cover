@@ -5,7 +5,8 @@
 
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+const draco = new DRACOLoader();
 import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
 import { HANDS } from './viewmodel.js';
 import { WEAPONS } from '../config.js';
@@ -24,7 +25,7 @@ const PACE = { gehen: 1.2, rennen: 7, ducken: 1.9 };
 const FIT = { straighten: 0.6, crouchTop: 1.2 };
 
 export function loadKiSoldier() {
-  return new GLTFLoader().setMeshoptDecoder(MeshoptDecoder)
+  return new GLTFLoader().setDRACOLoader(draco)
     .loadAsync(`${import.meta.env.BASE_URL}models/ki/soldat.glb`)
     .then(gltf => {
       const clips = {};

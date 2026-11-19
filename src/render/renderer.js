@@ -4,7 +4,8 @@ import { createViewmodel, loadWeapons, loadHands } from './viewmodel.js';
 import { createEffects } from './effects.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+const draco = new DRACOLoader();
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
@@ -309,7 +310,7 @@ function boxGeometry(b, perFace = false) {
 
 const propCache = {};
 function loadProp(name) {
-  propCache[name] ??= new GLTFLoader().setMeshoptDecoder(MeshoptDecoder)
+  propCache[name] ??= new GLTFLoader().setDRACOLoader(draco)
     .loadAsync(`${import.meta.env.BASE_URL}models/custom/${name}.glb`)
     .then(gltf => gltf.scene)
     .catch(() => null); // fehlt das Modell, bleibt die Stelle leer (Kollision bleibt)
