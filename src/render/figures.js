@@ -40,7 +40,7 @@ function block(parent, color, size, pos, mats) {
 const SKINS = [0xd9c2a5, 0xc69c7a, 0x9c6b4a, 0xe8d2b8, 0x6f4a32, 0xb8865f];
 
 export function createFigure(scene, team, id = 0) {
-  const f = hasKiSoldier() ? kiFigure(scene, team) : soldier ? soldierFigure(scene, team, id) : blockFigure(scene, team);
+  const f = hasKiSoldier() ? kiFigure(scene, team, id) : soldier ? soldierFigure(scene, team, id) : blockFigure(scene, team);
   f.bar = createBar();
   f.group.add(f.bar.group);
   return f;

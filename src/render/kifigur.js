@@ -11,7 +11,11 @@ import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
 import { HANDS } from './viewmodel.js';
 import { WEAPONS } from '../config.js';
 
-let model = null; // { scene, clips: { stehen, gehen, rennen, ducken, tod }, maps: { A, B } }
+// Mehrere Varianten (soldat.glb, soldat_muetze.glb …), je Spieler eine. Alle mit demselben Meshy-Skelett.
+// Je Variante: { scene, clips: { stehen, gehen, rennen, ducken, tod }, maps: { A, B } }
+// ?varianten=aus: nur der erste Soldat (zum Vergleich)
+const VARIANTS = new URLSearchParams(location.search).get('varianten') === 'aus' ? ['soldat'] : ['soldat', 'soldat_muetze'];
+const models = [];
 
 // Bei diesem Tempo (m/s) laufen die Bewegungen in ihrer eigenen Geschwindigkeit. Von sich aus (in Blender gemessen)
 // passt Rennen zu 5,5 m/s und Ducken zu 1,24 m/s, macht dann aber 4 Schritte je Sekunde und wirkt gehetzt. Mit
@@ -24,21 +28,27 @@ const PACE = { gehen: 1.2, rennen: 7, ducken: 1.9 };
 // richtet der Code den Oberkörper ein Stück auf, senkt geduckt die Hüfte und schiebt den Körper unter den Kopf.
 const FIT = { straighten: 0.6, crouchTop: 1.2 };
 
-export function loadKiSoldier() {
+function loadVariant(name) {
   return new GLTFLoader().setDRACOLoader(draco)
-    .loadAsync(`${import.meta.env.BASE_URL}models/ki/soldat.glb`)
+    .loadAsync(`${import.meta.env.BASE_URL}models/ki/${name}.glb`)
     .then(gltf => {
       const clips = {};
       for (const c of gltf.animations) clips[c.name] = c;
       let map = null;
       gltf.scene.traverse(o => { if (o.isMesh && o.material.map) map = o.material.map; });
-      model = { scene: gltf.scene, clips, maps: { A: map, B: map ? recolor(map) : null } };
-      return true;
+      return { scene: gltf.scene, clips, maps: { A: map, B: map ? recolor(map) : null } };
     })
-    .catch(() => false);
+    .catch(() => null);
 }
 
-export const hasKiSoldier = () => !!model;
+export function loadKiSoldier() {
+  return Promise.all(VARIANTS.map(loadVariant)).then(list => {
+    models.push(...list.filter(Boolean));
+    return models.length > 0;
+  });
+}
+
+export const hasKiSoldier = () => models.length > 0;
 
 // Team B: alles Blaue (Helm, Weste) wird orange. Der Farbton dreht, Helligkeit und Sättigung bleiben.
 function recolor(map) {
@@ -86,7 +96,7 @@ const BONES = {
 };
 
 // Nur Gefallene verblassen und brauchen Transparenz. Durchsichtig und doppelseitig zeichnet three.js jede Figur zweimal.
-function buildBody(team, fading = false) {
+function buildBody(model, team, fading = false) {
   const body = cloneSkinned(model.scene);
   body.updateMatrixWorld(true);
   const mats = [];
@@ -104,11 +114,12 @@ function buildBody(team, fading = false) {
   return { body, mats };
 }
 
-export function kiFigure(scene, team) {
+export function kiFigure(scene, team, id = 0) {
+  const model = models[id % models.length];
   const group = new THREE.Group();
   const pivot = new THREE.Group();
   group.add(pivot);
-  const { body, mats } = buildBody(team);
+  const { body, mats } = buildBody(model, team);
   body.rotation.y = Math.PI; // das Modell schaut nach +Z, die Figur nach −Z
   pivot.add(body);
   const bones = {};
@@ -131,7 +142,7 @@ export function kiFigure(scene, team) {
   aim.add(gunHolder);
   scene.add(group);
   return {
-    ki: true, team, group, pivot, body, mats, bones, mixer, actions, aim, gunHolder,
+    ki: true, model, team, group, pivot, body, mats, bones, mixer, actions, aim, gunHolder,
     flash: 0, fall: 0, weapon: null, muzzle: 0, muzzleMesh: null,
     kneel: 0, last: null, bodyYaw: null, reloadLeft: 0, reloadTime: 1, w: { stehen: 1, gehen: 0, rennen: 0, ducken: 0 },
     air: 0, stab: 0, hitFrom: null, flinch: 0, headshot: false, dead: false,
@@ -360,13 +371,14 @@ const ARMS_STAND = 2;
 
 export function spawnKiCorpse(f) {
   const scene = f.group.parent;
+  const model = f.model;
   if (!scene || !model.clips.tod) return;
   const group = new THREE.Group();
   group.position.copy(f.group.position);
   // Die Bewegung fällt nach hinten: Rücken zur Trefferrichtung drehen, dann fällt er vom Schützen weg
   const h = f.hitFrom;
   group.rotation.y = h && (h.x || h.z) ? Math.atan2(h.x, h.z) : f.group.rotation.y;
-  const { body, mats } = buildBody(f.team, true);
+  const { body, mats } = buildBody(model, f.team, true);
   body.rotation.y = Math.PI;
   group.add(body);
   const mixer = new THREE.AnimationMixer(body);
