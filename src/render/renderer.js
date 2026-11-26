@@ -89,7 +89,7 @@ export function createRenderer(canvas, world) {
     applyDaytime(DAYTIMES[world.licht] ?? DAYTIMES.mittag);
     if (mapGroup) {
       scene.remove(mapGroup);
-      mapGroup.traverse(o => { o.geometry?.dispose(); o.material?.dispose(); });
+      mapGroup.traverse(o => { o.geometry?.dispose(); if (o.material?.map?.userData.own) o.material.map.dispose(); o.material?.dispose(); });
     }
     mapGroup = new THREE.Group();
     const groups = {};
@@ -148,17 +148,18 @@ export function createRenderer(canvas, world) {
       water.receiveShadow = true;
       mapGroup.add(water);
     }
-    // Wasser-Zonen aus dem Kartenbauer: Oberfläche auf der Oberkante; Absturz-Zonen sieht man im Spiel nicht
+    // Zonen aus dem Kartenbauer, Fläche auf der Oberkante: Wasser blau, Absturz als dunkler Abgrund
     for (const z of world.zones ?? []) {
-      if (z.kind !== 'wasser') continue;
-      const water = new THREE.Mesh(
-        new THREE.PlaneGeometry(z.max[0] - z.min[0], z.max[2] - z.min[2]),
-        new THREE.MeshLambertMaterial({ color: 0x2f6b8f, transparent: true, opacity: 0.88 }),
-      );
-      water.rotation.x = -Math.PI / 2;
-      water.position.set((z.min[0] + z.max[0]) / 2, z.max[1], (z.min[2] + z.max[2]) / 2);
-      water.receiveShadow = true;
-      mapGroup.add(water);
+      const w = z.max[0] - z.min[0];
+      const d = z.max[2] - z.min[2];
+      const material = z.kind === 'wasser'
+        ? new THREE.MeshLambertMaterial({ color: 0x2f6b8f, transparent: true, opacity: 0.88 })
+        : new THREE.MeshBasicMaterial({ map: abyssTexture(w, d) });
+      const plane = new THREE.Mesh(new THREE.PlaneGeometry(w, d), material);
+      plane.rotation.x = -Math.PI / 2;
+      plane.position.set((z.min[0] + z.max[0]) / 2, z.max[1], (z.min[2] + z.max[2]) / 2);
+      plane.receiveShadow = z.kind === 'wasser';
+      mapGroup.add(plane);
     }
     scene.add(mapGroup);
     const floor = world.boxes.find(b => b.type === 'boden') ?? { min: [-20, 0, -20], max: [20, 0, 20] };
@@ -364,4 +365,34 @@ function variation(b) {
     h = Math.imul(h, 16777619) >>> 0;
   }
   return 0.93 + ((h % 1000) / 1000) * 0.14;
+}
+
+// Abgrund: innen schwarz, zum Rand hin ein schmaler Übergang in dunkles Grau, damit man die Kante sieht.
+// Eigenes Bild je Zone, 32 Pixel je Meter, damit der Rand überall gleich breit ist (0,5 m).
+function abyssTexture(w, d) {
+  const k = Math.min(32, 512 / Math.max(w, d));
+  const cw = Math.max(8, Math.round(w * k));
+  const ch = Math.max(8, Math.round(d * k));
+  const c = document.createElement('canvas');
+  c.width = cw;
+  c.height = ch;
+  const g = c.getContext('2d');
+  const img = g.createImageData(cw, ch);
+  const rim = 0.5 * k;
+  for (let y = 0; y < ch; y++) {
+    for (let x = 0; x < cw; x++) {
+      const edge = Math.min(x, y, cw - 1 - x, ch - 1 - y);
+      const t = Math.max(0, 1 - edge / rim);
+      const v = 6 + 70 * t * t;
+      const i = (y * cw + x) * 4;
+      img.data[i] = img.data[i + 1] = v;
+      img.data[i + 2] = v + 4;
+      img.data[i + 3] = 255;
+    }
+  }
+  g.putImageData(img, 0, 0);
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.userData.own = true; // gehört nur dieser Zone, wird beim Kartenwechsel freigegeben
+  return tex;
 }

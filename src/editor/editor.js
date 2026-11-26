@@ -48,7 +48,7 @@ const TOOLS = [
   ['brunnen', 'Brunnen', 'Klicken'],
   ['marktstand', 'Marktstand', 'Klicken, R dreht'],
   ['wasser', 'Wasser', 'Ziehen: Wasserfläche, wer hineinfällt, ist raus'],
-  ['absturz', 'Absturz', 'Ziehen: unsichtbare Absturzzone (z. B. unter Löchern), wer hineingerät, ist raus'],
+  ['absturz', 'Absturz', 'Ziehen: Abgrund (dunkle Fläche), wer hineingerät, ist raus'],
 ];
 
 const round = v => Math.round(v * 1000) / 1000;
@@ -314,7 +314,7 @@ export function createEditor({ view, canvas, onPlay, onExit }) {
   ghost.visible = false;
   overlay.add(ghost);
   let marks = null;
-  // Absturzzonen sieht man im Spiel nicht, im Kartenbauer als rote Kästen
+  // Absturzzonen im Kartenbauer zusätzlich als rote Kästen, damit man ihre Tiefe sieht
   const dropGroup = new THREE.Group();
   overlay.add(dropGroup);
   const dropMat = new THREE.MeshBasicMaterial({ color: 0xff3b30, transparent: true, opacity: 0.25, depthWrite: false });
@@ -515,7 +515,7 @@ export function createEditor({ view, canvas, onPlay, onExit }) {
         + field('Tiefe (z)', num('d', it.max[2] - it.min[2], 0.1, 0.1))
         + field('Oberkante', num('top', it.max[1], 0.1))
         + field('Höhe', num('h', it.max[1] - it.min[1], 0.1, 0.1))
-        + `<p class="ed-hint">${it.kind === 'wasser' ? 'Wasser zeigt seine Oberfläche auf der Oberkante. ' : 'Im Spiel unsichtbar. '}Wer mit den Füßen nicht höher als die Oberkante darüber kommt, ist raus. Bots meiden die Fläche.</p>`;
+        + `<p class="ed-hint">${it.kind === 'wasser' ? 'Wasser zeigt seine Oberfläche auf der Oberkante. ' : 'Im Spiel ein dunkler Abgrund auf der Oberkante. '}Wer mit den Füßen nicht höher als die Oberkante darüber kommt, ist raus. Bots meiden die Fläche.</p>`;
     } else if (s.kind === 'stairs') {
       html = `<h3>Treppe</h3>`
         + field('Hinauf nach', opts('dir', DIRS, it.dir))
