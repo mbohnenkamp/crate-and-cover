@@ -7,7 +7,7 @@ import { createHud, boardHtml, TEAM_NAMES } from './render/hud.js';
 import { createWorld } from './game/world.js';
 import { createSound } from './audio/sound.js';
 import { createMinimap } from './render/minimap.js';
-import { createEditor } from './editor/editor.js';
+import { createEditor, loadStore, readMap, buildMap } from './editor/editor.js';
 import testkarte from './maps/testkarte.json';
 import hafen from './maps/hafen.json';
 import altstadt from './maps/altstadt.json';
@@ -17,7 +17,21 @@ import baustelle from './maps/baustelle.json';
 const MAPS = { hafen, altstadt, baustelle, testkarte };
 // testMap: Karte aus dem Kartenbauer, solange dort Probe gespielt wird
 let testMap = null;
-const mapFor = s => testMap ?? (s.mode === 'schiessstand' ? testkarte : MAPS[s.map]);
+const mapFor = s => testMap ?? (s.mode === 'schiessstand' ? testkarte : MAPS[s.map] ?? customMap(s.map) ?? hafen);
+
+// Eigene Karten aus dem Kartenbauer stehen als „eigen:Name“ in der Kartenauswahl; Wegpunkte beim Laden
+const CUSTOM = 'eigen:';
+let customCache = { key: null, map: null };
+function customMap(key) {
+  if (!key?.startsWith(CUSTOM)) return null;
+  const stored = loadStore()[key.slice(CUSTOM.length)];
+  if (!stored) return null;
+  const json = JSON.stringify(stored);
+  if (customCache.key !== json) {
+    try { customCache = { key: json, map: buildMap(readMap(stored)) }; } catch { return null; }
+  }
+  return customCache.map;
+}
 
 const $ = id => document.getElementById(id);
 const canvas = $('game');
@@ -55,6 +69,7 @@ const editor = createEditor({
   onExit() {
     editor.close();
     input.clickToLock = true;
+    showCustomMaps();
     newGame();
     showScreen('menu');
   },
@@ -82,7 +97,7 @@ function loadSettings() {
   try { stored = JSON.parse(localStorage.getItem(SETTINGS_KEY)) ?? {}; } catch {}
   const s = { ...MATCH.defaults };
   if (['deathmatch', 'schiessstand'].includes(stored.mode)) s.mode = stored.mode;
-  if (stored.map in MAPS) s.map = stored.map;
+  if (stored.map in MAPS || customMap(stored.map)) s.map = stored.map;
   if (['leicht', 'mittel', 'schwer'].includes(stored.difficulty)) s.difficulty = stored.difficulty;
   if (MATCH.killGoals.includes(stored.killGoal)) s.killGoal = stored.killGoal;
   if (MATCH.timeLimits.includes(stored.timeLimit)) s.timeLimit = stored.timeLimit;
@@ -102,9 +117,10 @@ function showScreen(name) {
   for (const [k, el] of Object.entries(screens)) el.classList.toggle('hidden', k !== name);
 }
 
+const markers = {};
 for (const group of document.querySelectorAll('.opt')) {
   const key = group.dataset.key;
-  const mark = () => {
+  const mark = markers[key] = () => {
     for (const b of group.children) b.classList.toggle('on', b.dataset.v === String(settings[key]));
   };
   group.addEventListener('click', e => {
@@ -132,10 +148,26 @@ for (const el of document.querySelectorAll('[data-setting]')) {
     settings[el.dataset.setting] = Number(el.value);
     saveSettings();
     showSliders();
-for (const el of document.querySelectorAll('.demo')) el.addEventListener('click', () => { sound.unlock(); sound.demo(); });
   });
 }
+for (const el of document.querySelectorAll('.demo')) el.addEventListener('click', () => { sound.unlock(); sound.demo(); });
 showSliders();
+
+function showCustomMaps() {
+  const group = document.querySelector('.opt[data-key=map]');
+  for (const b of group.querySelectorAll('.eigen')) b.remove();
+  for (const name of Object.keys(loadStore()).sort()) {
+    const b = document.createElement('button');
+    b.className = 'eigen';
+    b.dataset.v = CUSTOM + name;
+    b.textContent = name;
+    b.title = 'Eigene Karte aus dem Kartenbauer';
+    group.append(b);
+  }
+  if (settings.map.startsWith(CUSTOM) && !customMap(settings.map)) settings.map = MATCH.defaults.map;
+  markers.map();
+}
+showCustomMaps();
 
 // Bestenliste: die letzten 50 Partien Team-Deathmatch, angezeigt die zehn mit den meisten Abschüssen
 function loadBest() {

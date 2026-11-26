@@ -117,6 +117,10 @@
     #ed-status { position: fixed; left: 10px; bottom: 10px; padding: 6px 10px; background: rgba(24, 28, 35, .85);
       border-radius: 6px; color: #c8ced6; }
     #ed-status b { color: #ffd27a; font-weight: 600; }
+    #ed-status .bad { color: #ff6b5e; } #ed-status .warn { color: #ffd27a; } #ed-status .good { color: #7dff8a; }
+    #ed-rect { position: fixed; border: 1px solid #ffd27a; background: rgba(255, 210, 122, .12); pointer-events: none; }
+    .opt[data-key=map] { flex-wrap: wrap; }
+    .opt button.eigen { font-style: italic; }
     .hidden { display: none !important; }
   </style>
 </head>
@@ -144,6 +148,9 @@
     <div id="ed-top">
       <input id="ed-name" maxlength="40" title="Name der Karte">
       <select id="ed-licht" title="Tageszeit"></select>
+      <select id="ed-grid" title="Raster"><option value="0.25">Raster 0,25 m</option><option value="0.5" selected>Raster 0,5 m</option><option value="1">Raster 1 m</option></select>
+      <button id="ed-undo" title="Rückgängig (Strg+Z)">↶</button>
+      <button id="ed-redo" title="Wiederholen (Strg+Y)">↷</button>
       <span class="sep"></span>
       <button id="ed-new">Neu</button>
       <button id="ed-save">Speichern</button>
@@ -155,7 +162,7 @@
       <button id="ed-import">Datei einlesen</button>
       <input id="ed-file" type="file" accept=".json,application/json" class="hidden">
       <span class="sep"></span>
-      <button id="ed-paths">Wege prüfen</button>
+      <button id="ed-check">Karte prüfen</button>
       <button id="ed-play" class="primary">Probe spielen</button>
       <button id="ed-exit">Zum Startmenü</button>
     </div>
@@ -165,6 +172,7 @@
       <div id="ed-props"></div>
     </div>
     <div id="ed-status"></div>
+    <div id="ed-rect" class="hidden"></div>
   </div>
   <div id="overlay">
     <div class="box" id="menu">

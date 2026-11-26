@@ -1,16 +1,17 @@
 // Kartenbauer: eigene Karten im Spiel bauen. Draufsicht mit freier Kamera; Wände, Blöcke, Kisten, Treppen,
-// Startpunkte und Modelle setzen, verschieben und ändern. Karten im Browser speichern, als JSON-Datei aus- und
-// einlesen, mit Bots Probe spielen. Die Karte hat dasselbe Format wie src/maps/*.json; die Kollision der
-// Modelle und die Wegpunkte entstehen erst beim Spielen und Ausgeben (buildMap).
+// Startpunkte und Modelle setzen, verschieben und ändern. Mehrfachauswahl, Kopieren, Spiegeln für faire Hälften,
+// Rückgängig. Karten im Browser speichern, als JSON-Datei aus- und einlesen, prüfen und mit Bots Probe spielen.
+// Die Karte hat dasselbe Format wie src/maps/*.json; die Kollision der Modelle und die Wegpunkte entstehen erst
+// beim Spielen und Ausgeben (buildMap).
 
 import * as THREE from 'three';
-import { createWorld } from '../game/world.js';
-import { buildWaypoints } from '../game/wegpunkte.js';
-import { TEAM_COLORS } from '../render/figures.js';
+import { BODY } from '../config.js';
+import { createWorld, overlaps } from '../game/world.js';
+import { buildWaypoints, walk } from '../game/wegpunkte.js';
 
 const DRAFT_KEY = 'arena-shooter.kartenbauer-entwurf';
 const STORE_KEY = 'arena-shooter.eigene-karten';
-const GRID = 0.5;
+const MAX_STEP = 0.45; // höhere Stufen schafft niemand (MOVE.stepHeight)
 
 const BLOCK_TYPES = {
   boden: ['Boden', '#9a9184'], wand: ['Wand', '#cfc8bb'], beton: ['Beton', '#a8a49c'], ziegel: ['Ziegel', '#a5553f'],
@@ -22,6 +23,7 @@ const LOOKS = ['beton', 'putz', 'stein', 'ziegel', 'pflaster', 'bretter', 'kiste
 const DAYTIME_NAMES = { mittag: 'Mittag', morgen: 'Morgen', abend: 'Abend' };
 const DIRS = { '-z': 'Norden', '+x': 'Osten', '+z': 'Süden', '-x': 'Westen' };
 const PROP_NAMES = { baum: 'Baum', brunnen: 'Brunnen', marktstand: 'Marktstand' };
+const KIND_NAMES = { box: 'Block', stairs: 'Treppe', spawn: 'Startpunkt', prop: 'Modell' };
 
 // Kollision der Modelle bei Drehung 0, relativ zum Fußpunkt (Maße wie in tools/karte_altstadt.mjs)
 const PROP_BOXES = {
@@ -34,7 +36,7 @@ const PROP_BOXES = {
 };
 
 const TOOLS = [
-  ['select', 'Auswählen', 'Klicken wählt, Ziehen verschiebt'],
+  ['select', 'Auswählen', 'Klicken wählt, Ziehen verschiebt, Shift+Klick wählt dazu, Ziehen auf freier Fläche wählt einen Bereich'],
   ['wand', 'Wand', 'Ziehen: Wand von Punkt zu Punkt'],
   ['block', 'Block', 'Ziehen: Fläche aufziehen'],
   ['kiste', 'Kiste', 'Klicken, auch auf andere Kisten'],
@@ -46,9 +48,9 @@ const TOOLS = [
   ['marktstand', 'Marktstand', 'Klicken, R dreht'],
 ];
 
-const snap = v => Math.round(v / GRID) * GRID;
 const round = v => Math.round(v * 1000) / 1000;
 const clone = o => JSON.parse(JSON.stringify(o));
+const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
 
 export function newMap(name = 'Meine Karte', w = 40, d = 40) {
   const hx = w / 2;
@@ -105,6 +107,40 @@ function union(list) {
   return { min, max };
 }
 
+function itemBounds(kind, it) {
+  if (kind === 'box') return it;
+  if (kind === 'stairs') return union(stairBoxes(it));
+  if (kind === 'prop') return union(propBoxes(it));
+  const [x, y, z] = it.pos;
+  return { min: [x - 0.5, y, z - 0.5], max: [x + 0.5, y + 1.8, z + 0.5] };
+}
+
+function moveItem(kind, it, dx, dz) {
+  const vs = kind === 'box' ? [it.min, it.max] : kind === 'stairs' ? [it.start] : [it.pos];
+  for (const v of vs) { v[0] = round(v[0] + dx); v[2] = round(v[2] + dz); }
+}
+
+// Spiegelbild an der Mittellinie: axis 0 = Ost–West (x → -x), 2 = Nord–Süd (z → -z). Teams tauschen die Seite.
+function mirrorItem(kind, it, axis) {
+  const m = clone(it);
+  if (kind === 'box') {
+    m.min[axis] = round(-it.max[axis]);
+    m.max[axis] = round(-it.min[axis]);
+    return m;
+  }
+  if (kind === 'stairs') {
+    m.start[axis] = round(-it.start[axis]);
+    if (it.dir[1] === (axis === 0 ? 'x' : 'z')) m.dir = (it.dir[0] === '+' ? '-' : '+') + it.dir[1];
+    return m;
+  }
+  m.pos[axis] = round(-it.pos[axis]);
+  const yaw = it.yaw ?? 0;
+  m.yaw = round(axis === 0 ? -yaw : Math.PI - yaw);
+  m.yaw = round(((m.yaw % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2));
+  if (kind === 'spawn') m.team = it.team === 'A' ? 'B' : 'A';
+  return m;
+}
+
 // Karte zum Spielen und Ausgeben: Kollision der Modelle dazu, Wegpunkte neu
 export function buildMap(map) {
   const out = clone(map);
@@ -114,15 +150,66 @@ export function buildMap(map) {
   return out;
 }
 
+// Prüft die Karte. problems: so nicht spielbar; warnings: spielbar, aber schlecht
+export function checkMap(map) {
+  const built = clone(map);
+  built.boxes = [...map.boxes, ...map.props.flatMap(propBoxes)];
+  const wp = buildWaypoints(built);
+  built.waypoints = { nodes: wp.nodes, links: wp.links };
+  const world = createWorld(built);
+  const problems = [];
+  const warnings = [];
+  const badSpawns = [];
+  const hw = BODY.halfWidth;
+  for (const team of ['A', 'B']) {
+    const n = map.spawns.filter(s => s.team === team).length;
+    const name = team === 'A' ? 'Blau' : 'Orange';
+    if (!n) problems.push(`Team ${name} hat keinen Startpunkt`);
+    else if (n < 4) warnings.push(`Team ${name} hat nur ${n} Startpunkt${n > 1 ? 'e' : ''} (vier Spieler je Team)`);
+  }
+  if (wp.nodes.length < 2) problems.push('Keine Wege für die Bots gefunden — fehlt der Boden?');
+  map.spawns.forEach((s, i) => {
+    const [x, y, z] = s.pos;
+    const label = `Start ${s.team === 'A' ? 'Blau' : 'Orange'} bei ${x} / ${z}`;
+    if (overlaps(world, x - hw, y + 0.02, z - hw, x + hw, y + BODY.standHeight, z + hw)) {
+      problems.push(`${label} steckt in einem Block`);
+      badSpawns.push(i);
+      return;
+    }
+    if (!overlaps(world, x - 0.05, y - 0.1, z - 0.05, x + 0.05, y - 0.01, z + 0.05)) {
+      warnings.push(`${label} schwebt (fällt beim Start)`);
+      badSpawns.push(i);
+      return;
+    }
+    // Erreicht man von hier mit der echten Bewegung einen Wegpunkt des Netzes?
+    const near = wp.nodes
+      .filter(n => Math.abs(n[1] - y) < 1.5)
+      .sort((a, b) => Math.hypot(a[0] - x, a[2] - z) - Math.hypot(b[0] - x, b[2] - z))
+      .slice(0, 4);
+    if (!near.some(n => Math.hypot(n[0] - x, n[2] - z) < 8 && walk(world, s.pos, n) && walk(world, n, s.pos))) {
+      warnings.push(`${label} ist vom Wegenetz abgeschnitten (eingesperrt?)`);
+      badSpawns.push(i);
+    }
+  });
+  map.stairs.forEach(t => {
+    if (t.rise > MAX_STEP) warnings.push(`Treppe bei ${t.start[0]} / ${t.start[2]}: Stufen über ${MAX_STEP} m schafft niemand`);
+  });
+  // Auf Baumkronen, Brunnendach und Marktstand will niemand hin
+  const onProp = n => world.boxes.some(b => b.hidden && Math.abs(b.max[1] - n[1]) < 0.01
+    && n[0] >= b.min[0] && n[0] <= b.max[0] && n[2] >= b.min[2] && n[2] <= b.max[2]);
+  const dropped = wp.dropped.filter(n => !onProp(n));
+  if (dropped.length) warnings.push(dropped.length === 1 ? '1 Stelle ist nicht erreichbar (roter Punkt)' : `${dropped.length} Stellen sind nicht erreichbar (rote Punkte)`);
+  return { problems, warnings, badSpawns, dropped, built };
+}
+
 // Eingelesene Karte prüfen und auf das Format des Kartenbauers bringen (Modell-Kollision fällt weg, kommt neu)
 export function readMap(data) {
   if (!data || !Array.isArray(data.boxes) || !Array.isArray(data.spawns)) throw new Error('Keine Karte von Crate & Cover');
   const vec = v => Array.isArray(v) && v.length === 3 && v.every(Number.isFinite);
-  const boxes = data.boxes.filter(b => b && vec(b.min) && vec(b.max) && !b.hidden);
   const map = {
     ...data,
     name: String(data.name ?? 'Eingelesene Karte').slice(0, 40),
-    boxes,
+    boxes: data.boxes.filter(b => b && vec(b.min) && vec(b.max) && !b.hidden),
     stairs: (data.stairs ?? []).filter(t => t && vec(t.start) && DIRS[t.dir] && t.steps > 0),
     spawns: data.spawns.filter(s => s && vec(s.pos) && (s.team === 'A' || s.team === 'B')),
     props: (data.props ?? []).filter(p => p && vec(p.pos) && PROP_BOXES[p.model]),
@@ -133,7 +220,7 @@ export function readMap(data) {
   return map;
 }
 
-function loadStore() {
+export function loadStore() {
   try { return JSON.parse(localStorage.getItem(STORE_KEY)) ?? {}; } catch { return {}; }
 }
 
@@ -154,7 +241,7 @@ function rayBox(o, d, min, max) {
     }
     let t1 = (min[i] - o[i]) / d[i];
     let t2 = (max[i] - o[i]) / d[i];
-    let s = -Math.sign(d[i]);
+    const s = -Math.sign(d[i]);
     if (t1 > t2) [t1, t2] = [t2, t1];
     if (t1 > tmin) { tmin = t1; axis = i; sign = s; }
     if (t2 < tmax) tmax = t2;
@@ -172,13 +259,26 @@ export function createEditor({ view, canvas, onPlay, onExit }) {
   const props = $('ed-props');
   const status = $('ed-status');
   const help = $('ed-help');
+  const rectEl = $('ed-rect');
 
   let map = loadDraft() ?? newMap();
   let tool = 'select';
-  let selected = null; // { kind: 'box' | 'stairs' | 'spawn' | 'prop', index }
+  let sel = []; // [{ kind: 'box' | 'stairs' | 'spawn' | 'prop', index }]
   let active = false;
   let message = '';
-  let pathInfo = null;
+  let checkInfo = null;
+  let grid = 0.5;
+  let clipboard = null;
+  let mouseRay = null;
+  let undoList = [];
+  let redoList = [];
+  let snapshot = JSON.stringify(map);
+
+  const snap = v => Math.round(v / grid) * grid;
+  const lists = () => ({ box: map.boxes, stairs: map.stairs, spawn: map.spawns, prop: map.props });
+  const itemOf = s => lists()[s.kind][s.index];
+  const one = () => (sel.length === 1 ? sel[0] : null);
+  const isSelected = s => sel.some(x => x.kind === s.kind && x.index === s.index);
 
   const cam = { x: 0, z: 0, dist: 45, yaw: 0, pitch: -1.0 };
   const keys = new Set();
@@ -187,44 +287,65 @@ export function createEditor({ view, canvas, onPlay, onExit }) {
   const overlay = new THREE.Group();
   overlay.visible = false;
   view.scene.add(overlay);
-  const grid = new THREE.GridHelper(200, 200, 0xffffff, 0xffffff);
-  grid.material.transparent = true;
-  grid.material.opacity = 0.18;
-  grid.material.depthWrite = false;
-  grid.position.y = 0.015;
-  overlay.add(grid);
+  const gridMesh = new THREE.GridHelper(200, 400, 0xffffff, 0xffffff);
+  gridMesh.material.transparent = true;
+  gridMesh.material.opacity = 0.18;
+  gridMesh.material.depthWrite = false;
+  gridMesh.position.y = 0.015;
+  overlay.add(gridMesh);
   const unitBox = new THREE.BoxGeometry(1, 1, 1);
-  const selBox = new THREE.LineSegments(new THREE.EdgesGeometry(unitBox), new THREE.LineBasicMaterial({ color: 0xffd27a, depthTest: false }));
-  selBox.renderOrder = 10;
-  selBox.visible = false;
-  overlay.add(selBox);
+  const edges = new THREE.EdgesGeometry(unitBox);
+  const selMat = new THREE.LineBasicMaterial({ color: 0xffd27a, depthTest: false });
+  const selGroup = new THREE.Group();
+  overlay.add(selGroup);
   const ghost = new THREE.Mesh(unitBox, new THREE.MeshBasicMaterial({ color: 0x7dff8a, transparent: true, opacity: 0.35, depthWrite: false }));
   ghost.visible = false;
   overlay.add(ghost);
-  let paths = null;
+  let marks = null;
 
   function placeBox(obj, b) {
     obj.position.set((b.min[0] + b.max[0]) / 2, (b.min[1] + b.max[1]) / 2, (b.min[2] + b.max[2]) / 2);
     obj.scale.set(Math.max(b.max[0] - b.min[0], 0.05), Math.max(b.max[1] - b.min[1], 0.05), Math.max(b.max[2] - b.min[2], 0.05));
   }
 
-  function bounds(sel) {
-    if (sel.kind === 'box') return map.boxes[sel.index];
-    if (sel.kind === 'stairs') return union(stairBoxes(map.stairs[sel.index]));
-    if (sel.kind === 'prop') return union(propBoxes(map.props[sel.index]));
-    const [x, y, z] = map.spawns[sel.index].pos;
-    return { min: [x - 0.5, y, z - 0.5], max: [x + 0.5, y + 1.8, z + 0.5] };
-  }
+  const bounds = s => itemBounds(s.kind, itemOf(s));
 
-  // ---- Karte zeichnen und sichern ----
+  // ---- Karte zeichnen, sichern, Rückgängig ----
 
-  function rebuild() {
+  function rebuild(record = true) {
+    const now = JSON.stringify(map);
+    if (record && now !== snapshot) {
+      undoList.push(snapshot);
+      if (undoList.length > 100) undoList.shift();
+      redoList = [];
+    }
+    snapshot = now;
     view.setWorld(createWorld({ ...map, boxes: [...map.boxes, ...map.props.flatMap(propBoxes)] }), true);
-    try { localStorage.setItem(DRAFT_KEY, JSON.stringify(map)); } catch {}
-    clearPaths();
+    try { localStorage.setItem(DRAFT_KEY, now); } catch {}
+    clearMarks();
     showSelection();
     showProps();
     showStatus();
+  }
+
+  function undo() {
+    if (!undoList.length) { say('Nichts mehr rückgängig zu machen'); return; }
+    redoList.push(snapshot);
+    map = JSON.parse(undoList.pop());
+    sel = [];
+    showMapSettings();
+    rebuild(false);
+    say('Rückgängig');
+  }
+
+  function redo() {
+    if (!redoList.length) { say('Nichts zu wiederholen'); return; }
+    undoList.push(snapshot);
+    map = JSON.parse(redoList.pop());
+    sel = [];
+    showMapSettings();
+    rebuild(false);
+    say('Wiederholt');
   }
 
   function loadDraft() {
@@ -236,13 +357,16 @@ export function createEditor({ view, canvas, onPlay, onExit }) {
 
   function setMap(m) {
     map = m;
-    selected = null;
+    sel = [];
+    undoList = [];
+    redoList = [];
+    snapshot = JSON.stringify(map);
     const floor = map.boxes.find(b => b.type === 'boden');
     const size = floor ? Math.max(floor.max[0] - floor.min[0], floor.max[2] - floor.min[2]) : 40;
     Object.assign(cam, { x: 0, z: 0, dist: Math.max(20, size * 1.1), yaw: 0, pitch: -1.0 });
     showMapSettings();
     showStore();
-    rebuild();
+    rebuild(false);
   }
 
   function say(text) {
@@ -255,50 +379,77 @@ export function createEditor({ view, canvas, onPlay, onExit }) {
     const b = map.spawns.filter(s => s.team === 'B').length;
     const parts = [`${map.boxes.length} Blöcke`, `${map.stairs.length} Treppen`, `${map.props.length} Modelle`,
       `Start Blau ${a}`, `Start Orange ${b}`];
-    if (pathInfo) parts.push(pathInfo);
-    status.innerHTML = parts.join(' · ') + (message ? `<br><b>${message}</b>` : '');
+    if (sel.length > 1) parts.push(`${sel.length} ausgewählt`);
+    let html = parts.join(' · ');
+    if (checkInfo) html += checkInfo;
+    if (message) html += `<br><b>${esc(message)}</b>`;
+    status.innerHTML = html;
   }
 
-  function clearPaths() {
-    if (paths) {
-      overlay.remove(paths);
-      paths.geometry.dispose();
-      paths = null;
+  function clearMarks() {
+    if (marks) {
+      overlay.remove(marks);
+      marks.traverse(o => o.geometry?.dispose());
+      marks = null;
     }
-    pathInfo = null;
+    checkInfo = null;
   }
 
-  function showPaths() {
-    clearPaths();
-    const built = buildMap(map);
-    const { nodes, links } = built.waypoints;
+  // Karte prüfen: Wege in Pink, unerreichbare Stellen und schlechte Startpunkte in Rot, Meldungen unten
+  function runCheck() {
+    clearMarks();
+    const result = checkMap(map);
+    const { nodes, links } = result.built.waypoints;
+    marks = new THREE.Group();
     const pts = [];
     for (const [a, b] of links) pts.push(nodes[a][0], nodes[a][1] + 0.1, nodes[a][2], nodes[b][0], nodes[b][1] + 0.1, nodes[b][2]);
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
-    paths = new THREE.LineSegments(geo, new THREE.LineBasicMaterial({ color: 0xff4fd8, depthTest: false }));
-    paths.renderOrder = 9;
-    overlay.add(paths);
-    pathInfo = `${nodes.length} Wegpunkte`;
-    return built;
+    const lines = new THREE.LineSegments(geo, new THREE.LineBasicMaterial({ color: 0xff4fd8, depthTest: false }));
+    lines.renderOrder = 9;
+    marks.add(lines);
+    const red = new THREE.MeshBasicMaterial({ color: 0xff3b30, depthTest: false });
+    for (const n of result.dropped) {
+      const dot = new THREE.Mesh(new THREE.SphereGeometry(0.25, 8, 6), red);
+      dot.position.set(n[0], n[1] + 0.25, n[2]);
+      dot.renderOrder = 9;
+      marks.add(dot);
+    }
+    for (const i of result.badSpawns) {
+      const ring = new THREE.Mesh(new THREE.RingGeometry(0.6, 0.85, 24), red);
+      ring.rotation.x = -Math.PI / 2;
+      const [x, y, z] = map.spawns[i].pos;
+      ring.position.set(x, y + 0.05, z);
+      ring.renderOrder = 9;
+      marks.add(ring);
+    }
+    overlay.add(marks);
+    const lines2 = [...result.problems.map(p => `<span class="bad">✗ ${esc(p)}</span>`), ...result.warnings.map(w => `<span class="warn">! ${esc(w)}</span>`)];
+    checkInfo = ` · ${nodes.length} Wegpunkte` + (lines2.length ? `<br>${lines2.slice(0, 6).join('<br>')}` : '<br><span class="good">✓ Keine Probleme gefunden</span>');
+    message = '';
+    showStatus();
+    return result;
   }
 
   // ---- Auswahl und Eigenschaften ----
 
-  function select(sel) {
-    selected = sel;
+  function select(list) {
+    sel = list;
     showSelection();
     showProps();
+    showStatus();
   }
 
   function showSelection() {
-    if (selected && !itemOf(selected)) selected = null;
-    selBox.visible = !!selected;
-    if (selected) placeBox(selBox, bounds(selected));
-  }
-
-  function itemOf(sel) {
-    return { box: map.boxes, stairs: map.stairs, spawn: map.spawns, prop: map.props }[sel.kind][sel.index];
+    sel = sel.filter(s => itemOf(s));
+    selGroup.clear();
+    selGroup.position.set(0, 0, 0);
+    for (const s of sel) {
+      const box = new THREE.LineSegments(edges, selMat);
+      box.renderOrder = 10;
+      placeBox(box, bounds(s));
+      selGroup.add(box);
+    }
   }
 
   function field(label, input) {
@@ -306,15 +457,25 @@ export function createEditor({ view, canvas, onPlay, onExit }) {
   }
   const num = (key, value, step = 0.5, min = '') => `<input type="number" data-k="${key}" value="${round(value)}" step="${step}" min="${min}">`;
   const opts = (key, list, value) => `<select data-k="${key}">${Object.entries(list).map(([v, t]) => `<option value="${v}"${v === value ? ' selected' : ''}>${t}</option>`).join('')}</select>`;
+  const groupButtons = `<div class="ed-row"><button data-act="dup">Verdoppeln</button><button data-act="del">Löschen</button></div>
+    <div class="ed-row"><button data-act="mirrorX" title="Spiegelbild an der Mittellinie Nord–Süd, Teams tauschen">Spiegeln Ost–West</button></div>
+    <div class="ed-row"><button data-act="mirrorZ" title="Spiegelbild an der Mittellinie Ost–West, Teams tauschen">Spiegeln Nord–Süd</button></div>`;
 
   function showProps() {
-    if (!selected) {
-      props.innerHTML = `<p class="ed-hint">${TOOLS.find(t => t[0] === tool)[2]}.<br>Kamera: WASD oder Pfeile schieben, Mausrad zoomt, rechte Maustaste dreht und neigt, Q/E drehen.<br>Entf löscht, Strg+D verdoppelt, R dreht, Esc hebt die Auswahl auf.</p>`;
+    if (!sel.length) {
+      props.innerHTML = `<p class="ed-hint">${TOOLS.find(t => t[0] === tool)[2]}.<br><br>Kamera: WASD oder Pfeile schieben, Mausrad zoomt, rechte Maustaste dreht und neigt, mittlere Maustaste schiebt, Q/E drehen.<br><br>Entf löscht, Strg+D verdoppelt, Strg+C/V kopiert und fügt an der Maus ein, Strg+Z macht rückgängig, Strg+Y wiederholt, R dreht, Strg+A wählt alles, Esc hebt die Auswahl auf.<br><br>Faire Hälften: eine Seite bauen, mit Ziehen auswählen, Spiegeln.</p>`;
       return;
     }
-    const it = itemOf(selected);
+    if (sel.length > 1) {
+      const count = {};
+      for (const s of sel) count[s.kind] = (count[s.kind] ?? 0) + 1;
+      props.innerHTML = `<h3>${sel.length} ausgewählt</h3><p class="ed-hint">${Object.entries(count).map(([k, n]) => `${n} × ${KIND_NAMES[k]}`).join(', ')}.<br>Ziehen verschiebt alle zusammen.</p>${groupButtons}`;
+      return;
+    }
+    const s = sel[0];
+    const it = itemOf(s);
     let html = '';
-    if (selected.kind === 'box') {
+    if (s.kind === 'box') {
       const looks = { '': 'Standard', ...Object.fromEntries(LOOKS.map(l => [l, l[0].toUpperCase() + l.slice(1)])) };
       html = `<h3>Block</h3>`
         + field('Art', opts('type', Object.fromEntries(Object.entries(BLOCK_TYPES).map(([k, v]) => [k, v[0]])), it.type))
@@ -324,7 +485,7 @@ export function createEditor({ view, canvas, onPlay, onExit }) {
         + field('Unterkante', num('y', it.min[1], 0.1))
         + field('Farbe', `<input type="color" data-k="color" value="${it.color ?? BLOCK_TYPES[it.type]?.[1] ?? '#999999'}">`)
         + field('Oberfläche', opts('look', looks, it.look ?? ''));
-    } else if (selected.kind === 'stairs') {
+    } else if (s.kind === 'stairs') {
       html = `<h3>Treppe</h3>`
         + field('Hinauf nach', opts('dir', DIRS, it.dir))
         + field('Stufen', num('steps', it.steps, 1, 1))
@@ -332,28 +493,28 @@ export function createEditor({ view, canvas, onPlay, onExit }) {
         + field('Stufentiefe', num('depth', it.depth, 0.05, 0.2))
         + field('Breite', num('width', it.width, 0.1, 0.8))
         + field('Unterkante', num('y', it.start[1], 0.1))
-        + `<p class="ed-hint">Höhe oben: ${round(it.steps * it.rise)} m. Stufen über 0,45 m schafft niemand.</p>`;
-    } else if (selected.kind === 'spawn') {
+        + `<p class="ed-hint">Höhe oben: ${round(it.steps * it.rise)} m. Stufen über ${MAX_STEP} m schafft niemand.</p>`;
+    } else if (s.kind === 'spawn') {
       html = `<h3>Startpunkt</h3>`
         + field('Team', opts('team', { A: 'Blau', B: 'Orange' }, it.team))
         + field('Blickrichtung (Grad)', num('deg', ((Math.round(it.yaw * 180 / Math.PI) % 360) + 360) % 360, 15))
         + field('Höhe', num('y', it.pos[1], 0.1));
     } else {
       html = `<h3>${PROP_NAMES[it.model]}</h3>`
-        + field('Drehung (Grad)', opts('deg', { 0: '0', 90: '90', 180: '180', 270: '270' }, String(Math.round((it.yaw ?? 0) * 180 / Math.PI / 90) * 90 % 360)))
+        + field('Drehung (Grad)', opts('deg', { 0: '0', 90: '90', 180: '180', 270: '270' }, String(((Math.round((it.yaw ?? 0) * 180 / Math.PI / 90) * 90) % 360 + 360) % 360)))
         + (it.model === 'marktstand' ? field('Stoff', `<input type="color" data-k="color" value="${it.color ?? '#b33a3a'}">`) : '');
     }
-    html += `<div class="ed-row"><button data-act="dup">Verdoppeln</button><button data-act="del">Löschen</button></div>`;
-    props.innerHTML = html;
+    props.innerHTML = html + groupButtons;
   }
 
   props.addEventListener('change', e => {
     const k = e.target.dataset.k;
-    if (!k || !selected) return;
-    const it = itemOf(selected);
+    const s = one();
+    if (!k || !s) return;
+    const it = itemOf(s);
     const v = e.target.type === 'number' ? Number(e.target.value) : e.target.value;
     if (e.target.type === 'number' && !Number.isFinite(v)) return;
-    if (selected.kind === 'box') {
+    if (s.kind === 'box') {
       const cx = (it.min[0] + it.max[0]) / 2;
       const cz = (it.min[2] + it.max[2]) / 2;
       if (k === 'w' && v > 0) { it.min[0] = round(cx - v / 2); it.max[0] = round(cx + v / 2); }
@@ -363,14 +524,14 @@ export function createEditor({ view, canvas, onPlay, onExit }) {
       if (k === 'type') { it.type = v; it.color = BLOCK_TYPES[v][1]; }
       if (k === 'color') it.color = v;
       if (k === 'look') { if (v) it.look = v; else delete it.look; }
-    } else if (selected.kind === 'stairs') {
+    } else if (s.kind === 'stairs') {
       if (k === 'dir') it.dir = v;
       if (k === 'steps' && v >= 1) it.steps = Math.min(40, Math.round(v));
       if (k === 'rise' && v > 0) it.rise = v;
       if (k === 'depth' && v > 0) it.depth = v;
       if (k === 'width' && v > 0) it.width = v;
       if (k === 'y') it.start[1] = round(v);
-    } else if (selected.kind === 'spawn') {
+    } else if (s.kind === 'spawn') {
       if (k === 'team') it.team = v;
       if (k === 'deg') it.yaw = round(v * Math.PI / 180);
       if (k === 'y') it.pos[1] = round(v);
@@ -382,45 +543,94 @@ export function createEditor({ view, canvas, onPlay, onExit }) {
   });
 
   props.addEventListener('click', e => {
-    if (e.target.dataset.act === 'del') remove();
-    if (e.target.dataset.act === 'dup') duplicate();
+    const act = e.target.dataset.act;
+    if (act === 'del') remove();
+    if (act === 'dup') duplicate();
+    if (act === 'mirrorX') mirror(0);
+    if (act === 'mirrorZ') mirror(2);
   });
 
+  // Neue Dinge anhängen und als Auswahl setzen
+  function addItems(items) {
+    const added = [];
+    for (const { kind, item } of items) {
+      const list = lists()[kind];
+      list.push(item);
+      added.push({ kind, index: list.length - 1 });
+    }
+    sel = added;
+  }
+
   function remove() {
-    if (!selected) return;
-    const list = { box: map.boxes, stairs: map.stairs, spawn: map.spawns, prop: map.props }[selected.kind];
-    list.splice(selected.index, 1);
-    selected = null;
+    if (!sel.length) return;
+    // Von hinten löschen, damit die übrigen Nummern stimmen
+    for (const s of [...sel].sort((a, b) => b.index - a.index)) lists()[s.kind].splice(s.index, 1);
+    sel = [];
     rebuild();
+  }
+
+  function selectedItems() {
+    return sel.map(s => ({ kind: s.kind, item: clone(itemOf(s)) }));
   }
 
   function duplicate() {
-    if (!selected) return;
-    const it = clone(itemOf(selected));
-    const list = { box: map.boxes, stairs: map.stairs, spawn: map.spawns, prop: map.props }[selected.kind];
-    moveItem(selected.kind, it, 1, 1);
-    list.push(it);
-    selected = { kind: selected.kind, index: list.length - 1 };
+    if (!sel.length) return;
+    const items = selectedItems();
+    for (const { kind, item } of items) moveItem(kind, item, 1, 1);
+    addItems(items);
     rebuild();
   }
 
-  function moveItem(kind, it, dx, dz) {
-    const vs = kind === 'box' ? [it.min, it.max] : kind === 'stairs' ? [it.start] : [it.pos];
-    for (const v of vs) { v[0] = round(v[0] + dx); v[2] = round(v[2] + dz); }
+  function copy() {
+    if (!sel.length) return;
+    clipboard = selectedItems();
+    say(`${clipboard.length} kopiert`);
+  }
+
+  // Einfügen an der Maus (Mitte der Gruppe auf den Mauspunkt), sonst versetzt
+  function paste() {
+    if (!clipboard) return;
+    const items = clone(clipboard);
+    const b = union(items.map(({ kind, item }) => itemBounds(kind, item)));
+    const p = mouseRay && planePoint(mouseRay, b.min[1]);
+    const dx = p ? snap(p[0] - (b.min[0] + b.max[0]) / 2) : 1;
+    const dz = p ? snap(p[2] - (b.min[2] + b.max[2]) / 2) : 1;
+    for (const { kind, item } of items) moveItem(kind, item, dx, dz);
+    addItems(items);
+    rebuild();
+    say(`${items.length} eingefügt`);
+  }
+
+  // Spiegelkopie der Auswahl; was es spiegelgleich schon gibt (oder in der Mitte liegt), wird nicht verdoppelt
+  function mirror(axis) {
+    if (!sel.length) { say('Erst auswählen (Ziehen auf freier Fläche wählt einen Bereich)'); return; }
+    // Vergleich mit Blickrichtung auf 0 bis 360 Grad gebracht (-90 Grad und 270 Grad sind dasselbe)
+    const key = (kind, it) => kind + JSON.stringify({ ...it, yaw: it.yaw === undefined ? 0 : Math.round(((it.yaw % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2) * 100) % 628 });
+    const existing = new Set(Object.entries(lists()).flatMap(([kind, list]) => list.map(it => key(kind, it))));
+    const items = [];
+    for (const { kind, item } of selectedItems()) {
+      const m = mirrorItem(kind, item, axis);
+      if (!existing.has(key(kind, m))) items.push({ kind, item: m });
+    }
+    if (!items.length) { say('Alles schon spiegelgleich vorhanden'); return; }
+    addItems(items);
+    rebuild();
+    say(`${items.length} gespiegelt${items.some(i => i.kind === 'spawn') ? ', Startpunkte mit Teamwechsel' : ''}`);
   }
 
   // R: Blöcke um 90 Grad (Breite und Tiefe tauschen), Treppen, Startpunkte und Modelle drehen
   function rotate() {
-    if (!selected) return;
-    const it = itemOf(selected);
-    if (selected.kind === 'box') {
+    const s = one();
+    if (!s) return;
+    const it = itemOf(s);
+    if (s.kind === 'box') {
       const cx = (it.min[0] + it.max[0]) / 2;
       const cz = (it.min[2] + it.max[2]) / 2;
       const hw = (it.max[0] - it.min[0]) / 2;
       const hd = (it.max[2] - it.min[2]) / 2;
       it.min[0] = round(cx - hd); it.max[0] = round(cx + hd);
       it.min[2] = round(cz - hw); it.max[2] = round(cz + hw);
-    } else if (selected.kind === 'stairs') {
+    } else if (s.kind === 'stairs') {
       const order = ['-z', '+x', '+z', '-x'];
       it.dir = order[(order.indexOf(it.dir) + 1) % 4];
     } else {
@@ -453,7 +663,7 @@ export function createEditor({ view, canvas, onPlay, onExit }) {
     map.boxes.forEach((b, i) => test('box', i, [b]));
     map.stairs.forEach((t, i) => test('stairs', i, stairBoxes(t)));
     map.props.forEach((p, i) => test('prop', i, propBoxes(p)));
-    map.spawns.forEach((s, i) => test('spawn', i, [bounds({ kind: 'spawn', index: i })]));
+    map.spawns.forEach((s, i) => test('spawn', i, [itemBounds('spawn', s)]));
     return best;
   }
 
@@ -487,7 +697,7 @@ export function createEditor({ view, canvas, onPlay, onExit }) {
       const min = [0, a[1], 0];
       const max = [0, a[1] + 3, 0];
       min[along] = Math.min(a[along], b[along]);
-      max[along] = Math.max(a[along], b[along]) + (a[along] === b[along] ? GRID : 0);
+      max[along] = Math.max(a[along], b[along]) + (a[along] === b[along] ? grid : 0);
       min[across] = a[across] - 0.25;
       max[across] = a[across] + 0.25;
       return { kind: 'box', item: { type: 'wand', min, max, color: BLOCK_TYPES.wand[1] } };
@@ -515,15 +725,34 @@ export function createEditor({ view, canvas, onPlay, onExit }) {
   let stairDir = '-z';
   let propYaw = 0;
 
-  function draftBounds(dr) {
-    if (dr.kind === 'box') return dr.item;
-    if (dr.kind === 'stairs') return union(stairBoxes(dr.item));
-    if (dr.kind === 'prop') return union(propBoxes(dr.item));
-    const [x, y, z] = dr.item.pos;
-    return { min: [x - 0.5, y, z - 0.5], max: [x + 0.5, y + 1.8, z + 0.5] };
+  let drag = null; // { mode: 'place' | 'move' | 'orbit' | 'rect', ... }
+
+  function showRect(d, e) {
+    const x = Math.min(d.x0, e.clientX);
+    const y = Math.min(d.y0, e.clientY);
+    Object.assign(rectEl.style, { left: `${x}px`, top: `${y}px`, width: `${Math.abs(e.clientX - d.x0)}px`, height: `${Math.abs(e.clientY - d.y0)}px` });
+    rectEl.classList.remove('hidden');
   }
 
-  let drag = null; // { mode: 'place' | 'move' | 'orbit', ... }
+  // Alles, dessen Mitte im Rechteck auf dem Bildschirm liegt
+  function selectRect(d, e) {
+    const r = canvas.getBoundingClientRect();
+    const [x0, x1] = [Math.min(d.x0, e.clientX), Math.max(d.x0, e.clientX)];
+    const [y0, y1] = [Math.min(d.y0, e.clientY), Math.max(d.y0, e.clientY)];
+    const found = [];
+    const v = new THREE.Vector3();
+    for (const [kind, list] of Object.entries(lists())) {
+      list.forEach((it, index) => {
+        const b = itemBounds(kind, it);
+        v.set((b.min[0] + b.max[0]) / 2, (b.min[1] + b.max[1]) / 2, (b.min[2] + b.max[2]) / 2).project(view.camera);
+        if (v.z > 1) return;
+        const sx = r.left + ((v.x + 1) / 2) * r.width;
+        const sy = r.top + ((1 - v.y) / 2) * r.height;
+        if (sx >= x0 && sx <= x1 && sy >= y0 && sy <= y1) found.push({ kind, index });
+      });
+    }
+    return found;
+  }
 
   canvas.addEventListener('mousedown', e => {
     if (!active) return;
@@ -535,10 +764,20 @@ export function createEditor({ view, canvas, onPlay, onExit }) {
     const ray = rayAt(e);
     if (tool === 'select') {
       const hit = pick(ray);
-      if (!hit) { select(null); return; }
-      select({ kind: hit.kind, index: hit.index });
-      const it = itemOf(selected);
-      const baseY = selected.kind === 'box' ? it.min[1] : selected.kind === 'stairs' ? it.start[1] : it.pos[1];
+      // Auf freie Fläche (oder den Boden): Bereich aufziehen
+      const floorHit = hit && hit.kind === 'box' && map.boxes[hit.index].type === 'boden' && !isSelected(hit);
+      if (!hit || floorHit) {
+        drag = { mode: 'rect', x0: e.clientX, y0: e.clientY, add: e.shiftKey, hit: floorHit ? { kind: hit.kind, index: hit.index } : null };
+        return;
+      }
+      const s = { kind: hit.kind, index: hit.index };
+      if (e.shiftKey) {
+        select(isSelected(s) ? sel.filter(x => !(x.kind === s.kind && x.index === s.index)) : [...sel, s]);
+        return;
+      }
+      if (!isSelected(s)) select([s]);
+      const it = itemOf(s);
+      const baseY = s.kind === 'box' ? it.min[1] : s.kind === 'stairs' ? it.start[1] : it.pos[1];
       const p = ray.o.map((v, i) => v + ray.d[i] * hit.t);
       drag = { mode: 'move', baseY, start: planePoint(ray, baseY) ?? [snap(p[0]), baseY, snap(p[2])], dx: 0, dz: 0 };
       return;
@@ -546,7 +785,7 @@ export function createEditor({ view, canvas, onPlay, onExit }) {
     const a = surfacePoint(ray);
     if (!a) return;
     drag = { mode: 'place', a, b: a };
-    placeBox(ghost, draftBounds(draft(a)));
+    placeBox(ghost, itemBounds(draft(a).kind, draft(a).item));
   });
 
   window.addEventListener('mousemove', e => {
@@ -566,46 +805,65 @@ export function createEditor({ view, canvas, onPlay, onExit }) {
       }
       return;
     }
+    if (drag?.mode === 'rect') {
+      showRect(drag, e);
+      return;
+    }
     if (e.target !== canvas && !drag) { ghost.visible = false; return; }
     const ray = rayAt(e);
+    mouseRay = ray;
     if (drag?.mode === 'move') {
       const p = planePoint(ray, drag.baseY);
       if (!p) return;
       drag.dx = p[0] - drag.start[0];
       drag.dz = p[2] - drag.start[2];
-      const b = bounds(selected);
-      placeBox(selBox, { min: [b.min[0] + drag.dx, b.min[1], b.min[2] + drag.dz], max: [b.max[0] + drag.dx, b.max[1], b.max[2] + drag.dz] });
+      selGroup.position.set(drag.dx, 0, drag.dz);
       return;
     }
     if (tool === 'select') { ghost.visible = false; return; }
     if (drag?.mode === 'place') {
       const p = planePoint(ray, drag.a[1]);
       if (p) drag.b = p;
-      placeBox(ghost, draftBounds(draft(drag.a, drag.b)));
+      const dr = draft(drag.a, drag.b);
+      placeBox(ghost, itemBounds(dr.kind, dr.item));
       ghost.visible = true;
       return;
     }
     const a = surfacePoint(ray);
     ghost.visible = !!a;
-    if (a) placeBox(ghost, draftBounds(draft(a)));
+    if (a) {
+      const dr = draft(a);
+      placeBox(ghost, itemBounds(dr.kind, dr.item));
+    }
   });
 
   window.addEventListener('mouseup', e => {
     if (!active || !drag) return;
     const d = drag;
     drag = null;
+    if (d.mode === 'rect') {
+      rectEl.classList.add('hidden');
+      const small = Math.abs(e.clientX - d.x0) < 4 && Math.abs(e.clientY - d.y0) < 4;
+      if (small) {
+        // Einfacher Klick: Boden auswählen oder Auswahl aufheben
+        if (d.hit) select(d.add ? [...sel, d.hit] : [d.hit]);
+        else if (!d.add) select([]);
+        return;
+      }
+      const found = selectRect(d, e).filter(s => !(s.kind === 'box' && map.boxes[s.index].type === 'boden'));
+      select(d.add ? [...sel, ...found.filter(s => !isSelected(s))] : found);
+      return;
+    }
     if (d.mode === 'move' && (d.dx || d.dz)) {
-      moveItem(selected.kind, itemOf(selected), d.dx, d.dz);
+      for (const s of sel) moveItem(s.kind, itemOf(s), d.dx, d.dz);
       rebuild();
     }
     if (d.mode === 'place') {
       const dr = draft(d.a, d.b);
-      const list = { box: map.boxes, stairs: map.stairs, spawn: map.spawns, prop: map.props }[dr.kind];
-      list.push(dr.item);
-      selected = { kind: dr.kind, index: list.length - 1 };
+      addItems([dr]);
       rebuild();
       // Startpunkte und Modelle meist einzeln, danach gleich wieder Auswählen
-      if (dr.kind !== 'box') setTool('select');
+      if (dr.kind !== 'box') setTool('select', true);
     }
   });
 
@@ -618,15 +876,29 @@ export function createEditor({ view, canvas, onPlay, onExit }) {
   const typing = e => ['INPUT', 'SELECT', 'TEXTAREA'].includes(e.target.tagName);
   window.addEventListener('keydown', e => {
     if (!active || typing(e)) return;
+    const mod = e.ctrlKey || e.metaKey;
+    if (mod) {
+      const k = e.code;
+      if (k === 'KeyZ' && !e.shiftKey) { e.preventDefault(); undo(); }
+      else if (k === 'KeyY' || (k === 'KeyZ' && e.shiftKey)) { e.preventDefault(); redo(); }
+      else if (k === 'KeyD') { e.preventDefault(); duplicate(); }
+      else if (k === 'KeyC') { e.preventDefault(); copy(); }
+      else if (k === 'KeyV') { e.preventDefault(); paste(); }
+      else if (k === 'KeyA') {
+        e.preventDefault();
+        select(Object.entries(lists()).flatMap(([kind, list]) => list.map((it, index) => ({ kind, index })))
+          .filter(s => !(s.kind === 'box' && map.boxes[s.index].type === 'boden')));
+      }
+      return;
+    }
     keys.add(e.code);
     if (e.code === 'Delete' || e.code === 'Backspace') { e.preventDefault(); remove(); }
-    if (e.code === 'KeyD' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); keys.delete('KeyD'); duplicate(); }
-    if (e.code === 'KeyR' && !e.ctrlKey && !e.metaKey) {
-      if (selected) rotate();
+    if (e.code === 'KeyR') {
+      if (sel.length) rotate();
       else if (tool === 'treppe') stairDir = { '-z': '+x', '+x': '+z', '+z': '-x', '-x': '-z' }[stairDir];
       else propYaw = round((propYaw - Math.PI / 2 + Math.PI * 4) % (Math.PI * 2));
     }
-    if (e.code === 'Escape') { if (selected) select(null); else setTool('select'); }
+    if (e.code === 'Escape') { if (sel.length) select([]); else setTool('select'); }
   });
   window.addEventListener('keyup', e => keys.delete(e.code));
   window.addEventListener('blur', () => keys.clear());
@@ -637,11 +909,11 @@ export function createEditor({ view, canvas, onPlay, onExit }) {
   toolBox.innerHTML = TOOLS.map(([k, name]) => `<button data-tool="${k}">${name}</button>`).join('');
   toolBox.addEventListener('click', e => { if (e.target.dataset.tool) setTool(e.target.dataset.tool); });
 
-  function setTool(t) {
+  function setTool(t, keepSelection = false) {
     tool = t;
     for (const b of toolBox.children) b.classList.toggle('on', b.dataset.tool === t);
     ghost.visible = false;
-    if (t !== 'select') selected = null;
+    if (t !== 'select' && !keepSelection) sel = [];
     showSelection();
     showProps();
     help.textContent = TOOLS.find(x => x[0] === t)[2];
@@ -654,11 +926,14 @@ export function createEditor({ view, canvas, onPlay, onExit }) {
 
   $('ed-name').addEventListener('change', e => { map.name = e.target.value.trim().slice(0, 40) || 'Meine Karte'; rebuild(); });
   $('ed-licht').addEventListener('change', e => { map.licht = e.target.value; rebuild(); });
+  $('ed-grid').addEventListener('change', e => { grid = Number(e.target.value); });
+  $('ed-undo').addEventListener('click', undo);
+  $('ed-redo').addEventListener('click', redo);
 
   function showStore() {
     const names = Object.keys(loadStore()).sort();
     $('ed-saved').innerHTML = names.length
-      ? names.map(n => `<option${n === map.name ? ' selected' : ''}>${n.replace(/</g, '&lt;')}</option>`).join('')
+      ? names.map(n => `<option${n === map.name ? ' selected' : ''}>${esc(n)}</option>`).join('')
       : '<option value="">— noch keine —</option>';
     $('ed-del').textContent = 'Löschen';
   }
@@ -667,7 +942,7 @@ export function createEditor({ view, canvas, onPlay, onExit }) {
   $('ed-save').addEventListener('click', () => {
     const store = loadStore();
     store[map.name] = clone(map);
-    if (saveStore(store)) { showStore(); say(`Gespeichert als „${map.name}“`); }
+    if (saveStore(store)) { showStore(); say(`Gespeichert als „${map.name}“, steht jetzt auch in der Kartenauswahl`); }
     else say('Speichern ging nicht (Browser-Speicher voll oder gesperrt)');
   });
   $('ed-open').addEventListener('click', () => {
@@ -713,19 +988,12 @@ export function createEditor({ view, canvas, onPlay, onExit }) {
     }
   });
 
-  $('ed-paths').addEventListener('click', () => {
-    const built = showPaths();
-    showStatus();
-    say(built.waypoints.nodes.length < 10 ? 'Kaum Wegpunkte — die Bots finden sich hier schlecht zurecht' : 'Wege der Bots in Pink');
-  });
+  $('ed-check').addEventListener('click', runCheck);
 
   $('ed-play').addEventListener('click', () => {
-    const a = map.spawns.some(s => s.team === 'A');
-    const b = map.spawns.some(s => s.team === 'B');
-    if (!a || !b) { say('Jedes Team braucht mindestens einen Startpunkt'); return; }
-    const built = buildMap(map);
-    if (built.waypoints.nodes.length < 2) { say('Keine Wege für die Bots gefunden — fehlt der Boden?'); return; }
-    onPlay(built);
+    const result = runCheck();
+    if (result.problems.length) { say('So geht es noch nicht — siehe rote Zeilen'); return; }
+    onPlay(result.built);
   });
   $('ed-exit').addEventListener('click', () => onExit());
 
@@ -756,25 +1024,27 @@ export function createEditor({ view, canvas, onPlay, onExit }) {
 
   return {
     get map() { return map; },
+    get selection() { return sel; },
     open() {
       active = true;
       root.classList.remove('hidden');
       overlay.visible = true;
       showMapSettings();
       showStore();
-      rebuild();
+      rebuild(false);
     },
     close() {
       active = false;
       drag = null;
       keys.clear();
       root.classList.add('hidden');
+      rectEl.classList.add('hidden');
       overlay.visible = false;
-      clearPaths();
+      clearMarks();
     },
     update,
     camera,
     // Zum Prüfen im Browser
-    setMap, buildMap: () => buildMap(map), setTool, select,
+    setMap, buildMap: () => buildMap(map), check: runCheck, setTool, select, undo, redo, mirror, copy, paste,
   };
 }
