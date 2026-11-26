@@ -6,10 +6,19 @@
 
 import { writeFileSync } from 'node:fs';
 import { containerDeko, wheels, GLAS } from './schmuck.mjs';
+import { propBoxes } from '../src/game/props.js';
 
 const boxes = [];
 const deko = []; // Schmuck ohne Kollision: Zaunpfosten, Räder, Scheiben, Container-Details, Kranbänder
 const stairs = [];
+const props = [];
+
+// Modelle von Poly Haven (CC0): Kollision aus der gemeinsamen Liste src/game/props.js
+const place = (model, x, y, z, yaw = 0, extra = {}) => {
+  const p = { model, pos: [+x.toFixed(3), +y.toFixed(3), +z.toFixed(3)], yaw: +yaw.toFixed(4), ...extra };
+  props.push(p);
+  for (const b of propBoxes(p)) boxes.push(b);
+};
 
 function entry(type, min, max, color, look) {
   const b = { type, min: min.map((v, i) => +Math.min(v, max[i]).toFixed(3)), max: max.map((v, i) => +Math.max(v, min[i]).toFixed(3)) };
@@ -233,11 +242,28 @@ box('kran', [-21, 12.5, -10.8], [-17, 14, -9.2], '#5d6670');
 box('balken', [14.95, 9, -10.05], [15.05, 14, -9.95]);
 box('ziegel', [14.4, 8, -10.6], [15.6, 9, -9.4], '#9a4e3a');
 
+// Kleinkram von Poly Haven, spiegelgleich
+const PH = 'polyhaven/';
+both((X, s) => {
+  // Zementsäcke neben den Ziegelpaletten, zwei übereinander
+  place(PH + 'cement_bag', X(4.4), 0, -13.6, Math.PI / 2);
+  place(PH + 'cement_bag', X(4.4), 0.18, -13.5, Math.PI / 2 + 0.15);
+  place(PH + 'cement_bag', X(4.4), 0, -12.8, Math.PI / 2 - 0.1);
+  // Liegende Altreifen neben dem Lkw, gestapelt
+  place(PH + 'old_tyre', X(21.4), 0.083, -16.6, 0, { rx: Math.PI / 2 });
+  place(PH + 'old_tyre', X(21.4), 0.25, -16.6, 0.4, { rx: Math.PI / 2 });
+  // Eimer am Betonmischer, rostige Fässer am Rohrstapel, Müllsack am Baucontainer
+  place(PH + 'wooden_bucket_01', X(15.6), 0, 7.7, s);
+  place(PH + 'barrel_03', X(17.1), 0, 20.2, 0.2);
+  place(PH + 'barrel_03', X(17.2), 0, 19.4, 1.1);
+  place(PH + 'trashbag', X(23.5), 0, -21.1, 0.6 * s);
+});
+
 const spawns = [];
 for (const [team, s, yaw] of [['A', -1, -Math.PI / 2], ['B', 1, Math.PI / 2]]) {
   for (const z of [-3, 0, 3, 6]) spawns.push({ team, pos: [s * 28, 0, z], yaw: +yaw.toFixed(5) });
 }
 
-const map = { name: 'Baustelle', killY: -20, boxes, stairs, spawns, looks: { boden: 'erde' }, licht: 'mittag', deko };
+const map = { name: 'Baustelle', killY: -20, boxes, stairs, spawns, looks: { boden: 'erde' }, licht: 'mittag', deko, props };
 writeFileSync(new URL('../src/maps/baustelle.json', import.meta.url), JSON.stringify(map, null, 1));
 console.log(`Baustelle: ${boxes.length} Blöcke, ${deko.length} Schmuckblöcke, ${stairs.length} Treppen`);

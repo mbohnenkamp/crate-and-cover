@@ -8,6 +8,7 @@ import * as THREE from 'three';
 import { BODY } from '../config.js';
 import { createWorld, overlaps, zoneAt } from '../game/world.js';
 import { buildWaypoints, walk } from '../game/wegpunkte.js';
+import { PROP_MODELS, propBoxes } from '../game/props.js';
 
 const DRAFT_KEY = 'arena-shooter.kartenbauer-entwurf';
 const STORE_KEY = 'arena-shooter.eigene-karten';
@@ -22,19 +23,8 @@ const LOOKS = ['beton', 'putz', 'stein', 'ziegel', 'pflaster', 'bretter', 'kiste
   'erde', 'sand', 'laub', 'glatt'];
 const DAYTIME_NAMES = { mittag: 'Mittag', morgen: 'Morgen', abend: 'Abend' };
 const DIRS = { '-z': 'Norden', '+x': 'Osten', '+z': 'Süden', '-x': 'Westen' };
-const PROP_NAMES = { baum: 'Baum', brunnen: 'Brunnen', marktstand: 'Marktstand' };
 const KIND_NAMES = { box: 'Block', stairs: 'Treppe', spawn: 'Startpunkt', prop: 'Modell', zone: 'Zone' };
 const ZONE_NAMES = { wasser: 'Wasser', absturz: 'Absturz' };
-
-// Kollision der Modelle bei Drehung 0, relativ zum Fußpunkt (Maße wie in tools/karte_altstadt.mjs)
-const PROP_BOXES = {
-  baum: [['stamm', [-0.25, 0, -0.25], [0.25, 3, 0.25], '#6b4a2f'], ['laub', [-1.5, 2.6, -1.5], [1.5, 5, 1.5], '#4f7d3f']],
-  brunnen: [['brunnen', [-1.5, 0, -1.5], [1.5, 0.9, 1.5], '#9a958c'], ['brunnen', [-0.25, 0.9, -0.25], [0.25, 2.6, 0.25], '#9a958c'],
-    ['dach', [-0.9, 2.6, -0.9], [0.9, 2.8, 0.9], '#8e4a3a']],
-  marktstand: [['kiste', [-1.3, 0, -0.5], [1.3, 1, 0.5]],
-    ...[[-1.2, -0.4], [-1.2, 0.4], [1.2, -0.4], [1.2, 0.4]].map(([x, z]) => ['pfosten', [x - 0.05, 0, z - 0.05], [x + 0.05, 2.3, z + 0.05]]),
-    ['stoff', [-1.5, 2.3, -1.2], [1.5, 2.4, 1.2]]],
-};
 
 const TOOLS = [
   ['select', 'Auswählen', 'Klicken wählt, Ziehen verschiebt, Shift+Klick wählt dazu, Ziehen auf freier Fläche wählt einen Bereich'],
@@ -47,6 +37,10 @@ const TOOLS = [
   ['baum', 'Baum', 'Klicken, R dreht'],
   ['brunnen', 'Brunnen', 'Klicken'],
   ['marktstand', 'Marktstand', 'Klicken, R dreht'],
+  ['polyhaven/wine_barrel_01', 'Holzfass', 'Klicken'],
+  ['polyhaven/barrel_01', 'Ölfass', 'Klicken'],
+  ['polyhaven/wooden_crate_02', 'Holzkiste', 'Klicken, R dreht'],
+  ['polyhaven/old_tyre', 'Reifen', 'Klicken, R dreht'],
   ['wasser', 'Wasser', 'Ziehen: Wasserfläche, wer hineinfällt, ist raus'],
   ['absturz', 'Absturz', 'Ziehen: Abgrund (dunkle Fläche), wer hineingerät, ist raus'],
 ];
@@ -74,28 +68,6 @@ export function newMap(name = 'Meine Karte', w = 40, d = 40) {
   };
 }
 
-function rotateBox(min, max, yaw, at) {
-  const c = Math.cos(yaw);
-  const s = Math.sin(yaw);
-  const xs = [];
-  const zs = [];
-  for (const x of [min[0], max[0]]) for (const z of [min[2], max[2]]) {
-    xs.push(x * c + z * s);
-    zs.push(-x * s + z * c);
-  }
-  return {
-    min: [round(at[0] + Math.min(...xs)), round(at[1] + min[1]), round(at[2] + Math.min(...zs))],
-    max: [round(at[0] + Math.max(...xs)), round(at[1] + max[1]), round(at[2] + Math.max(...zs))],
-  };
-}
-
-// Kollisionsblöcke eines Modells (nicht gezeichnet, an ihrer Stelle steht das Modell)
-function propBoxes(p) {
-  return (PROP_BOXES[p.model] ?? []).map(([type, min, max, color]) => ({
-    type, ...rotateBox(min, max, p.yaw ?? 0, p.pos), color: p.model === 'marktstand' && type === 'stoff' ? p.color : color, hidden: true,
-  }));
-}
-
 function stairBoxes(t) {
   return createWorld({ boxes: [], stairs: [t], spawns: [] }).boxes;
 }
@@ -115,7 +87,12 @@ const boxLike = kind => kind === 'box' || kind === 'zone';
 function itemBounds(kind, it) {
   if (boxLike(kind)) return it;
   if (kind === 'stairs') return union(stairBoxes(it));
-  if (kind === 'prop') return union(propBoxes(it));
+  if (kind === 'prop') {
+    const boxes = propBoxes(it);
+    if (boxes.length) return union(boxes);
+    const [x, y, z] = it.pos; // Modell ohne Kollision: kleiner Kasten zum Anfassen
+    return { min: [x - 0.35, y, z - 0.35], max: [x + 0.35, y + 0.6, z + 0.35] };
+  }
   const [x, y, z] = it.pos;
   return { min: [x - 0.5, y, z - 0.5], max: [x + 0.5, y + 1.8, z + 0.5] };
 }
@@ -217,13 +194,17 @@ export function checkMap(map) {
 export function readMap(data) {
   if (!data || !Array.isArray(data.boxes) || !Array.isArray(data.spawns)) throw new Error('Keine Karte von Crate & Cover');
   const vec = v => Array.isArray(v) && v.length === 3 && v.every(Number.isFinite);
+  // Unsichtbare Blöcke, die zu einem Modell gehören, fallen weg (kommen beim Bauen neu); andere unsichtbare Blöcke
+  // (z. B. die Kollision unter den schrägen Dächern) bleiben
+  const key = b => [...b.min, ...b.max].map(v => Math.round(v * 100)).join(',');
+  const fromProps = new Set((data.props ?? []).filter(p => p && vec(p.pos)).flatMap(propBoxes).map(key));
   const map = {
     ...data,
     name: String(data.name ?? 'Eingelesene Karte').slice(0, 40),
-    boxes: data.boxes.filter(b => b && vec(b.min) && vec(b.max) && !b.hidden),
+    boxes: data.boxes.filter(b => b && vec(b.min) && vec(b.max) && !(b.hidden && fromProps.has(key(b)))),
     stairs: (data.stairs ?? []).filter(t => t && vec(t.start) && DIRS[t.dir] && t.steps > 0),
     spawns: data.spawns.filter(s => s && vec(s.pos) && (s.team === 'A' || s.team === 'B')),
-    props: (data.props ?? []).filter(p => p && vec(p.pos) && PROP_BOXES[p.model]),
+    props: (data.props ?? []).filter(p => p && vec(p.pos) && PROP_MODELS[p.model]),
     zones: (data.zones ?? []).filter(z => z && vec(z.min) && vec(z.max) && ZONE_NAMES[z.kind]),
     deko: Array.isArray(data.deko) ? data.deko : [],
   };
@@ -531,7 +512,7 @@ export function createEditor({ view, canvas, onPlay, onExit }) {
         + field('Blickrichtung (Grad)', num('deg', ((Math.round(it.yaw * 180 / Math.PI) % 360) + 360) % 360, 15))
         + field('Höhe', num('y', it.pos[1], 0.1));
     } else {
-      html = `<h3>${PROP_NAMES[it.model]}</h3>`
+      html = `<h3>${PROP_MODELS[it.model].name}</h3>`
         + field('Drehung (Grad)', opts('deg', { 0: '0', 90: '90', 180: '180', 270: '270' }, String(((Math.round((it.yaw ?? 0) * 180 / Math.PI / 90) * 90) % 360 + 360) % 360)))
         + (it.model === 'marktstand' ? field('Stoff', `<input type="color" data-k="color" value="${it.color ?? '#b33a3a'}">`) : '');
     }
@@ -695,7 +676,7 @@ export function createEditor({ view, canvas, onPlay, onExit }) {
     };
     map.boxes.forEach((b, i) => test('box', i, [b]));
     map.stairs.forEach((t, i) => test('stairs', i, stairBoxes(t)));
-    map.props.forEach((p, i) => test('prop', i, propBoxes(p)));
+    map.props.forEach((p, i) => test('prop', i, [itemBounds('prop', p)]));
     map.spawns.forEach((s, i) => test('spawn', i, [itemBounds('spawn', s)]));
     if (withZones) map.zones.forEach((z, i) => test('zone', i, [z]));
     return best;

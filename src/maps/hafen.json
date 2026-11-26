@@ -1452,6 +1452,96 @@
     1.5,
     3.5
    ]
+  },
+  {
+   "type": "stahl",
+   "min": [
+    -10.73,
+    0,
+    14.22
+   ],
+   "max": [
+    -10.17,
+    0.88,
+    14.78
+   ],
+   "color": "#3f5a6b",
+   "hidden": true
+  },
+  {
+   "type": "stahl",
+   "min": [
+    -10.73,
+    0,
+    14.92
+   ],
+   "max": [
+    -10.17,
+    0.88,
+    15.48
+   ],
+   "color": "#3f5a6b",
+   "hidden": true
+  },
+  {
+   "type": "stahl",
+   "min": [
+    -11.33,
+    0,
+    14.27
+   ],
+   "max": [
+    -10.77,
+    0.88,
+    14.83
+   ],
+   "color": "#3f5a6b",
+   "hidden": true
+  },
+  {
+   "type": "stahl",
+   "min": [
+    10.17,
+    0,
+    14.22
+   ],
+   "max": [
+    10.73,
+    0.88,
+    14.78
+   ],
+   "color": "#3f5a6b",
+   "hidden": true
+  },
+  {
+   "type": "stahl",
+   "min": [
+    10.17,
+    0,
+    14.92
+   ],
+   "max": [
+    10.73,
+    0.88,
+    15.48
+   ],
+   "color": "#3f5a6b",
+   "hidden": true
+  },
+  {
+   "type": "stahl",
+   "min": [
+    10.77,
+    0,
+    14.27
+   ],
+   "max": [
+    11.33,
+    0.88,
+    14.83
+   ],
+   "color": "#3f5a6b",
+   "hidden": true
   }
  ],
  "stairs": [
@@ -15171,6 +15261,188 @@
    "look": "stahl"
   }
  ],
+ "props": [
+  {
+   "model": "polyhaven/barrel_01",
+   "pos": [
+    -10.45,
+    0,
+    14.5
+   ],
+   "yaw": 0
+  },
+  {
+   "model": "polyhaven/barrel_01",
+   "pos": [
+    -10.45,
+    0,
+    15.2
+   ],
+   "yaw": 0
+  },
+  {
+   "model": "polyhaven/barrel_01",
+   "pos": [
+    -11.05,
+    0,
+    14.55
+   ],
+   "yaw": 0
+  },
+  {
+   "model": "polyhaven/old_tyre",
+   "pos": [
+    -8,
+    -0.38,
+    -20.2
+   ],
+   "yaw": 0
+  },
+  {
+   "model": "polyhaven/old_tyre",
+   "pos": [
+    -16,
+    -0.38,
+    -20.2
+   ],
+   "yaw": 0
+  },
+  {
+   "model": "polyhaven/old_tyre",
+   "pos": [
+    -24,
+    -0.38,
+    -20.2
+   ],
+   "yaw": 0
+  },
+  {
+   "model": "polyhaven/trashbag",
+   "pos": [
+    -26.6,
+    0,
+    18.1
+   ],
+   "yaw": -0.4
+  },
+  {
+   "model": "polyhaven/trashbag",
+   "pos": [
+    -27.2,
+    0,
+    18.3
+   ],
+   "yaw": 0.3
+  },
+  {
+   "model": "polyhaven/plastic_crate_02",
+   "pos": [
+    -28.4,
+    0,
+    18.1
+   ],
+   "yaw": 0
+  },
+  {
+   "model": "polyhaven/plastic_crate_02",
+   "pos": [
+    -28.4,
+    0.255,
+    18.1
+   ],
+   "yaw": 0.2
+  },
+  {
+   "model": "polyhaven/barrel_01",
+   "pos": [
+    10.45,
+    0,
+    14.5
+   ],
+   "yaw": 0
+  },
+  {
+   "model": "polyhaven/barrel_01",
+   "pos": [
+    10.45,
+    0,
+    15.2
+   ],
+   "yaw": 0
+  },
+  {
+   "model": "polyhaven/barrel_01",
+   "pos": [
+    11.05,
+    0,
+    14.55
+   ],
+   "yaw": 0
+  },
+  {
+   "model": "polyhaven/old_tyre",
+   "pos": [
+    8,
+    -0.38,
+    -20.2
+   ],
+   "yaw": 0
+  },
+  {
+   "model": "polyhaven/old_tyre",
+   "pos": [
+    16,
+    -0.38,
+    -20.2
+   ],
+   "yaw": 0
+  },
+  {
+   "model": "polyhaven/old_tyre",
+   "pos": [
+    24,
+    -0.38,
+    -20.2
+   ],
+   "yaw": 0
+  },
+  {
+   "model": "polyhaven/trashbag",
+   "pos": [
+    26.6,
+    0,
+    18.1
+   ],
+   "yaw": 0.4
+  },
+  {
+   "model": "polyhaven/trashbag",
+   "pos": [
+    27.2,
+    0,
+    18.3
+   ],
+   "yaw": -0.3
+  },
+  {
+   "model": "polyhaven/plastic_crate_02",
+   "pos": [
+    28.4,
+    0,
+    18.1
+   ],
+   "yaw": 0
+  },
+  {
+   "model": "polyhaven/plastic_crate_02",
+   "pos": [
+    28.4,
+    0.255,
+    18.1
+   ],
+   "yaw": 0.2
+  }
+ ],
  "waypoints": {
   "nodes": [
    [
@@ -17053,10 +17325,6 @@
    ],
    [
     75,
-    76
-   ],
-   [
-    75,
     85
    ],
    [
@@ -17470,10 +17738,6 @@
    [
     129,
     136
-   ],
-   [
-    131,
-    132
    ],
    [
     131,

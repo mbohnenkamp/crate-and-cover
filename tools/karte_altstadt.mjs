@@ -5,6 +5,7 @@
 // innen), daneben Kirchgärten mit Hecken und Bäumen, im Süden das Gasthaus mit Dachterrasse.
 
 import { writeFileSync } from 'node:fs';
+import { propBoxes } from '../src/game/props.js';
 
 const T = 0.3; // Wandstärke der Häuser
 const boxes = [];
@@ -24,6 +25,13 @@ const trim = (min, max, color, look) => deko.push(entry('deko', min, max, color,
 const hiddenBox = (type, min, max, color) => { box(type, min, max, color); boxes[boxes.length - 1].hidden = true; };
 const props = [];
 const prop = (model, x, z, yaw = 0, color) => props.push({ model, pos: [+x.toFixed(3), 0, +z.toFixed(3)], yaw, ...(color ? { color } : {}) });
+
+// Modelle von Poly Haven (CC0): Kollision aus der gemeinsamen Liste src/game/props.js
+const place = (model, x, y, z, yaw = 0, extra = {}) => {
+  const p = { model, pos: [+x.toFixed(3), +y.toFixed(3), +z.toFixed(3)], yaw: +yaw.toFixed(4), ...extra };
+  props.push(p);
+  for (const b of propBoxes(p)) boxes.push(b);
+};
 
 // Schräges Dach als Schmuck (siehe roofParts im Renderer); die Blöcke darunter bleiben die Kollision
 const roofDeko = (form, min, max, color, extra = {}) => deko.push({ type: 'deko', form, min: min.map(v => +v.toFixed(3)), max: max.map(v => +v.toFixed(3)), color, ...extra });
@@ -308,6 +316,28 @@ box('wand', [-4.5, 3.6, 21.7], [4.5, 4.4, 22], G);
 box('wand', [-6, 3.6, 15.3], [-5.7, 4.4, 21.7], G);
 box('wand', [5.7, 3.6, 15.3], [6, 4.4, 21.7], G);
 for (const [x, z] of [[-3, 18.5], [3, 18.5], [0, 20.3]]) box('kiste', [x - 0.6, 0, z - 0.6], [x + 0.6, 0.8, z + 0.6], '#7a5532');
+
+// Kleinkram von Poly Haven, spiegelgleich
+const PH = 'polyhaven/';
+both((X, s) => {
+  // Wandlaternen neben den Haustüren, Arm zur Gasse (Modell: Wandplatte bei z = 0, Arm nach +z)
+  place(PH + 'street_lamp_02', X(19) + 1.4, 2.5, -11, 0);
+  place(PH + 'street_lamp_02', X(17.5) - 1.4, 2.5, -7, Math.PI);
+  place(PH + 'street_lamp_02', X(19) + 1.4, 2.5, 5, Math.PI);
+  place(PH + 'street_lamp_02', X(17) - 1.4, 2.5, 13, 0);
+  // Holzfässer neben der Tür des Gasthauses
+  for (const a of [2.2, 3.0]) place(PH + 'wine_barrel_01', X(a), 0, 14.5, a * 0.7);
+  // Holzkiste hinter dem Marktstand, Eimer am Brunnen
+  place(PH + 'wooden_crate_02', X(8.3), 0, -0.5, 0);
+  place(PH + 'wooden_bucket_01', X(1.95), 0, 4.5, s * 0.6);
+  // Unkraut am Fuß der Hauswände (fünf Pflanzen in einer Reihe von 7,9 m je Wand)
+  for (const [z, yaw] of [[13.15, 0], [-19.15, 0]]) place(PH + 'weed_plant_02', Math.min(X(15.1), X(22.9)), 0, z, yaw);
+  // Büsche am Kirchgarten, Müllsäcke an der Stadtmauer im Süden
+  place(PH + 'shrub_sorrel_01', X(9.6), 0, -12.6, s);
+  place(PH + 'shrub_sorrel_01', X(13.6), 0, -16.2, -s);
+  place(PH + 'trashbag', X(12), 0, 23.4, 0.3 * s);
+  place(PH + 'trashbag', X(12.6), 0, 23.5, -0.5 * s);
+});
 
 const spawns = [];
 for (const [team, s, yaw] of [['A', -1, -Math.PI / 2], ['B', 1, Math.PI / 2]]) {

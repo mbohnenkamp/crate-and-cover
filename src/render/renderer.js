@@ -19,6 +19,7 @@ import { surfaceMaterial, lookFor, OLD_LIGHT } from './textures.js';
 const NO_AO = new URLSearchParams(location.search).get('schatten') === 'aus';
 import { createSky, DAYTIMES } from './sky.js';
 import { bakeShadows } from './schatten.js';
+import { PROP_MODELS } from '../game/props.js';
 
 const COLORS = {
   container: 0x8c8f93,
@@ -159,10 +160,13 @@ export function createRenderer(canvas, world) {
         if (!model || mapGroup !== group) return;
         const inst = model.clone(true);
         inst.position.set(p.pos[0], p.pos[1], p.pos[2]);
-        inst.rotation.y = p.yaw ?? 0;
+        // yaw dreht um die Hochachse, rx kippt (z. B. liegender Reifen); scale aus der Modellliste
+        inst.rotation.set(p.rx ?? 0, p.yaw ?? 0, 0, 'YXZ');
+        inst.scale.setScalar(PROP_MODELS[p.model]?.scale ?? 1);
         inst.traverse(o => {
           if (!o.isMesh) return;
-          o.castShadow = o.receiveShadow = true;
+          o.castShadow = PROP_MODELS[p.model]?.shadow !== false;
+          o.receiveShadow = true;
           if (p.color && o.material.name === `${p.model}_stoff`) {
             o.material = o.material.clone();
             o.material.color.set(p.color);
@@ -402,7 +406,7 @@ function boxGeometry(b, perFace = false, rects = null) {
 const propCache = {};
 function loadProp(name) {
   propCache[name] ??= new GLTFLoader().setDRACOLoader(draco)
-    .loadAsync(`${import.meta.env.BASE_URL}models/custom/${name}.glb`)
+    .loadAsync(`${import.meta.env.BASE_URL}models/${name.includes('/') ? name : `custom/${name}`}.glb`)
     .then(gltf => gltf.scene)
     .catch(() => null); // fehlt das Modell, bleibt die Stelle leer (Kollision bleibt)
   return propCache[name];

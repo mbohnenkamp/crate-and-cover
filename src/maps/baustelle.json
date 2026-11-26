@@ -2154,6 +2154,66 @@
     -9.4
    ],
    "color": "#9a4e3a"
+  },
+  {
+   "type": "stahl",
+   "min": [
+    -17.42,
+    0,
+    19.88
+   ],
+   "max": [
+    -16.78,
+    0.93,
+    20.52
+   ],
+   "color": "#6b3a2a",
+   "hidden": true
+  },
+  {
+   "type": "stahl",
+   "min": [
+    -17.52,
+    0,
+    19.08
+   ],
+   "max": [
+    -16.88,
+    0.93,
+    19.72
+   ],
+   "color": "#6b3a2a",
+   "hidden": true
+  },
+  {
+   "type": "stahl",
+   "min": [
+    16.78,
+    0,
+    19.88
+   ],
+   "max": [
+    17.42,
+    0.93,
+    20.52
+   ],
+   "color": "#6b3a2a",
+   "hidden": true
+  },
+  {
+   "type": "stahl",
+   "min": [
+    16.88,
+    0,
+    19.08
+   ],
+   "max": [
+    17.52,
+    0.93,
+    19.72
+   ],
+   "color": "#6b3a2a",
+   "hidden": true
   }
  ],
  "stairs": [
@@ -9088,6 +9148,174 @@
    ],
    "color": "#2f3f4f",
    "look": "glatt"
+  }
+ ],
+ "props": [
+  {
+   "model": "polyhaven/cement_bag",
+   "pos": [
+    -4.4,
+    0,
+    -13.6
+   ],
+   "yaw": 1.5708
+  },
+  {
+   "model": "polyhaven/cement_bag",
+   "pos": [
+    -4.4,
+    0.18,
+    -13.5
+   ],
+   "yaw": 1.7208
+  },
+  {
+   "model": "polyhaven/cement_bag",
+   "pos": [
+    -4.4,
+    0,
+    -12.8
+   ],
+   "yaw": 1.4708
+  },
+  {
+   "model": "polyhaven/old_tyre",
+   "pos": [
+    -21.4,
+    0.083,
+    -16.6
+   ],
+   "yaw": 0,
+   "rx": 1.5707963267948966
+  },
+  {
+   "model": "polyhaven/old_tyre",
+   "pos": [
+    -21.4,
+    0.25,
+    -16.6
+   ],
+   "yaw": 0.4,
+   "rx": 1.5707963267948966
+  },
+  {
+   "model": "polyhaven/wooden_bucket_01",
+   "pos": [
+    -15.6,
+    0,
+    7.7
+   ],
+   "yaw": -1
+  },
+  {
+   "model": "polyhaven/barrel_03",
+   "pos": [
+    -17.1,
+    0,
+    20.2
+   ],
+   "yaw": 0.2
+  },
+  {
+   "model": "polyhaven/barrel_03",
+   "pos": [
+    -17.2,
+    0,
+    19.4
+   ],
+   "yaw": 1.1
+  },
+  {
+   "model": "polyhaven/trashbag",
+   "pos": [
+    -23.5,
+    0,
+    -21.1
+   ],
+   "yaw": -0.6
+  },
+  {
+   "model": "polyhaven/cement_bag",
+   "pos": [
+    4.4,
+    0,
+    -13.6
+   ],
+   "yaw": 1.5708
+  },
+  {
+   "model": "polyhaven/cement_bag",
+   "pos": [
+    4.4,
+    0.18,
+    -13.5
+   ],
+   "yaw": 1.7208
+  },
+  {
+   "model": "polyhaven/cement_bag",
+   "pos": [
+    4.4,
+    0,
+    -12.8
+   ],
+   "yaw": 1.4708
+  },
+  {
+   "model": "polyhaven/old_tyre",
+   "pos": [
+    21.4,
+    0.083,
+    -16.6
+   ],
+   "yaw": 0,
+   "rx": 1.5707963267948966
+  },
+  {
+   "model": "polyhaven/old_tyre",
+   "pos": [
+    21.4,
+    0.25,
+    -16.6
+   ],
+   "yaw": 0.4,
+   "rx": 1.5707963267948966
+  },
+  {
+   "model": "polyhaven/wooden_bucket_01",
+   "pos": [
+    15.6,
+    0,
+    7.7
+   ],
+   "yaw": 1
+  },
+  {
+   "model": "polyhaven/barrel_03",
+   "pos": [
+    17.1,
+    0,
+    20.2
+   ],
+   "yaw": 0.2
+  },
+  {
+   "model": "polyhaven/barrel_03",
+   "pos": [
+    17.2,
+    0,
+    19.4
+   ],
+   "yaw": 1.1
+  },
+  {
+   "model": "polyhaven/trashbag",
+   "pos": [
+    23.5,
+    0,
+    -21.1
+   ],
+   "yaw": 0.6
   }
  ],
  "waypoints": {

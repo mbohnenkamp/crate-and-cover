@@ -5466,6 +5466,96 @@
     20.9
    ],
    "color": "#7a5532"
+  },
+  {
+   "type": "kiste",
+   "min": [
+    -2.57,
+    0,
+    14.13
+   ],
+   "max": [
+    -1.83,
+    0.87,
+    14.87
+   ],
+   "color": "#7a5532",
+   "hidden": true
+  },
+  {
+   "type": "kiste",
+   "min": [
+    -3.37,
+    0,
+    14.13
+   ],
+   "max": [
+    -2.63,
+    0.87,
+    14.87
+   ],
+   "color": "#7a5532",
+   "hidden": true
+  },
+  {
+   "type": "kiste",
+   "min": [
+    -8.57,
+    0,
+    -1.08
+   ],
+   "max": [
+    -8.03,
+    0.45,
+    0.08
+   ],
+   "color": "#8a6440",
+   "hidden": true
+  },
+  {
+   "type": "kiste",
+   "min": [
+    1.83,
+    0,
+    14.13
+   ],
+   "max": [
+    2.57,
+    0.87,
+    14.87
+   ],
+   "color": "#7a5532",
+   "hidden": true
+  },
+  {
+   "type": "kiste",
+   "min": [
+    2.63,
+    0,
+    14.13
+   ],
+   "max": [
+    3.37,
+    0.87,
+    14.87
+   ],
+   "color": "#7a5532",
+   "hidden": true
+  },
+  {
+   "type": "kiste",
+   "min": [
+    8.03,
+    0,
+    -1.08
+   ],
+   "max": [
+    8.57,
+    0.45,
+    0.08
+   ],
+   "color": "#8a6440",
+   "hidden": true
   }
  ],
  "stairs": [
@@ -21240,6 +21330,258 @@
     4.5
    ],
    "yaw": 0
+  },
+  {
+   "model": "polyhaven/street_lamp_02",
+   "pos": [
+    -17.6,
+    2.5,
+    -11
+   ],
+   "yaw": 0
+  },
+  {
+   "model": "polyhaven/street_lamp_02",
+   "pos": [
+    -18.9,
+    2.5,
+    -7
+   ],
+   "yaw": 3.1416
+  },
+  {
+   "model": "polyhaven/street_lamp_02",
+   "pos": [
+    -17.6,
+    2.5,
+    5
+   ],
+   "yaw": 3.1416
+  },
+  {
+   "model": "polyhaven/street_lamp_02",
+   "pos": [
+    -18.4,
+    2.5,
+    13
+   ],
+   "yaw": 0
+  },
+  {
+   "model": "polyhaven/wine_barrel_01",
+   "pos": [
+    -2.2,
+    0,
+    14.5
+   ],
+   "yaw": 1.54
+  },
+  {
+   "model": "polyhaven/wine_barrel_01",
+   "pos": [
+    -3,
+    0,
+    14.5
+   ],
+   "yaw": 2.1
+  },
+  {
+   "model": "polyhaven/wooden_crate_02",
+   "pos": [
+    -8.3,
+    0,
+    -0.5
+   ],
+   "yaw": 0
+  },
+  {
+   "model": "polyhaven/wooden_bucket_01",
+   "pos": [
+    -1.95,
+    0,
+    4.5
+   ],
+   "yaw": -0.6
+  },
+  {
+   "model": "polyhaven/weed_plant_02",
+   "pos": [
+    -22.9,
+    0,
+    13.15
+   ],
+   "yaw": 0
+  },
+  {
+   "model": "polyhaven/weed_plant_02",
+   "pos": [
+    -22.9,
+    0,
+    -19.15
+   ],
+   "yaw": 0
+  },
+  {
+   "model": "polyhaven/shrub_sorrel_01",
+   "pos": [
+    -9.6,
+    0,
+    -12.6
+   ],
+   "yaw": -1
+  },
+  {
+   "model": "polyhaven/shrub_sorrel_01",
+   "pos": [
+    -13.6,
+    0,
+    -16.2
+   ],
+   "yaw": 1
+  },
+  {
+   "model": "polyhaven/trashbag",
+   "pos": [
+    -12,
+    0,
+    23.4
+   ],
+   "yaw": -0.3
+  },
+  {
+   "model": "polyhaven/trashbag",
+   "pos": [
+    -12.6,
+    0,
+    23.5
+   ],
+   "yaw": 0.5
+  },
+  {
+   "model": "polyhaven/street_lamp_02",
+   "pos": [
+    20.4,
+    2.5,
+    -11
+   ],
+   "yaw": 0
+  },
+  {
+   "model": "polyhaven/street_lamp_02",
+   "pos": [
+    16.1,
+    2.5,
+    -7
+   ],
+   "yaw": 3.1416
+  },
+  {
+   "model": "polyhaven/street_lamp_02",
+   "pos": [
+    20.4,
+    2.5,
+    5
+   ],
+   "yaw": 3.1416
+  },
+  {
+   "model": "polyhaven/street_lamp_02",
+   "pos": [
+    15.6,
+    2.5,
+    13
+   ],
+   "yaw": 0
+  },
+  {
+   "model": "polyhaven/wine_barrel_01",
+   "pos": [
+    2.2,
+    0,
+    14.5
+   ],
+   "yaw": 1.54
+  },
+  {
+   "model": "polyhaven/wine_barrel_01",
+   "pos": [
+    3,
+    0,
+    14.5
+   ],
+   "yaw": 2.1
+  },
+  {
+   "model": "polyhaven/wooden_crate_02",
+   "pos": [
+    8.3,
+    0,
+    -0.5
+   ],
+   "yaw": 0
+  },
+  {
+   "model": "polyhaven/wooden_bucket_01",
+   "pos": [
+    1.95,
+    0,
+    4.5
+   ],
+   "yaw": 0.6
+  },
+  {
+   "model": "polyhaven/weed_plant_02",
+   "pos": [
+    15.1,
+    0,
+    13.15
+   ],
+   "yaw": 0
+  },
+  {
+   "model": "polyhaven/weed_plant_02",
+   "pos": [
+    15.1,
+    0,
+    -19.15
+   ],
+   "yaw": 0
+  },
+  {
+   "model": "polyhaven/shrub_sorrel_01",
+   "pos": [
+    9.6,
+    0,
+    -12.6
+   ],
+   "yaw": 1
+  },
+  {
+   "model": "polyhaven/shrub_sorrel_01",
+   "pos": [
+    13.6,
+    0,
+    -16.2
+   ],
+   "yaw": -1
+  },
+  {
+   "model": "polyhaven/trashbag",
+   "pos": [
+    12,
+    0,
+    23.4
+   ],
+   "yaw": 0.3
+  },
+  {
+   "model": "polyhaven/trashbag",
+   "pos": [
+    12.6,
+    0,
+    23.5
+   ],
+   "yaw": -0.5
   }
  ],
  "waypoints": {

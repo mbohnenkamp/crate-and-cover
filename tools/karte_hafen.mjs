@@ -4,6 +4,7 @@
 // Mittelgang mit Kran und Brücke in 5,2 m Höhe zwischen zwei Containertürmen, zweite Containerreihe, Lagerhalle.
 
 import { writeFileSync } from 'node:fs';
+import { propBoxes } from '../src/game/props.js';
 import { containerDeko, GLAS } from './schmuck.mjs';
 
 const C = { len: 6, h: 2.6, w: 2.4 };
@@ -11,6 +12,14 @@ const COLORS = ['#a83a2c', '#3f7a4a', '#2d6e73', '#8c8f93', '#7a3046', '#c9a43a'
 const HALLE = '#aab1b8';
 const boxes = [];
 const deko = []; // Schmuck ohne Kollision: Container-Details, Torrahmen, Fenster, Kaikante
+const props = [];
+
+// Modelle von Poly Haven (CC0): Kollision aus der gemeinsamen Liste src/game/props.js
+const place = (model, x, y, z, yaw = 0, extra = {}) => {
+  const p = { model, pos: [+x.toFixed(3), +y.toFixed(3), +z.toFixed(3)], yaw: +yaw.toFixed(4), ...extra };
+  props.push(p);
+  for (const b of propBoxes(p)) boxes.push(b);
+};
 const stairs = [];
 
 function entry(type, min, max, color, look) {
@@ -153,6 +162,21 @@ containerDeko(trim, [-3, 2.6, -27.2], [3, 5.2, -24.8], COLORS[0]);
 box('kiste', [-1, 0, -3.5], [0.5, 1.5, -2]);
 box('kiste', [-0.5, 0, 2], [1, 1.5, 3.5]);
 
+// Kleinkram von Poly Haven, spiegelgleich
+const PH = 'polyhaven/';
+both((X, s) => {
+  // Ölfässer an der Außenwand der Lagerhalle. Am Kai veränderten sie die Wege der Bots, einer fiel dann ins Wasser
+  // (Testspieler 26.11.2026); hier nicht.
+  for (const [a, z] of [[10.45, 14.5], [10.45, 15.2], [11.05, 14.55]]) place(PH + 'barrel_01', X(a), 0, z, 0);
+  // Altreifen als Fender an der Kaimauer, zwischen den Pollern
+  for (const a of [8, 16, 24]) place(PH + 'old_tyre', X(a), -0.38, -20.2, 0);
+  // Müllsäcke und Getränkekisten vor dem Bürocontainer
+  place(PH + 'trashbag', X(26.6), 0, 18.1, 0.4 * s);
+  place(PH + 'trashbag', X(27.2), 0, 18.3, -0.3 * s);
+  place(PH + 'plastic_crate_02', X(28.4), 0, 18.1, 0);
+  place(PH + 'plastic_crate_02', X(28.4), 0.255, 18.1, 0.2);
+});
+
 const spawns = [];
 for (const [team, s, yaw] of [['A', -1, -Math.PI / 2], ['B', 1, Math.PI / 2]]) {
   for (const z of [-4, -1.3, 1.3, 4]) spawns.push({ team, pos: [s * 32, 0, z], yaw: +yaw.toFixed(5) });
@@ -171,6 +195,7 @@ const map = {
   looks: { boden: 'beton', wand: 'beton', dach: 'wellblech', treppe: 'stahl' },
   licht: 'morgen',
   deko,
+  props,
 };
 writeFileSync(new URL('../src/maps/hafen.json', import.meta.url), JSON.stringify(map, null, 1));
 console.log(`Hafen: ${boxes.length} Blöcke, ${deko.length} Schmuckblöcke, ${stairs.length} Treppen`);
