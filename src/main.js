@@ -388,4 +388,4 @@ function playSounds(events) {
 }
 
 // Zum Prüfen im Browser
-window.arena = { get game() { return game; }, input, stepGame, startMatch, showScreen, sound, settings, editor, openEditor };
+window.arena = { get game() { return game; }, input, stepGame, startMatch, showScreen, sound, settings, editor, openEditor, view };

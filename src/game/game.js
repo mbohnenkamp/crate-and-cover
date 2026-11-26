@@ -2,7 +2,7 @@
 // Ein Zeitschritt liefert Ereignisse für Bild und Ton. Kennt kein Three.js, läuft auch in Node.
 
 import { TICK_RATE, MATCH, STEPS, MOVE } from '../config.js';
-import { createWorld } from './world.js';
+import { createWorld, zoneAt } from './world.js';
 import { createPlayer, stepPlayer, respawn, horizontalSpeed } from './player.js';
 import { createArms, stepWeapon, refillArms } from './weapons.js';
 import { createTargets, stepTargets } from './targets.js';
@@ -110,6 +110,7 @@ export function stepGame(game, humanCmd) {
       continue;
     }
     const cmd = p.isBot ? thinkBot(game, p, DT, events) : humanCmd;
+    if (p.isBot && game.world.zones.length) avoidZones(game.world, p, cmd);
     // Blick zuerst übernehmen, sonst schießt die Waffe in die Richtung des vorigen Schritts
     p.yaw = cmd.yaw;
     p.pitch = cmd.pitch;
@@ -120,6 +121,10 @@ export function stepGame(game, humanCmd) {
     footsteps(game, p, wasOnGround, fallSpeed, events);
     fallDamage(game, p, wasOnGround, fallSpeed, events);
     if (p.pos.y < game.world.killY + 1) killPlayer(game, p, null, null, false, events);
+    else {
+      const zone = zoneAt(game.world, p.pos.x, p.pos.y, p.pos.z);
+      if (zone) killPlayer(game, p, null, null, false, events, zone.kind);
+    }
   }
 
   stepTargets(game.targets, game.time, DT);
@@ -175,6 +180,23 @@ export function damagePlayer(game, victim, shooter, damage, part, weapon, events
     return true;
   }
   return false;
+}
+
+// Bots bleiben am Rand von Wasser und Absturzzonen stehen, statt im Gefecht hineinzulaufen
+function avoidZones(world, p, cmd) {
+  const sin = Math.sin(cmd.yaw);
+  const cos = Math.cos(cmd.yaw);
+  const wx = -sin * cmd.forward + cos * cmd.right;
+  const wz = -cos * cmd.forward - sin * cmd.right;
+  const len = Math.hypot(wx, wz);
+  // Auch mit dem Schwung, den er schon hat: 1,2 m in Laufrichtung und dort, wo er in 0,4 s wäre
+  const ahead = len > 0 ? [[p.pos.x + (wx / len) * 1.2, p.pos.z + (wz / len) * 1.2]] : [];
+  ahead.push([p.pos.x + p.vel.x * 0.4, p.pos.z + p.vel.z * 0.4]);
+  if (ahead.some(([x, z]) => zoneAt(world, x, p.pos.y, z))) {
+    cmd.forward = 0;
+    cmd.right = 0;
+    cmd.jump = false;
+  }
 }
 
 function killPlayer(game, victim, killer, weapon, head, events, cause = null) {

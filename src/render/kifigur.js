@@ -352,13 +352,20 @@ export function animateKi(f, pos, yaw, crouched, alive, dt, weapon, pitch, airbo
 // Gefallene: eigene Kopie, spielt die Sterbe-Bewegung, bleibt liegen und verblasst
 const corpses = [];
 const LIE = 6;
+// Die Sterbe-Bewegung steht anfangs gut 1,5 s aufrecht mit ausgebreiteten Armen und kippt erst dann (Boden bei
+// 2,3 s). Marco sah nur das Stehen, das Umfallen ging unter. Darum ab 1,1 s: kurz taumeln, nach 1 s liegt er.
+const DEATH_START = 1.1;
+const DEATH_SPEED = 1.3;
+const ARMS_STAND = 2;
 
 export function spawnKiCorpse(f) {
   const scene = f.group.parent;
   if (!scene || !model.clips.tod) return;
   const group = new THREE.Group();
   group.position.copy(f.group.position);
-  group.rotation.y = f.group.rotation.y;
+  // Die Bewegung fällt nach hinten: Rücken zur Trefferrichtung drehen, dann fällt er vom Schützen weg
+  const h = f.hitFrom;
+  group.rotation.y = h && (h.x || h.z) ? Math.atan2(h.x, h.z) : f.group.rotation.y;
   const { body, mats } = buildBody(f.team, true);
   body.rotation.y = Math.PI;
   group.add(body);
@@ -366,8 +373,19 @@ export function spawnKiCorpse(f) {
   const action = mixer.clipAction(model.clips.tod);
   action.setLoop(THREE.LoopOnce);
   action.clampWhenFinished = true;
-  action.timeScale = 1.5; // die Bewegung dauert von sich aus 3,5 s, der Wiedereinstieg kommt nach 3 s
-  action.play();
+  action.timeScale = DEATH_SPEED;
+  action.time = DEATH_START;
+  // Aus der Standhaltung überblenden statt aus der Grundhaltung (T-Pose) zu springen
+  if (model.clips.stehen) {
+    const stand = mixer.clipAction(model.clips.stehen);
+    stand.play();
+    action.play();
+    stand.crossFadeTo(action, 0.15, false);
+    // Die Sterbe-Bewegung reißt die Arme weit zur Seite. Arme zu zwei Dritteln aus der Standhaltung nehmen.
+    model.armsStand ??= new THREE.AnimationClip('arme', -1,
+      model.clips.stehen.tracks.filter(t => /Shoulder|Arm|Hand/.test(t.name) && t.name.endsWith('.quaternion')));
+    mixer.clipAction(model.armsStand).setEffectiveWeight(ARMS_STAND).play();
+  } else action.play();
   scene.add(group);
   corpses.push({ group, mats, mixer, age: 0 });
 }

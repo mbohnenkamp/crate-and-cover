@@ -96,7 +96,7 @@ export function createHud() {
           const v = game.players[e.victim];
           const k = e.killer !== null ? game.players[e.killer] : null;
           if (k) feedLine(`${nameTag(k)} <small>${WEAPONS[e.weapon].name}${e.head ? ' · Kopf' : ''}</small> ${nameTag(v)}`, k === me || v === me ? 'mine' : '');
-          const fell = e.cause === 'fall' ? 'abgestürzt' : game.world.fallText;
+          const fell = e.cause === 'fall' || e.cause === 'absturz' ? 'abgestürzt' : e.cause === 'wasser' ? 'ins Wasser gefallen' : game.world.fallText;
           if (!k) feedLine(`${nameTag(v)} <small>${fell}</small>`);
           if (v === me) killedBy = k ? `${esc(k.name)} · ${WEAPONS[e.weapon].name}${e.head ? ' · Kopftreffer' : ''}` : fell;
         }

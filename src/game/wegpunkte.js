@@ -3,7 +3,7 @@
 // größten Netz gehört, fällt weg. Läuft in Node (tools/wegpunkte.mjs) und im Browser (Kartenbauer).
 
 import { BODY, TICK_RATE } from '../config.js';
-import { createWorld, overlaps } from './world.js';
+import { createWorld, overlaps, zoneAt } from './world.js';
 import { createPlayer, stepPlayer, emptyCommand } from './player.js';
 
 const SPACING = 4;
@@ -47,7 +47,7 @@ export function buildWaypoints(map) {
   const nodes = [];
   const add = (x, y, z, exact = false) => {
     x = +x.toFixed(2); y = +y.toFixed(3); z = +z.toFixed(2);
-    if (!fits(x, y, z) || !supported(x, y, z)) return null;
+    if (!fits(x, y, z) || !supported(x, y, z) || zoneAt(world, x, y, z)) return null;
     const near = nodes.findIndex(n => Math.hypot(n[0] - x, n[2] - z) < (exact ? 0.1 : 1.5) && Math.abs(n[1] - y) < 0.5);
     if (near >= 0) return near;
     nodes.push([x, y, z]);
@@ -101,6 +101,10 @@ export function buildWaypoints(map) {
       const z = p[2] + ((q[2] - p[2]) * i) / n;
       if (overlaps(world, x - clear, y, z - clear, x + clear, y + 1.2, z + clear)) return false;
       if (!overlaps(world, x - 0.15, low, z - 0.15, x + 0.15, y - 0.45, z + 0.15)) return false;
+      // Nicht durch Wasser oder Absturzzonen (mit Körperbreite Abstand)
+      for (const [ox, oz] of [[0, 0], [clear, 0], [-clear, 0], [0, clear], [0, -clear]]) {
+        if (zoneAt(world, x + ox, Math.min(p[1], q[1]), z + oz)) return false;
+      }
     }
     return true;
   }

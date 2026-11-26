@@ -12,6 +12,8 @@ export function createWorld(map) {
     spawns: map.spawns,
     killY: map.killY ?? -20,
     water: map.water ?? null,
+    // Zonen aus dem Kartenbauer: Wasser (sichtbare Oberfläche) und Absturz (unsichtbar). Wer hineingerät, ist raus.
+    zones: (map.zones ?? []).map(z => ({ kind: z.kind, min: z.min, max: z.max })),
     fallText: map.fallText ?? 'abgestürzt',
     // Nur fürs Aussehen: Oberfläche je Blockart und Schmuckblöcke ohne Kollision (Rahmen, Gesimse, Zinnen)
     looks: map.looks ?? null,
@@ -43,6 +45,15 @@ function expandStairs(t) {
     out.push({ min, max, type: 'treppe' });
   }
   return out;
+}
+
+// Zone an einer Stelle (Fußpunkt): drin ist, wer über der Fläche steht und mit den Füßen nicht höher als die Oberkante
+export function zoneAt(world, x, y, z) {
+  for (const zone of world.zones ?? []) {
+    if (x >= zone.min[0] && x <= zone.max[0] && z >= zone.min[2] && z <= zone.max[2] &&
+        y >= zone.min[1] - 0.5 && y <= zone.max[1] + 0.05) return zone;
+  }
+  return null;
 }
 
 const EPS = 1e-4;

@@ -148,6 +148,18 @@ export function createRenderer(canvas, world) {
       water.receiveShadow = true;
       mapGroup.add(water);
     }
+    // Wasser-Zonen aus dem Kartenbauer: Oberfläche auf der Oberkante; Absturz-Zonen sieht man im Spiel nicht
+    for (const z of world.zones ?? []) {
+      if (z.kind !== 'wasser') continue;
+      const water = new THREE.Mesh(
+        new THREE.PlaneGeometry(z.max[0] - z.min[0], z.max[2] - z.min[2]),
+        new THREE.MeshLambertMaterial({ color: 0x2f6b8f, transparent: true, opacity: 0.88 }),
+      );
+      water.rotation.x = -Math.PI / 2;
+      water.position.set((z.min[0] + z.max[0]) / 2, z.max[1], (z.min[2] + z.max[2]) / 2);
+      water.receiveShadow = true;
+      mapGroup.add(water);
+    }
     scene.add(mapGroup);
     const floor = world.boxes.find(b => b.type === 'boden') ?? { min: [-20, 0, -20], max: [20, 0, 20] };
     const hx = (floor.max[0] - floor.min[0]) / 2 + 4;

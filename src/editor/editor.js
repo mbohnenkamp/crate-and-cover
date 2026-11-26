@@ -6,7 +6,7 @@
 
 import * as THREE from 'three';
 import { BODY } from '../config.js';
-import { createWorld, overlaps } from '../game/world.js';
+import { createWorld, overlaps, zoneAt } from '../game/world.js';
 import { buildWaypoints, walk } from '../game/wegpunkte.js';
 
 const DRAFT_KEY = 'arena-shooter.kartenbauer-entwurf';
@@ -23,7 +23,8 @@ const LOOKS = ['beton', 'putz', 'stein', 'ziegel', 'pflaster', 'bretter', 'kiste
 const DAYTIME_NAMES = { mittag: 'Mittag', morgen: 'Morgen', abend: 'Abend' };
 const DIRS = { '-z': 'Norden', '+x': 'Osten', '+z': 'Süden', '-x': 'Westen' };
 const PROP_NAMES = { baum: 'Baum', brunnen: 'Brunnen', marktstand: 'Marktstand' };
-const KIND_NAMES = { box: 'Block', stairs: 'Treppe', spawn: 'Startpunkt', prop: 'Modell' };
+const KIND_NAMES = { box: 'Block', stairs: 'Treppe', spawn: 'Startpunkt', prop: 'Modell', zone: 'Zone' };
+const ZONE_NAMES = { wasser: 'Wasser', absturz: 'Absturz' };
 
 // Kollision der Modelle bei Drehung 0, relativ zum Fußpunkt (Maße wie in tools/karte_altstadt.mjs)
 const PROP_BOXES = {
@@ -46,6 +47,8 @@ const TOOLS = [
   ['baum', 'Baum', 'Klicken, R dreht'],
   ['brunnen', 'Brunnen', 'Klicken'],
   ['marktstand', 'Marktstand', 'Klicken, R dreht'],
+  ['wasser', 'Wasser', 'Ziehen: Wasserfläche, wer hineinfällt, ist raus'],
+  ['absturz', 'Absturz', 'Ziehen: unsichtbare Absturzzone (z. B. unter Löchern), wer hineingerät, ist raus'],
 ];
 
 const round = v => Math.round(v * 1000) / 1000;
@@ -67,7 +70,7 @@ export function newMap(name = 'Meine Karte', w = 40, d = 40) {
       wall([-hx - 1, 0, -hz - 1], [-hx, 5, hz + 1]), wall([hx, 0, -hz - 1], [hx + 1, 5, hz + 1]),
       wall([-hx, 0, -hz - 1], [hx, 5, -hz]), wall([-hx, 0, hz], [hx, 5, hz + 1]),
     ],
-    stairs: [], spawns, props: [], deko: [],
+    stairs: [], spawns, props: [], zones: [], deko: [],
   };
 }
 
@@ -107,8 +110,10 @@ function union(list) {
   return { min, max };
 }
 
+const boxLike = kind => kind === 'box' || kind === 'zone';
+
 function itemBounds(kind, it) {
-  if (kind === 'box') return it;
+  if (boxLike(kind)) return it;
   if (kind === 'stairs') return union(stairBoxes(it));
   if (kind === 'prop') return union(propBoxes(it));
   const [x, y, z] = it.pos;
@@ -116,14 +121,14 @@ function itemBounds(kind, it) {
 }
 
 function moveItem(kind, it, dx, dz) {
-  const vs = kind === 'box' ? [it.min, it.max] : kind === 'stairs' ? [it.start] : [it.pos];
+  const vs = boxLike(kind) ? [it.min, it.max] : kind === 'stairs' ? [it.start] : [it.pos];
   for (const v of vs) { v[0] = round(v[0] + dx); v[2] = round(v[2] + dz); }
 }
 
 // Spiegelbild an der Mittellinie: axis 0 = Ost–West (x → -x), 2 = Nord–Süd (z → -z). Teams tauschen die Seite.
 function mirrorItem(kind, it, axis) {
   const m = clone(it);
-  if (kind === 'box') {
+  if (boxLike(kind)) {
     m.min[axis] = round(-it.max[axis]);
     m.max[axis] = round(-it.min[axis]);
     return m;
@@ -191,13 +196,19 @@ export function checkMap(map) {
       badSpawns.push(i);
     }
   });
+  map.spawns.forEach(s => {
+    const z = zoneAt(world, ...s.pos);
+    if (z) problems.push(`Start ${s.team === 'A' ? 'Blau' : 'Orange'} bei ${s.pos[0]} / ${s.pos[2]} liegt in einer ${ZONE_NAMES[z.kind]}zone`);
+  });
   map.stairs.forEach(t => {
     if (t.rise > MAX_STEP) warnings.push(`Treppe bei ${t.start[0]} / ${t.start[2]}: Stufen über ${MAX_STEP} m schafft niemand`);
   });
   // Auf Baumkronen, Brunnendach und Marktstand will niemand hin
   const onProp = n => world.boxes.some(b => b.hidden && Math.abs(b.max[1] - n[1]) < 0.01
     && n[0] >= b.min[0] && n[0] <= b.max[0] && n[2] >= b.min[2] && n[2] <= b.max[2]);
-  const dropped = wp.dropped.filter(n => !onProp(n));
+  // Punkte direkt am Rand von Wasser und Absturz verlieren nur ihre Verbindungen, erreichbar sind sie trotzdem
+  const nearZone = n => world.zones.some(z => n[0] > z.min[0] - 1.5 && n[0] < z.max[0] + 1.5 && n[2] > z.min[2] - 1.5 && n[2] < z.max[2] + 1.5);
+  const dropped = wp.dropped.filter(n => !onProp(n) && !nearZone(n));
   if (dropped.length) warnings.push(dropped.length === 1 ? '1 Stelle ist nicht erreichbar (roter Punkt)' : `${dropped.length} Stellen sind nicht erreichbar (rote Punkte)`);
   return { problems, warnings, badSpawns, dropped, built };
 }
@@ -213,6 +224,7 @@ export function readMap(data) {
     stairs: (data.stairs ?? []).filter(t => t && vec(t.start) && DIRS[t.dir] && t.steps > 0),
     spawns: data.spawns.filter(s => s && vec(s.pos) && (s.team === 'A' || s.team === 'B')),
     props: (data.props ?? []).filter(p => p && vec(p.pos) && PROP_BOXES[p.model]),
+    zones: (data.zones ?? []).filter(z => z && vec(z.min) && vec(z.max) && ZONE_NAMES[z.kind]),
     deko: Array.isArray(data.deko) ? data.deko : [],
   };
   delete map.waypoints;
@@ -275,7 +287,7 @@ export function createEditor({ view, canvas, onPlay, onExit }) {
   let snapshot = JSON.stringify(map);
 
   const snap = v => Math.round(v / grid) * grid;
-  const lists = () => ({ box: map.boxes, stairs: map.stairs, spawn: map.spawns, prop: map.props });
+  const lists = () => ({ box: map.boxes, stairs: map.stairs, spawn: map.spawns, prop: map.props, zone: map.zones });
   const itemOf = s => lists()[s.kind][s.index];
   const one = () => (sel.length === 1 ? sel[0] : null);
   const isSelected = s => sel.some(x => x.kind === s.kind && x.index === s.index);
@@ -302,6 +314,10 @@ export function createEditor({ view, canvas, onPlay, onExit }) {
   ghost.visible = false;
   overlay.add(ghost);
   let marks = null;
+  // Absturzzonen sieht man im Spiel nicht, im Kartenbauer als rote Kästen
+  const dropGroup = new THREE.Group();
+  overlay.add(dropGroup);
+  const dropMat = new THREE.MeshBasicMaterial({ color: 0xff3b30, transparent: true, opacity: 0.25, depthWrite: false });
 
   function placeBox(obj, b) {
     obj.position.set((b.min[0] + b.max[0]) / 2, (b.min[1] + b.max[1]) / 2, (b.min[2] + b.max[2]) / 2);
@@ -321,6 +337,13 @@ export function createEditor({ view, canvas, onPlay, onExit }) {
     }
     snapshot = now;
     view.setWorld(createWorld({ ...map, boxes: [...map.boxes, ...map.props.flatMap(propBoxes)] }), true);
+    dropGroup.clear();
+    for (const z of map.zones) {
+      if (z.kind !== 'absturz') continue;
+      const m = new THREE.Mesh(unitBox, dropMat);
+      placeBox(m, z);
+      dropGroup.add(m);
+    }
     try { localStorage.setItem(DRAFT_KEY, now); } catch {}
     clearMarks();
     showSelection();
@@ -377,7 +400,7 @@ export function createEditor({ view, canvas, onPlay, onExit }) {
   function showStatus() {
     const a = map.spawns.filter(s => s.team === 'A').length;
     const b = map.spawns.filter(s => s.team === 'B').length;
-    const parts = [`${map.boxes.length} Blöcke`, `${map.stairs.length} Treppen`, `${map.props.length} Modelle`,
+    const parts = [`${map.boxes.length} Blöcke`, `${map.stairs.length} Treppen`, `${map.props.length} Modelle`, `${map.zones.length} Zonen`,
       `Start Blau ${a}`, `Start Orange ${b}`];
     if (sel.length > 1) parts.push(`${sel.length} ausgewählt`);
     let html = parts.join(' · ');
@@ -485,6 +508,14 @@ export function createEditor({ view, canvas, onPlay, onExit }) {
         + field('Unterkante', num('y', it.min[1], 0.1))
         + field('Farbe', `<input type="color" data-k="color" value="${it.color ?? BLOCK_TYPES[it.type]?.[1] ?? '#999999'}">`)
         + field('Oberfläche', opts('look', looks, it.look ?? ''));
+    } else if (s.kind === 'zone') {
+      html = `<h3>${ZONE_NAMES[it.kind]}</h3>`
+        + field('Art', opts('zkind', ZONE_NAMES, it.kind))
+        + field('Breite (x)', num('w', it.max[0] - it.min[0], 0.1, 0.1))
+        + field('Tiefe (z)', num('d', it.max[2] - it.min[2], 0.1, 0.1))
+        + field('Oberkante', num('top', it.max[1], 0.1))
+        + field('Höhe', num('h', it.max[1] - it.min[1], 0.1, 0.1))
+        + `<p class="ed-hint">${it.kind === 'wasser' ? 'Wasser zeigt seine Oberfläche auf der Oberkante. ' : 'Im Spiel unsichtbar. '}Wer mit den Füßen nicht höher als die Oberkante darüber kommt, ist raus. Bots meiden die Fläche.</p>`;
     } else if (s.kind === 'stairs') {
       html = `<h3>Treppe</h3>`
         + field('Hinauf nach', opts('dir', DIRS, it.dir))
@@ -514,9 +545,11 @@ export function createEditor({ view, canvas, onPlay, onExit }) {
     const it = itemOf(s);
     const v = e.target.type === 'number' ? Number(e.target.value) : e.target.value;
     if (e.target.type === 'number' && !Number.isFinite(v)) return;
-    if (s.kind === 'box') {
+    if (boxLike(s.kind)) {
       const cx = (it.min[0] + it.max[0]) / 2;
       const cz = (it.min[2] + it.max[2]) / 2;
+      if (k === 'zkind') it.kind = v;
+      if (k === 'top') { const h = it.max[1] - it.min[1]; it.max[1] = round(v); it.min[1] = round(v - h); }
       if (k === 'w' && v > 0) { it.min[0] = round(cx - v / 2); it.max[0] = round(cx + v / 2); }
       if (k === 'd' && v > 0) { it.min[2] = round(cz - v / 2); it.max[2] = round(cz + v / 2); }
       if (k === 'h' && v > 0) it.max[1] = round(it.min[1] + v);
@@ -623,7 +656,7 @@ export function createEditor({ view, canvas, onPlay, onExit }) {
     const s = one();
     if (!s) return;
     const it = itemOf(s);
-    if (s.kind === 'box') {
+    if (boxLike(s.kind)) {
       const cx = (it.min[0] + it.max[0]) / 2;
       const cz = (it.min[2] + it.max[2]) / 2;
       const hw = (it.max[0] - it.min[0]) / 2;
@@ -652,7 +685,7 @@ export function createEditor({ view, canvas, onPlay, onExit }) {
   }
 
   // Nächstes Ding unter der Maus (fürs Auswählen)
-  function pick(ray) {
+  function pick(ray, withZones = true) {
     let best = null;
     const test = (kind, index, boxes) => {
       for (const b of boxes) {
@@ -664,12 +697,13 @@ export function createEditor({ view, canvas, onPlay, onExit }) {
     map.stairs.forEach((t, i) => test('stairs', i, stairBoxes(t)));
     map.props.forEach((p, i) => test('prop', i, propBoxes(p)));
     map.spawns.forEach((s, i) => test('spawn', i, [itemBounds('spawn', s)]));
+    if (withZones) map.zones.forEach((z, i) => test('zone', i, [z]));
     return best;
   }
 
   // Punkt zum Setzen: oben auf dem getroffenen Ding, sonst auf Bodenhöhe 0
   function surfacePoint(ray) {
-    const hit = pick(ray);
+    const hit = pick(ray, false);
     if (hit && hit.normal[1] === 1 && hit.kind !== 'spawn') {
       const p = ray.o.map((v, i) => v + ray.d[i] * hit.t);
       // Kiste auf Kiste: genau mittig stapeln
@@ -708,6 +742,14 @@ export function createEditor({ view, canvas, onPlay, onExit }) {
       const x1 = Math.max(a[0], b[0]) + (a[0] === b[0] ? 2 : 0);
       const z1 = Math.max(a[2], b[2]) + (a[2] === b[2] ? 2 : 0);
       return { kind: 'box', item: { type: 'beton', min: [x0, a[1], z0], max: [x1, a[1] + 3, z1], color: BLOCK_TYPES.beton[1] } };
+    }
+    if (tool === 'wasser' || tool === 'absturz') {
+      const x0 = Math.min(a[0], b[0]);
+      const z0 = Math.min(a[2], b[2]);
+      const x1 = Math.max(a[0], b[0]) + (a[0] === b[0] ? 2 : 0);
+      const z1 = Math.max(a[2], b[2]) + (a[2] === b[2] ? 2 : 0);
+      const top = round(a[1] + 0.05);
+      return { kind: 'zone', item: { kind: tool, min: [x0, round(top - (tool === 'wasser' ? 1 : 3)), z0], max: [x1, top, z1] } };
     }
     if (tool === 'kiste') {
       return { kind: 'box', item: { type: 'kiste', min: [a[0] - 0.5, a[1], a[2] - 0.5], max: [a[0] + 0.5, a[1] + 1, a[2] + 0.5], color: BLOCK_TYPES.kiste[1] } };
@@ -777,7 +819,7 @@ export function createEditor({ view, canvas, onPlay, onExit }) {
       }
       if (!isSelected(s)) select([s]);
       const it = itemOf(s);
-      const baseY = s.kind === 'box' ? it.min[1] : s.kind === 'stairs' ? it.start[1] : it.pos[1];
+      const baseY = boxLike(s.kind) ? it.min[1] : s.kind === 'stairs' ? it.start[1] : it.pos[1];
       const p = ray.o.map((v, i) => v + ray.d[i] * hit.t);
       drag = { mode: 'move', baseY, start: planePoint(ray, baseY) ?? [snap(p[0]), baseY, snap(p[2])], dx: 0, dz: 0 };
       return;
