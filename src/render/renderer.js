@@ -12,8 +12,9 @@ import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
 import { SMAAPass } from 'three/addons/postprocessing/SMAAPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { TEAM_COLORS, createFigure, updateFigure, updateBar, createTargetFigure, removeFigure, loadSoldier, updateCorpses, clearCorpses } from './figures.js';
-import { surfaceMaterial, lookFor } from './textures.js';
+import { surfaceMaterial, lookFor, OLD_LIGHT } from './textures.js';
 import { createSky, DAYTIMES } from './sky.js';
 
 const COLORS = {
@@ -64,6 +65,23 @@ export function createRenderer(canvas, world) {
   scene.add(sky.dome);
   const clock = new THREE.Clock();
 
+  // Umgebungslicht aus dem Himmel (je Tageszeit einmal): Licht von oben bläulich, vom Boden warm, weich je Richtung,
+  // statt einer einzigen flachen Streulicht-Farbe. Metall bekommt damit auch Spiegelungen.
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  let envTarget = null;
+  function updateEnvironment() {
+    if (OLD_LIGHT) return;
+    const parent = sky.dome.parent;
+    const holder = new THREE.Scene();
+    holder.add(sky.dome);
+    sky.dome.position.set(0, 0, 0);
+    envTarget?.dispose();
+    envTarget = pmrem.fromScene(holder, 0.04, 0.1, 1000);
+    parent.add(sky.dome);
+    scene.environment = envTarget.texture;
+    scene.environmentIntensity = Number(new URLSearchParams(location.search).get('umgebung') ?? 0.4);
+  }
+
   // Tageszeit der Karte: Sonne, Streulicht, Himmel, Nebel, Belichtung
   function applyDaytime(t) {
     sun.position.set(...t.sun);
@@ -71,10 +89,11 @@ export function createRenderer(canvas, world) {
     sun.intensity = t.sunIntensity;
     hemi.color.setHex(t.hemi[0]);
     hemi.groundColor.setHex(t.hemi[1]);
-    hemi.intensity = t.hemi[2];
+    hemi.intensity = t.hemi[2] * (OLD_LIGHT ? 1 : 0.2); // den Großteil trägt jetzt das Umgebungslicht
     scene.fog.color.setHex(t.fog);
     renderer.toneMappingExposure = t.exposure;
     sky.set(t);
+    updateEnvironment();
   }
 
   let mapGroup = null;
@@ -187,11 +206,18 @@ export function createRenderer(canvas, world) {
     effectLevel = level;
     composer?.dispose();
     composer = null;
-    if (level === 'aus') return;
+    if (level === 'aus' && OLD_LIGHT) return;
     const w = canvas.clientWidth;
     const h = canvas.clientHeight;
     composer = new EffectComposer(renderer);
     composer.addPass(new RenderPass(scene, camera));
+    if (level === 'aus') {
+      // Auch ohne Effekte die Farbabstimmung: ein zusätzlicher Durchgang über das Bild
+      composer.addPass(new OutputPass());
+      composer.addPass(new ShaderPass(GRADE));
+      composer.setSize(w, h);
+      return;
+    }
     if (level === 'voll') {
       const gtao = new GTAOPass(scene, camera, w, h);
       gtao.updateGtaoMaterial({ radius: 0.6, distanceExponent: 1, thickness: 1, scale: 1, samples: 12, distanceFallOff: 1, screenSpaceRadius: false });
@@ -200,6 +226,7 @@ export function createRenderer(canvas, world) {
     }
     composer.addPass(new UnrealBloomPass(new THREE.Vector2(w, h), 0.25, 0.5, 0.92));
     composer.addPass(new OutputPass());
+    if (!OLD_LIGHT) composer.addPass(new ShaderPass(GRADE));
     composer.addPass(new SMAAPass(w, h));
     composer.setSize(w, h);
   }
@@ -396,3 +423,24 @@ function abyssTexture(w, d) {
   tex.userData.own = true; // gehört nur dieser Zone, wird beim Kartenwechsel freigegeben
   return tex;
 }
+
+// Farbabstimmung nach Marcos Beispielbildern (realistischer Militär-Shooter): etwas entsättigt, mehr Kontrast,
+// helle Töne warm, dunkle kühl, Ränder leicht abgedunkelt. Läuft nach der Tonwertabbildung auf dem fertigen Bild.
+const GRADE = {
+  uniforms: { tDiffuse: { value: null } },
+  vertexShader: `varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+  fragmentShader: `
+    uniform sampler2D tDiffuse;
+    varying vec2 vUv;
+    void main() {
+      vec4 c = texture2D(tDiffuse, vUv);
+      vec3 col = c.rgb;
+      float l = dot(col, vec3(0.2126, 0.7152, 0.0722));
+      col = mix(vec3(l), col, 0.72);
+      col = (col - 0.5) * 1.18 + 0.5;
+      col += vec3(0.025, 0.008, -0.02) * smoothstep(0.45, 1.0, l);
+      col += vec3(-0.02, 0.0, 0.025) * (1.0 - smoothstep(0.0, 0.45, l));
+      col *= mix(0.72, 1.0, smoothstep(0.9, 0.35, length(vUv - 0.5)));
+      gl_FragColor = vec4(clamp(col, 0.0, 1.0), c.a);
+    }`,
+};

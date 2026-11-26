@@ -271,6 +271,16 @@ let fpsSince = last;
 function frame(now) {
   const frameDt = Math.min((now - last) / 1000, 0.25);
   last = now;
+  // Vergleichsaufnahmen (src/aufnahmen.js): fester Blick, Figuren an ihren Plätzen, keine Anzeige
+  if (shot) {
+    view.render(shot.view, game.players.map(p => ({ ...p.pos, eye: p.eye })), frameDt);
+    document.body.classList.add('in-menu');
+    info.classList.add('hidden');
+    shot.frames++;
+    shot.onFrame();
+    requestAnimationFrame(frame);
+    return;
+  }
   if (screen === 'editor') {
     editor.update(frameDt);
     view.renderPlain(editor.camera());
@@ -388,4 +398,48 @@ function playSounds(events) {
 }
 
 // Zum Prüfen im Browser
-window.arena = { get game() { return game; }, input, stepGame, startMatch, showScreen, sound, settings, editor, openEditor, view };
+// Für die Vergleichsaufnahmen: Karte laden, n Bilder mit festem Blick zeigen (und das letzte als PNG liefern), Bilder zählen
+let shot = null;
+function shoot(viewArg, n, capture = false) {
+  return new Promise(resolve => {
+    shot = {
+      view: viewArg, frames: 0,
+      onFrame() {
+        if (this.frames < n) return;
+        shot = null;
+        if (capture) canvas.toBlob(resolve, 'image/jpeg', 0.9);
+        else resolve();
+      },
+    };
+  });
+}
+function measure(viewArg, ms) {
+  return new Promise(resolve => {
+    const start = performance.now();
+    shot = {
+      view: viewArg, frames: 0,
+      onFrame() {
+        if (performance.now() - start < ms) return;
+        const n = this.frames;
+        shot = null;
+        resolve(n);
+      },
+    };
+  });
+}
+function loadMap(key) {
+  settings.mode = 'deathmatch';
+  settings.map = key;
+  showScreen(null);
+  newGame();
+}
+
+window.arena = {
+  get game() { return game; }, input, stepGame, startMatch, showScreen, sound, settings, editor, openEditor, view,
+  loadMap, shoot, measure, setEffects: level => view.setEffects(level),
+};
+
+const query = new URLSearchParams(location.search);
+if (query.has('aufnahmen')) {
+  import('./aufnahmen.js').then(m => m.runAufnahmen(window.arena, query.get('aufnahmen').replace(/[^\w-]/g, '') || 'aufnahme', query.get('effekte') ?? 'voll'));
+}

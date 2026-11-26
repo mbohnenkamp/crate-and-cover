@@ -432,9 +432,18 @@ function addDepth(material, tile, depth) {
   material.customProgramCacheKey = () => 'relief';
 }
 
+// Licht seit V4.33: physikalische Materialien mit Umgebungslicht aus dem Himmel und Farbabstimmung.
+// Zum Vergleich ?licht=alt hinter die Adresse: flaches Streulicht wie bis V4.32.
+export const OLD_LIGHT = query.get('licht') === 'alt';
+
+// Rauheit und Metallanteil je Oberfläche; was hier fehlt, ist matt und nicht metallisch
+const SHINE = { stahl: [0.45, 0.6], wellblech: [0.55, 0.45], glatt: [0.55, 0], kiste: [0.8, 0] };
+
 // Material einer Oberfläche: Farbbild, Reliefkarte und (wo die Texturkoordinaten die Weltlage sind) Tiefenwirkung.
 export function surfaceMaterial(look) {
-  const material = new THREE.MeshLambertMaterial({ map: textureFor(look), normalMap: reliefFor(look), vertexColors: true });
+  const maps = { map: textureFor(look), normalMap: reliefFor(look), vertexColors: true };
+  const [roughness, metalness] = SHINE[look] ?? [0.92, 0];
+  const material = OLD_LIGHT ? new THREE.MeshLambertMaterial(maps) : new THREE.MeshStandardMaterial({ ...maps, roughness, metalness });
   if (KI_LOOKS[look]) addDepth(material, KI_LOOKS[look][0], KI_LOOKS[look][1] * DEPTH);
   return material;
 }
