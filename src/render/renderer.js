@@ -15,7 +15,10 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { TEAM_COLORS, createFigure, updateFigure, updateBar, createTargetFigure, removeFigure, loadSoldier, updateCorpses, clearCorpses } from './figures.js';
 import { surfaceMaterial, lookFor, OLD_LIGHT } from './textures.js';
+// ?schatten=aus: ohne vorberechnete Verschattung (zum Vergleich)
+const NO_AO = new URLSearchParams(location.search).get('schatten') === 'aus';
 import { createSky, DAYTIMES } from './sky.js';
+import { bakeShadows } from './schatten.js';
 
 const COLORS = {
   container: 0x8c8f93,
@@ -101,29 +104,40 @@ export function createRenderer(canvas, world) {
 
   // Blöcke und Schmuckblöcke nach Oberfläche zusammengefasst (ein Mesh je Oberfläche). Farbe je Block als
   // Vertexfarbe mit leichter Abweichung, damit nicht jede Wand gleich aussieht. Schatten der Sonne über die ganze Karte.
-  // force: auch bei gleichem Namen neu bauen (Kartenbauer)
-  function setWorld(world, force = false) {
+  // force: auch bei gleichem Namen neu bauen; shade: Verschattung vorberechnen (im Kartenbauer aus, zu langsam je Änderung)
+  let bakeMs = 0;
+  function setWorld(world, force = false, shade = true) {
     if (worldName === world.name && !force) return;
     worldName = world.name;
     applyDaytime(DAYTIMES[world.licht] ?? DAYTIMES.mittag);
     if (mapGroup) {
       scene.remove(mapGroup);
-      mapGroup.traverse(o => { o.geometry?.dispose(); if (o.material?.map?.userData.own) o.material.map.dispose(); o.material?.dispose(); });
+      mapGroup.traverse(o => {
+        o.geometry?.dispose();
+        if (o.material?.map?.userData.own) o.material.map.dispose();
+        if (o.material?.aoMap?.userData.own) o.material.aoMap.dispose();
+        o.material?.dispose();
+      });
     }
     mapGroup = new THREE.Group();
     const groups = {};
+    const t0 = performance.now();
+    const shadows = shade && !OLD_LIGHT && !NO_AO ? bakeShadows(world.boxes, world.deko) : null;
+    bakeMs = performance.now() - t0;
     for (const b of [...world.boxes, ...world.deko]) {
       if (b.hidden) continue; // an seiner Stelle steht ein Blender-Modell
       const look = lookFor(b, world);
       const cast = b.type !== 'boden';
-      const geo = boxGeometry(b, look === 'kiste');
+      const geo = boxGeometry(b, look === 'kiste', shadows?.rects.get(b));
       tint(geo, new THREE.Color(b.color ?? COLORS[b.type] ?? 0xff00ff), variation(b));
       (groups[look + (cast ? '+' : '-')] ??= { look, cast, geos: [] }).geos.push(geo);
     }
     for (const g of Object.values(groups)) {
       const merged = mergeGeometries(g.geos);
       for (const geo of g.geos) geo.dispose();
-      const mesh = new THREE.Mesh(merged, surfaceMaterial(g.look));
+      const material = surfaceMaterial(g.look);
+      if (shadows) material.aoMap = shadows.texture;
+      const mesh = new THREE.Mesh(merged, material);
       mesh.castShadow = g.cast;
       mesh.receiveShadow = true;
       mapGroup.add(mesh);
@@ -259,6 +273,7 @@ export function createRenderer(canvas, world) {
     camera,
     scene,
     setWorld,
+    get bakeMs() { return bakeMs; },
     setEffects,
     setGame(g) {
       game = g;
@@ -343,12 +358,23 @@ export function createRenderer(canvas, world) {
 
 // Box mit Texturkoordinaten in Metern, damit die Oberfläche überall gleich groß ist.
 // perFace: ein Bild je Seite (Kisten, damit der Rahmen am Rand jeder Kiste liegt)
-function boxGeometry(b, perFace = false) {
+// rects: Platz jeder Fläche im Verschattungsbild (schatten.js), wird zur zweiten Texturkoordinate uv1
+function boxGeometry(b, perFace = false, rects = null) {
   const w = b.max[0] - b.min[0];
   const h = b.max[1] - b.min[1];
   const d = b.max[2] - b.min[2];
   const geo = new THREE.BoxGeometry(w, h, d);
   geo.translate((b.min[0] + b.max[0]) / 2, (b.min[1] + b.max[1]) / 2, (b.min[2] + b.max[2]) / 2);
+  if (rects) {
+    const src = geo.attributes.uv;
+    const uv1 = new Float32Array(src.count * 2);
+    for (let i = 0; i < src.count; i++) {
+      const r = rects[i >> 2];
+      uv1[i * 2] = r[0] + src.getX(i) * (r[2] - r[0]);
+      uv1[i * 2 + 1] = r[1] + src.getY(i) * (r[3] - r[1]);
+    }
+    geo.setAttribute('uv1', new THREE.BufferAttribute(uv1, 2));
+  }
   if (perFace) return geo;
   // Texturkoordinaten aus der Lage in der Welt (in Metern), damit Steinreihen und Bretter über
   // aneinanderstoßende Blöcke weiterlaufen. Seiten: ±x, ±y, ±z je vier Ecken.

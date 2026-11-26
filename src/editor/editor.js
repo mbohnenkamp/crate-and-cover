@@ -336,7 +336,7 @@ export function createEditor({ view, canvas, onPlay, onExit }) {
       redoList = [];
     }
     snapshot = now;
-    view.setWorld(createWorld({ ...map, boxes: [...map.boxes, ...map.props.flatMap(propBoxes)] }), true);
+    view.setWorld(createWorld({ ...map, boxes: [...map.boxes, ...map.props.flatMap(propBoxes)] }), true, false);
     dropGroup.clear();
     for (const z of map.zones) {
       if (z.kind !== 'absturz') continue;
