@@ -91,6 +91,32 @@
     #best td:first-child { color: #aab4c0; }
     #end-record { color: #ffd27a; font-weight: 600; margin: -6px 0 10px; }
     body.in-menu #minimap, body.in-menu #hurtdir { display: none !important; }
+    #editor { position: fixed; inset: 0; pointer-events: none; color: #eef1f5; font-size: 13px; display: flex; flex-direction: column; align-items: flex-start; }
+    #editor > * { pointer-events: auto; }
+    #ed-top { align-self: stretch; display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+      padding: 8px 10px; background: rgba(24, 28, 35, .92); }
+    #ed-top input, #ed-top select, #ed-side input, #ed-side select { background: #262d38; color: #eef1f5; border: 1px solid #3c4655;
+      border-radius: 5px; padding: 5px 6px; font: inherit; }
+    #ed-name { width: 150px; }
+    #editor button { padding: 6px 10px; border: 1px solid #3c4655; border-radius: 6px; background: #262d38; color: #eef1f5;
+      font: inherit; cursor: pointer; }
+    #editor button.on { background: #3d7bd9; border-color: #3d7bd9; }
+    #editor button.primary { background: #e0832f; border-color: #e0832f; font-weight: 600; }
+    #ed-top .sep { width: 1px; height: 22px; background: #3c4655; margin: 0 4px; }
+    #ed-side { margin: 10px; width: 230px; min-height: 0; flex: 0 1 auto; overflow: auto; margin-bottom: 52px;
+      padding: 10px; background: rgba(24, 28, 35, .92); border-radius: 8px; }
+    #ed-tools { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 10px; }
+    #ed-help { color: #ffd27a; margin-bottom: 8px; }
+    #ed-props h3 { margin: 8px 0 6px; font-size: 14px; }
+    #ed-props label { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin: 5px 0; }
+    #ed-props label input, #ed-props label select { width: 100px; box-sizing: border-box; }
+    #ed-props input[type=color] { padding: 0; height: 26px; }
+    .ed-hint { color: #aab4c0; line-height: 1.45; margin: 6px 0; }
+    .ed-row { display: flex; gap: 6px; margin-top: 10px; }
+    .ed-row button { flex: 1; }
+    #ed-status { position: fixed; left: 10px; bottom: 10px; padding: 6px 10px; background: rgba(24, 28, 35, .85);
+      border-radius: 6px; color: #c8ced6; }
+    #ed-status b { color: #ffd27a; font-weight: 600; }
     .hidden { display: none !important; }
   </style>
 </head>
@@ -114,6 +140,32 @@
     <div id="ammo"></div>
   </div>
   <div id="info"></div>
+  <div id="editor" class="hidden">
+    <div id="ed-top">
+      <input id="ed-name" maxlength="40" title="Name der Karte">
+      <select id="ed-licht" title="Tageszeit"></select>
+      <span class="sep"></span>
+      <button id="ed-new">Neu</button>
+      <button id="ed-save">Speichern</button>
+      <select id="ed-saved" title="Gespeicherte Karten"></select>
+      <button id="ed-open">Öffnen</button>
+      <button id="ed-del">Löschen</button>
+      <span class="sep"></span>
+      <button id="ed-export">Als Datei</button>
+      <button id="ed-import">Datei einlesen</button>
+      <input id="ed-file" type="file" accept=".json,application/json" class="hidden">
+      <span class="sep"></span>
+      <button id="ed-paths">Wege prüfen</button>
+      <button id="ed-play" class="primary">Probe spielen</button>
+      <button id="ed-exit">Zum Startmenü</button>
+    </div>
+    <div id="ed-side">
+      <div id="ed-tools"></div>
+      <div id="ed-help"></div>
+      <div id="ed-props"></div>
+    </div>
+    <div id="ed-status"></div>
+  </div>
   <div id="overlay">
     <div class="box" id="menu">
       <h1>Crate &amp; Cover</h1>
@@ -136,7 +188,7 @@
         <span>Lautstärke</span><input type="range" min="0" max="100" step="5" data-setting="volume"><output data-for="volume"></output>
         <span></span><button type="button" class="demo">Probehören</button><span></span>
       </div>
-      <div class="actions"><button class="primary" id="btn-start">Starten</button></div>
+      <div class="actions"><button class="primary" id="btn-start">Starten</button><button id="btn-editor">Kartenbauer</button></div>
       <details id="best-box">
         <summary>Bestenliste</summary>
         <div id="best"></div>

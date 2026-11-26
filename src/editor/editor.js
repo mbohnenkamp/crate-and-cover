@@ -1,0 +1,780 @@
+// Kartenbauer: eigene Karten im Spiel bauen. Draufsicht mit freier Kamera; Wände, Blöcke, Kisten, Treppen,
+// Startpunkte und Modelle setzen, verschieben und ändern. Karten im Browser speichern, als JSON-Datei aus- und
+// einlesen, mit Bots Probe spielen. Die Karte hat dasselbe Format wie src/maps/*.json; die Kollision der
+// Modelle und die Wegpunkte entstehen erst beim Spielen und Ausgeben (buildMap).
+
+import * as THREE from 'three';
+import { createWorld } from '../game/world.js';
+import { buildWaypoints } from '../game/wegpunkte.js';
+import { TEAM_COLORS } from '../render/figures.js';
+
+const DRAFT_KEY = 'arena-shooter.kartenbauer-entwurf';
+const STORE_KEY = 'arena-shooter.eigene-karten';
+const GRID = 0.5;
+
+const BLOCK_TYPES = {
+  boden: ['Boden', '#9a9184'], wand: ['Wand', '#cfc8bb'], beton: ['Beton', '#a8a49c'], ziegel: ['Ziegel', '#a5553f'],
+  holz: ['Holz', '#8a6440'], stahl: ['Stahl', '#7f8c99'], kiste: ['Kiste', '#b07a43'], container: ['Container', '#3f7a4a'],
+  plattform: ['Plattform', '#7f8c99'], dach: ['Dach', '#8e4a3a'], hecke: ['Hecke', '#3f6b38'],
+};
+const LOOKS = ['beton', 'putz', 'stein', 'ziegel', 'pflaster', 'bretter', 'kiste', 'dachziegel', 'wellblech', 'stahl',
+  'erde', 'sand', 'laub', 'glatt'];
+const DAYTIME_NAMES = { mittag: 'Mittag', morgen: 'Morgen', abend: 'Abend' };
+const DIRS = { '-z': 'Norden', '+x': 'Osten', '+z': 'Süden', '-x': 'Westen' };
+const PROP_NAMES = { baum: 'Baum', brunnen: 'Brunnen', marktstand: 'Marktstand' };
+
+// Kollision der Modelle bei Drehung 0, relativ zum Fußpunkt (Maße wie in tools/karte_altstadt.mjs)
+const PROP_BOXES = {
+  baum: [['stamm', [-0.25, 0, -0.25], [0.25, 3, 0.25], '#6b4a2f'], ['laub', [-1.5, 2.6, -1.5], [1.5, 5, 1.5], '#4f7d3f']],
+  brunnen: [['brunnen', [-1.5, 0, -1.5], [1.5, 0.9, 1.5], '#9a958c'], ['brunnen', [-0.25, 0.9, -0.25], [0.25, 2.6, 0.25], '#9a958c'],
+    ['dach', [-0.9, 2.6, -0.9], [0.9, 2.8, 0.9], '#8e4a3a']],
+  marktstand: [['kiste', [-1.3, 0, -0.5], [1.3, 1, 0.5]],
+    ...[[-1.2, -0.4], [-1.2, 0.4], [1.2, -0.4], [1.2, 0.4]].map(([x, z]) => ['pfosten', [x - 0.05, 0, z - 0.05], [x + 0.05, 2.3, z + 0.05]]),
+    ['stoff', [-1.5, 2.3, -1.2], [1.5, 2.4, 1.2]]],
+};
+
+const TOOLS = [
+  ['select', 'Auswählen', 'Klicken wählt, Ziehen verschiebt'],
+  ['wand', 'Wand', 'Ziehen: Wand von Punkt zu Punkt'],
+  ['block', 'Block', 'Ziehen: Fläche aufziehen'],
+  ['kiste', 'Kiste', 'Klicken, auch auf andere Kisten'],
+  ['treppe', 'Treppe', 'Klicken, R dreht'],
+  ['spawnA', 'Start Blau', 'Klicken'],
+  ['spawnB', 'Start Orange', 'Klicken'],
+  ['baum', 'Baum', 'Klicken, R dreht'],
+  ['brunnen', 'Brunnen', 'Klicken'],
+  ['marktstand', 'Marktstand', 'Klicken, R dreht'],
+];
+
+const snap = v => Math.round(v / GRID) * GRID;
+const round = v => Math.round(v * 1000) / 1000;
+const clone = o => JSON.parse(JSON.stringify(o));
+
+export function newMap(name = 'Meine Karte', w = 40, d = 40) {
+  const hx = w / 2;
+  const hz = d / 2;
+  const wall = (min, max) => ({ type: 'wand', min, max, color: '#a39c90', look: 'stein' });
+  const spawns = [];
+  for (const [team, x, yaw] of [['A', -hx + 3, -Math.PI / 2], ['B', hx - 3, Math.PI / 2]]) {
+    for (const z of [-3, -1, 1, 3]) spawns.push({ team, pos: [x, 0, z], yaw: round(yaw) });
+  }
+  return {
+    name, killY: -20, licht: 'mittag', looks: { boden: 'beton' },
+    boxes: [
+      { type: 'boden', min: [-hx, -1, -hz], max: [hx, 0, hz], color: '#8f877b' },
+      wall([-hx - 1, 0, -hz - 1], [-hx, 5, hz + 1]), wall([hx, 0, -hz - 1], [hx + 1, 5, hz + 1]),
+      wall([-hx, 0, -hz - 1], [hx, 5, -hz]), wall([-hx, 0, hz], [hx, 5, hz + 1]),
+    ],
+    stairs: [], spawns, props: [], deko: [],
+  };
+}
+
+function rotateBox(min, max, yaw, at) {
+  const c = Math.cos(yaw);
+  const s = Math.sin(yaw);
+  const xs = [];
+  const zs = [];
+  for (const x of [min[0], max[0]]) for (const z of [min[2], max[2]]) {
+    xs.push(x * c + z * s);
+    zs.push(-x * s + z * c);
+  }
+  return {
+    min: [round(at[0] + Math.min(...xs)), round(at[1] + min[1]), round(at[2] + Math.min(...zs))],
+    max: [round(at[0] + Math.max(...xs)), round(at[1] + max[1]), round(at[2] + Math.max(...zs))],
+  };
+}
+
+// Kollisionsblöcke eines Modells (nicht gezeichnet, an ihrer Stelle steht das Modell)
+function propBoxes(p) {
+  return (PROP_BOXES[p.model] ?? []).map(([type, min, max, color]) => ({
+    type, ...rotateBox(min, max, p.yaw ?? 0, p.pos), color: p.model === 'marktstand' && type === 'stoff' ? p.color : color, hidden: true,
+  }));
+}
+
+function stairBoxes(t) {
+  return createWorld({ boxes: [], stairs: [t], spawns: [] }).boxes;
+}
+
+function union(list) {
+  const min = [Infinity, Infinity, Infinity];
+  const max = [-Infinity, -Infinity, -Infinity];
+  for (const b of list) for (let i = 0; i < 3; i++) {
+    min[i] = Math.min(min[i], b.min[i]);
+    max[i] = Math.max(max[i], b.max[i]);
+  }
+  return { min, max };
+}
+
+// Karte zum Spielen und Ausgeben: Kollision der Modelle dazu, Wegpunkte neu
+export function buildMap(map) {
+  const out = clone(map);
+  out.boxes = [...map.boxes, ...map.props.flatMap(propBoxes)];
+  const wp = buildWaypoints(out);
+  out.waypoints = { nodes: wp.nodes, links: wp.links };
+  return out;
+}
+
+// Eingelesene Karte prüfen und auf das Format des Kartenbauers bringen (Modell-Kollision fällt weg, kommt neu)
+export function readMap(data) {
+  if (!data || !Array.isArray(data.boxes) || !Array.isArray(data.spawns)) throw new Error('Keine Karte von Crate & Cover');
+  const vec = v => Array.isArray(v) && v.length === 3 && v.every(Number.isFinite);
+  const boxes = data.boxes.filter(b => b && vec(b.min) && vec(b.max) && !b.hidden);
+  const map = {
+    ...data,
+    name: String(data.name ?? 'Eingelesene Karte').slice(0, 40),
+    boxes,
+    stairs: (data.stairs ?? []).filter(t => t && vec(t.start) && DIRS[t.dir] && t.steps > 0),
+    spawns: data.spawns.filter(s => s && vec(s.pos) && (s.team === 'A' || s.team === 'B')),
+    props: (data.props ?? []).filter(p => p && vec(p.pos) && PROP_BOXES[p.model]),
+    deko: Array.isArray(data.deko) ? data.deko : [],
+  };
+  delete map.waypoints;
+  delete map.targets;
+  return map;
+}
+
+function loadStore() {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY)) ?? {}; } catch { return {}; }
+}
+
+function saveStore(store) {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(store)); return true; } catch { return false; }
+}
+
+// Strahl gegen achsenparallele Box: Abstand und Seite (Normale) oder null
+function rayBox(o, d, min, max) {
+  let tmin = -Infinity;
+  let tmax = Infinity;
+  let axis = -1;
+  let sign = 0;
+  for (let i = 0; i < 3; i++) {
+    if (Math.abs(d[i]) < 1e-9) {
+      if (o[i] < min[i] || o[i] > max[i]) return null;
+      continue;
+    }
+    let t1 = (min[i] - o[i]) / d[i];
+    let t2 = (max[i] - o[i]) / d[i];
+    let s = -Math.sign(d[i]);
+    if (t1 > t2) [t1, t2] = [t2, t1];
+    if (t1 > tmin) { tmin = t1; axis = i; sign = s; }
+    if (t2 < tmax) tmax = t2;
+    if (tmin > tmax) return null;
+  }
+  if (tmax < 0 || axis < 0) return null;
+  const normal = [0, 0, 0];
+  normal[axis] = sign;
+  return { t: Math.max(tmin, 0), normal };
+}
+
+export function createEditor({ view, canvas, onPlay, onExit }) {
+  const $ = id => document.getElementById(id);
+  const root = $('editor');
+  const props = $('ed-props');
+  const status = $('ed-status');
+  const help = $('ed-help');
+
+  let map = loadDraft() ?? newMap();
+  let tool = 'select';
+  let selected = null; // { kind: 'box' | 'stairs' | 'spawn' | 'prop', index }
+  let active = false;
+  let message = '';
+  let pathInfo = null;
+
+  const cam = { x: 0, z: 0, dist: 45, yaw: 0, pitch: -1.0 };
+  const keys = new Set();
+
+  // Hilfsobjekte über der Karte: Raster, Auswahl, Vorschau, Wege
+  const overlay = new THREE.Group();
+  overlay.visible = false;
+  view.scene.add(overlay);
+  const grid = new THREE.GridHelper(200, 200, 0xffffff, 0xffffff);
+  grid.material.transparent = true;
+  grid.material.opacity = 0.18;
+  grid.material.depthWrite = false;
+  grid.position.y = 0.015;
+  overlay.add(grid);
+  const unitBox = new THREE.BoxGeometry(1, 1, 1);
+  const selBox = new THREE.LineSegments(new THREE.EdgesGeometry(unitBox), new THREE.LineBasicMaterial({ color: 0xffd27a, depthTest: false }));
+  selBox.renderOrder = 10;
+  selBox.visible = false;
+  overlay.add(selBox);
+  const ghost = new THREE.Mesh(unitBox, new THREE.MeshBasicMaterial({ color: 0x7dff8a, transparent: true, opacity: 0.35, depthWrite: false }));
+  ghost.visible = false;
+  overlay.add(ghost);
+  let paths = null;
+
+  function placeBox(obj, b) {
+    obj.position.set((b.min[0] + b.max[0]) / 2, (b.min[1] + b.max[1]) / 2, (b.min[2] + b.max[2]) / 2);
+    obj.scale.set(Math.max(b.max[0] - b.min[0], 0.05), Math.max(b.max[1] - b.min[1], 0.05), Math.max(b.max[2] - b.min[2], 0.05));
+  }
+
+  function bounds(sel) {
+    if (sel.kind === 'box') return map.boxes[sel.index];
+    if (sel.kind === 'stairs') return union(stairBoxes(map.stairs[sel.index]));
+    if (sel.kind === 'prop') return union(propBoxes(map.props[sel.index]));
+    const [x, y, z] = map.spawns[sel.index].pos;
+    return { min: [x - 0.5, y, z - 0.5], max: [x + 0.5, y + 1.8, z + 0.5] };
+  }
+
+  // ---- Karte zeichnen und sichern ----
+
+  function rebuild() {
+    view.setWorld(createWorld({ ...map, boxes: [...map.boxes, ...map.props.flatMap(propBoxes)] }), true);
+    try { localStorage.setItem(DRAFT_KEY, JSON.stringify(map)); } catch {}
+    clearPaths();
+    showSelection();
+    showProps();
+    showStatus();
+  }
+
+  function loadDraft() {
+    try {
+      const d = localStorage.getItem(DRAFT_KEY);
+      return d ? readMap(JSON.parse(d)) : null;
+    } catch { return null; }
+  }
+
+  function setMap(m) {
+    map = m;
+    selected = null;
+    const floor = map.boxes.find(b => b.type === 'boden');
+    const size = floor ? Math.max(floor.max[0] - floor.min[0], floor.max[2] - floor.min[2]) : 40;
+    Object.assign(cam, { x: 0, z: 0, dist: Math.max(20, size * 1.1), yaw: 0, pitch: -1.0 });
+    showMapSettings();
+    showStore();
+    rebuild();
+  }
+
+  function say(text) {
+    message = text;
+    showStatus();
+  }
+
+  function showStatus() {
+    const a = map.spawns.filter(s => s.team === 'A').length;
+    const b = map.spawns.filter(s => s.team === 'B').length;
+    const parts = [`${map.boxes.length} Blöcke`, `${map.stairs.length} Treppen`, `${map.props.length} Modelle`,
+      `Start Blau ${a}`, `Start Orange ${b}`];
+    if (pathInfo) parts.push(pathInfo);
+    status.innerHTML = parts.join(' · ') + (message ? `<br><b>${message}</b>` : '');
+  }
+
+  function clearPaths() {
+    if (paths) {
+      overlay.remove(paths);
+      paths.geometry.dispose();
+      paths = null;
+    }
+    pathInfo = null;
+  }
+
+  function showPaths() {
+    clearPaths();
+    const built = buildMap(map);
+    const { nodes, links } = built.waypoints;
+    const pts = [];
+    for (const [a, b] of links) pts.push(nodes[a][0], nodes[a][1] + 0.1, nodes[a][2], nodes[b][0], nodes[b][1] + 0.1, nodes[b][2]);
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
+    paths = new THREE.LineSegments(geo, new THREE.LineBasicMaterial({ color: 0xff4fd8, depthTest: false }));
+    paths.renderOrder = 9;
+    overlay.add(paths);
+    pathInfo = `${nodes.length} Wegpunkte`;
+    return built;
+  }
+
+  // ---- Auswahl und Eigenschaften ----
+
+  function select(sel) {
+    selected = sel;
+    showSelection();
+    showProps();
+  }
+
+  function showSelection() {
+    if (selected && !itemOf(selected)) selected = null;
+    selBox.visible = !!selected;
+    if (selected) placeBox(selBox, bounds(selected));
+  }
+
+  function itemOf(sel) {
+    return { box: map.boxes, stairs: map.stairs, spawn: map.spawns, prop: map.props }[sel.kind][sel.index];
+  }
+
+  function field(label, input) {
+    return `<label><span>${label}</span>${input}</label>`;
+  }
+  const num = (key, value, step = 0.5, min = '') => `<input type="number" data-k="${key}" value="${round(value)}" step="${step}" min="${min}">`;
+  const opts = (key, list, value) => `<select data-k="${key}">${Object.entries(list).map(([v, t]) => `<option value="${v}"${v === value ? ' selected' : ''}>${t}</option>`).join('')}</select>`;
+
+  function showProps() {
+    if (!selected) {
+      props.innerHTML = `<p class="ed-hint">${TOOLS.find(t => t[0] === tool)[2]}.<br>Kamera: WASD oder Pfeile schieben, Mausrad zoomt, rechte Maustaste dreht und neigt, Q/E drehen.<br>Entf löscht, Strg+D verdoppelt, R dreht, Esc hebt die Auswahl auf.</p>`;
+      return;
+    }
+    const it = itemOf(selected);
+    let html = '';
+    if (selected.kind === 'box') {
+      const looks = { '': 'Standard', ...Object.fromEntries(LOOKS.map(l => [l, l[0].toUpperCase() + l.slice(1)])) };
+      html = `<h3>Block</h3>`
+        + field('Art', opts('type', Object.fromEntries(Object.entries(BLOCK_TYPES).map(([k, v]) => [k, v[0]])), it.type))
+        + field('Breite (x)', num('w', it.max[0] - it.min[0], 0.1, 0.1))
+        + field('Tiefe (z)', num('d', it.max[2] - it.min[2], 0.1, 0.1))
+        + field('Höhe', num('h', it.max[1] - it.min[1], 0.1, 0.1))
+        + field('Unterkante', num('y', it.min[1], 0.1))
+        + field('Farbe', `<input type="color" data-k="color" value="${it.color ?? BLOCK_TYPES[it.type]?.[1] ?? '#999999'}">`)
+        + field('Oberfläche', opts('look', looks, it.look ?? ''));
+    } else if (selected.kind === 'stairs') {
+      html = `<h3>Treppe</h3>`
+        + field('Hinauf nach', opts('dir', DIRS, it.dir))
+        + field('Stufen', num('steps', it.steps, 1, 1))
+        + field('Stufenhöhe', num('rise', it.rise, 0.05, 0.05))
+        + field('Stufentiefe', num('depth', it.depth, 0.05, 0.2))
+        + field('Breite', num('width', it.width, 0.1, 0.8))
+        + field('Unterkante', num('y', it.start[1], 0.1))
+        + `<p class="ed-hint">Höhe oben: ${round(it.steps * it.rise)} m. Stufen über 0,45 m schafft niemand.</p>`;
+    } else if (selected.kind === 'spawn') {
+      html = `<h3>Startpunkt</h3>`
+        + field('Team', opts('team', { A: 'Blau', B: 'Orange' }, it.team))
+        + field('Blickrichtung (Grad)', num('deg', ((Math.round(it.yaw * 180 / Math.PI) % 360) + 360) % 360, 15))
+        + field('Höhe', num('y', it.pos[1], 0.1));
+    } else {
+      html = `<h3>${PROP_NAMES[it.model]}</h3>`
+        + field('Drehung (Grad)', opts('deg', { 0: '0', 90: '90', 180: '180', 270: '270' }, String(Math.round((it.yaw ?? 0) * 180 / Math.PI / 90) * 90 % 360)))
+        + (it.model === 'marktstand' ? field('Stoff', `<input type="color" data-k="color" value="${it.color ?? '#b33a3a'}">`) : '');
+    }
+    html += `<div class="ed-row"><button data-act="dup">Verdoppeln</button><button data-act="del">Löschen</button></div>`;
+    props.innerHTML = html;
+  }
+
+  props.addEventListener('change', e => {
+    const k = e.target.dataset.k;
+    if (!k || !selected) return;
+    const it = itemOf(selected);
+    const v = e.target.type === 'number' ? Number(e.target.value) : e.target.value;
+    if (e.target.type === 'number' && !Number.isFinite(v)) return;
+    if (selected.kind === 'box') {
+      const cx = (it.min[0] + it.max[0]) / 2;
+      const cz = (it.min[2] + it.max[2]) / 2;
+      if (k === 'w' && v > 0) { it.min[0] = round(cx - v / 2); it.max[0] = round(cx + v / 2); }
+      if (k === 'd' && v > 0) { it.min[2] = round(cz - v / 2); it.max[2] = round(cz + v / 2); }
+      if (k === 'h' && v > 0) it.max[1] = round(it.min[1] + v);
+      if (k === 'y') { const h = it.max[1] - it.min[1]; it.min[1] = round(v); it.max[1] = round(v + h); }
+      if (k === 'type') { it.type = v; it.color = BLOCK_TYPES[v][1]; }
+      if (k === 'color') it.color = v;
+      if (k === 'look') { if (v) it.look = v; else delete it.look; }
+    } else if (selected.kind === 'stairs') {
+      if (k === 'dir') it.dir = v;
+      if (k === 'steps' && v >= 1) it.steps = Math.min(40, Math.round(v));
+      if (k === 'rise' && v > 0) it.rise = v;
+      if (k === 'depth' && v > 0) it.depth = v;
+      if (k === 'width' && v > 0) it.width = v;
+      if (k === 'y') it.start[1] = round(v);
+    } else if (selected.kind === 'spawn') {
+      if (k === 'team') it.team = v;
+      if (k === 'deg') it.yaw = round(v * Math.PI / 180);
+      if (k === 'y') it.pos[1] = round(v);
+    } else {
+      if (k === 'deg') it.yaw = round(Number(v) * Math.PI / 180);
+      if (k === 'color') it.color = v;
+    }
+    rebuild();
+  });
+
+  props.addEventListener('click', e => {
+    if (e.target.dataset.act === 'del') remove();
+    if (e.target.dataset.act === 'dup') duplicate();
+  });
+
+  function remove() {
+    if (!selected) return;
+    const list = { box: map.boxes, stairs: map.stairs, spawn: map.spawns, prop: map.props }[selected.kind];
+    list.splice(selected.index, 1);
+    selected = null;
+    rebuild();
+  }
+
+  function duplicate() {
+    if (!selected) return;
+    const it = clone(itemOf(selected));
+    const list = { box: map.boxes, stairs: map.stairs, spawn: map.spawns, prop: map.props }[selected.kind];
+    moveItem(selected.kind, it, 1, 1);
+    list.push(it);
+    selected = { kind: selected.kind, index: list.length - 1 };
+    rebuild();
+  }
+
+  function moveItem(kind, it, dx, dz) {
+    const vs = kind === 'box' ? [it.min, it.max] : kind === 'stairs' ? [it.start] : [it.pos];
+    for (const v of vs) { v[0] = round(v[0] + dx); v[2] = round(v[2] + dz); }
+  }
+
+  // R: Blöcke um 90 Grad (Breite und Tiefe tauschen), Treppen, Startpunkte und Modelle drehen
+  function rotate() {
+    if (!selected) return;
+    const it = itemOf(selected);
+    if (selected.kind === 'box') {
+      const cx = (it.min[0] + it.max[0]) / 2;
+      const cz = (it.min[2] + it.max[2]) / 2;
+      const hw = (it.max[0] - it.min[0]) / 2;
+      const hd = (it.max[2] - it.min[2]) / 2;
+      it.min[0] = round(cx - hd); it.max[0] = round(cx + hd);
+      it.min[2] = round(cz - hw); it.max[2] = round(cz + hw);
+    } else if (selected.kind === 'stairs') {
+      const order = ['-z', '+x', '+z', '-x'];
+      it.dir = order[(order.indexOf(it.dir) + 1) % 4];
+    } else {
+      it.yaw = round(((it.yaw ?? 0) - Math.PI / 2 + Math.PI * 4) % (Math.PI * 2));
+    }
+    rebuild();
+  }
+
+  // ---- Maus: Strahl in die Karte ----
+
+  const raycaster = new THREE.Raycaster();
+  function rayAt(e) {
+    const r = canvas.getBoundingClientRect();
+    const ndc = new THREE.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+    view.camera.updateMatrixWorld();
+    raycaster.setFromCamera(ndc, view.camera);
+    const { origin: o, direction: d } = raycaster.ray;
+    return { o: [o.x, o.y, o.z], d: [d.x, d.y, d.z] };
+  }
+
+  // Nächstes Ding unter der Maus (fürs Auswählen)
+  function pick(ray) {
+    let best = null;
+    const test = (kind, index, boxes) => {
+      for (const b of boxes) {
+        const hit = rayBox(ray.o, ray.d, b.min, b.max);
+        if (hit && (!best || hit.t < best.t)) best = { kind, index, t: hit.t, normal: hit.normal };
+      }
+    };
+    map.boxes.forEach((b, i) => test('box', i, [b]));
+    map.stairs.forEach((t, i) => test('stairs', i, stairBoxes(t)));
+    map.props.forEach((p, i) => test('prop', i, propBoxes(p)));
+    map.spawns.forEach((s, i) => test('spawn', i, [bounds({ kind: 'spawn', index: i })]));
+    return best;
+  }
+
+  // Punkt zum Setzen: oben auf dem getroffenen Ding, sonst auf Bodenhöhe 0
+  function surfacePoint(ray) {
+    const hit = pick(ray);
+    if (hit && hit.normal[1] === 1 && hit.kind !== 'spawn') {
+      const p = ray.o.map((v, i) => v + ray.d[i] * hit.t);
+      // Kiste auf Kiste: genau mittig stapeln
+      const under = hit.kind === 'box' && map.boxes[hit.index];
+      if (tool === 'kiste' && under?.type === 'kiste') {
+        return [round((under.min[0] + under.max[0]) / 2), under.max[1], round((under.min[2] + under.max[2]) / 2)];
+      }
+      return [snap(p[0]), round(p[1]), snap(p[2])];
+    }
+    return planePoint(ray, 0);
+  }
+
+  function planePoint(ray, y) {
+    if (Math.abs(ray.d[1]) < 1e-6) return null;
+    const t = (y - ray.o[1]) / ray.d[1];
+    if (t < 0) return null;
+    return [snap(ray.o[0] + ray.d[0] * t), y, snap(ray.o[2] + ray.d[2] * t)];
+  }
+
+  // Was ein Werkzeug an einem Punkt (oder beim Ziehen von a nach b) setzen würde
+  function draft(a, b = a) {
+    if (tool === 'wand') {
+      const along = Math.abs(b[0] - a[0]) >= Math.abs(b[2] - a[2]) ? 0 : 2;
+      const across = 2 - along;
+      const min = [0, a[1], 0];
+      const max = [0, a[1] + 3, 0];
+      min[along] = Math.min(a[along], b[along]);
+      max[along] = Math.max(a[along], b[along]) + (a[along] === b[along] ? GRID : 0);
+      min[across] = a[across] - 0.25;
+      max[across] = a[across] + 0.25;
+      return { kind: 'box', item: { type: 'wand', min, max, color: BLOCK_TYPES.wand[1] } };
+    }
+    if (tool === 'block') {
+      const x0 = Math.min(a[0], b[0]);
+      const z0 = Math.min(a[2], b[2]);
+      const x1 = Math.max(a[0], b[0]) + (a[0] === b[0] ? 2 : 0);
+      const z1 = Math.max(a[2], b[2]) + (a[2] === b[2] ? 2 : 0);
+      return { kind: 'box', item: { type: 'beton', min: [x0, a[1], z0], max: [x1, a[1] + 3, z1], color: BLOCK_TYPES.beton[1] } };
+    }
+    if (tool === 'kiste') {
+      return { kind: 'box', item: { type: 'kiste', min: [a[0] - 0.5, a[1], a[2] - 0.5], max: [a[0] + 0.5, a[1] + 1, a[2] + 0.5], color: BLOCK_TYPES.kiste[1] } };
+    }
+    if (tool === 'treppe') {
+      return { kind: 'stairs', item: { start: [...a], dir: stairDir, steps: 10, rise: 0.3, depth: 0.5, width: 1.2 } };
+    }
+    if (tool === 'spawnA' || tool === 'spawnB') {
+      return { kind: 'spawn', item: { team: tool === 'spawnA' ? 'A' : 'B', pos: [...a], yaw: round(Math.atan2(a[0], a[2])) } };
+    }
+    const item = { model: tool, pos: [a[0], a[1], a[2]], yaw: propYaw };
+    if (tool === 'marktstand') item.color = '#b33a3a';
+    return { kind: 'prop', item };
+  }
+  let stairDir = '-z';
+  let propYaw = 0;
+
+  function draftBounds(dr) {
+    if (dr.kind === 'box') return dr.item;
+    if (dr.kind === 'stairs') return union(stairBoxes(dr.item));
+    if (dr.kind === 'prop') return union(propBoxes(dr.item));
+    const [x, y, z] = dr.item.pos;
+    return { min: [x - 0.5, y, z - 0.5], max: [x + 0.5, y + 1.8, z + 0.5] };
+  }
+
+  let drag = null; // { mode: 'place' | 'move' | 'orbit', ... }
+
+  canvas.addEventListener('mousedown', e => {
+    if (!active) return;
+    if (e.button === 2 || e.button === 1) {
+      drag = { mode: 'orbit', x: e.clientX, y: e.clientY, pan: e.button === 1 };
+      return;
+    }
+    if (e.button !== 0) return;
+    const ray = rayAt(e);
+    if (tool === 'select') {
+      const hit = pick(ray);
+      if (!hit) { select(null); return; }
+      select({ kind: hit.kind, index: hit.index });
+      const it = itemOf(selected);
+      const baseY = selected.kind === 'box' ? it.min[1] : selected.kind === 'stairs' ? it.start[1] : it.pos[1];
+      const p = ray.o.map((v, i) => v + ray.d[i] * hit.t);
+      drag = { mode: 'move', baseY, start: planePoint(ray, baseY) ?? [snap(p[0]), baseY, snap(p[2])], dx: 0, dz: 0 };
+      return;
+    }
+    const a = surfacePoint(ray);
+    if (!a) return;
+    drag = { mode: 'place', a, b: a };
+    placeBox(ghost, draftBounds(draft(a)));
+  });
+
+  window.addEventListener('mousemove', e => {
+    if (!active) return;
+    if (drag?.mode === 'orbit') {
+      const dx = e.clientX - drag.x;
+      const dy = e.clientY - drag.y;
+      drag.x = e.clientX;
+      drag.y = e.clientY;
+      if (drag.pan || e.shiftKey) {
+        const k = cam.dist * 0.0015;
+        cam.x -= (Math.cos(cam.yaw) * dx + Math.sin(cam.yaw) * dy) * k;
+        cam.z -= (-Math.sin(cam.yaw) * dx + Math.cos(cam.yaw) * dy) * k;
+      } else {
+        cam.yaw -= dx * 0.005;
+        cam.pitch = Math.max(-1.5, Math.min(-0.25, cam.pitch - dy * 0.005));
+      }
+      return;
+    }
+    if (e.target !== canvas && !drag) { ghost.visible = false; return; }
+    const ray = rayAt(e);
+    if (drag?.mode === 'move') {
+      const p = planePoint(ray, drag.baseY);
+      if (!p) return;
+      drag.dx = p[0] - drag.start[0];
+      drag.dz = p[2] - drag.start[2];
+      const b = bounds(selected);
+      placeBox(selBox, { min: [b.min[0] + drag.dx, b.min[1], b.min[2] + drag.dz], max: [b.max[0] + drag.dx, b.max[1], b.max[2] + drag.dz] });
+      return;
+    }
+    if (tool === 'select') { ghost.visible = false; return; }
+    if (drag?.mode === 'place') {
+      const p = planePoint(ray, drag.a[1]);
+      if (p) drag.b = p;
+      placeBox(ghost, draftBounds(draft(drag.a, drag.b)));
+      ghost.visible = true;
+      return;
+    }
+    const a = surfacePoint(ray);
+    ghost.visible = !!a;
+    if (a) placeBox(ghost, draftBounds(draft(a)));
+  });
+
+  window.addEventListener('mouseup', e => {
+    if (!active || !drag) return;
+    const d = drag;
+    drag = null;
+    if (d.mode === 'move' && (d.dx || d.dz)) {
+      moveItem(selected.kind, itemOf(selected), d.dx, d.dz);
+      rebuild();
+    }
+    if (d.mode === 'place') {
+      const dr = draft(d.a, d.b);
+      const list = { box: map.boxes, stairs: map.stairs, spawn: map.spawns, prop: map.props }[dr.kind];
+      list.push(dr.item);
+      selected = { kind: dr.kind, index: list.length - 1 };
+      rebuild();
+      // Startpunkte und Modelle meist einzeln, danach gleich wieder Auswählen
+      if (dr.kind !== 'box') setTool('select');
+    }
+  });
+
+  canvas.addEventListener('wheel', e => {
+    if (!active) return;
+    e.preventDefault();
+    cam.dist = Math.max(6, Math.min(160, cam.dist * (e.deltaY > 0 ? 1.12 : 1 / 1.12)));
+  }, { passive: false });
+
+  const typing = e => ['INPUT', 'SELECT', 'TEXTAREA'].includes(e.target.tagName);
+  window.addEventListener('keydown', e => {
+    if (!active || typing(e)) return;
+    keys.add(e.code);
+    if (e.code === 'Delete' || e.code === 'Backspace') { e.preventDefault(); remove(); }
+    if (e.code === 'KeyD' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); keys.delete('KeyD'); duplicate(); }
+    if (e.code === 'KeyR' && !e.ctrlKey && !e.metaKey) {
+      if (selected) rotate();
+      else if (tool === 'treppe') stairDir = { '-z': '+x', '+x': '+z', '+z': '-x', '-x': '-z' }[stairDir];
+      else propYaw = round((propYaw - Math.PI / 2 + Math.PI * 4) % (Math.PI * 2));
+    }
+    if (e.code === 'Escape') { if (selected) select(null); else setTool('select'); }
+  });
+  window.addEventListener('keyup', e => keys.delete(e.code));
+  window.addEventListener('blur', () => keys.clear());
+
+  // ---- Werkzeuge und Kartenleiste ----
+
+  const toolBox = $('ed-tools');
+  toolBox.innerHTML = TOOLS.map(([k, name]) => `<button data-tool="${k}">${name}</button>`).join('');
+  toolBox.addEventListener('click', e => { if (e.target.dataset.tool) setTool(e.target.dataset.tool); });
+
+  function setTool(t) {
+    tool = t;
+    for (const b of toolBox.children) b.classList.toggle('on', b.dataset.tool === t);
+    ghost.visible = false;
+    if (t !== 'select') selected = null;
+    showSelection();
+    showProps();
+    help.textContent = TOOLS.find(x => x[0] === t)[2];
+  }
+
+  function showMapSettings() {
+    $('ed-name').value = map.name;
+    $('ed-licht').innerHTML = Object.entries(DAYTIME_NAMES).map(([k, v]) => `<option value="${k}"${k === map.licht ? ' selected' : ''}>${v}</option>`).join('');
+  }
+
+  $('ed-name').addEventListener('change', e => { map.name = e.target.value.trim().slice(0, 40) || 'Meine Karte'; rebuild(); });
+  $('ed-licht').addEventListener('change', e => { map.licht = e.target.value; rebuild(); });
+
+  function showStore() {
+    const names = Object.keys(loadStore()).sort();
+    $('ed-saved').innerHTML = names.length
+      ? names.map(n => `<option${n === map.name ? ' selected' : ''}>${n.replace(/</g, '&lt;')}</option>`).join('')
+      : '<option value="">— noch keine —</option>';
+    $('ed-del').textContent = 'Löschen';
+  }
+
+  $('ed-new').addEventListener('click', () => { setMap(newMap()); say('Neue Karte'); });
+  $('ed-save').addEventListener('click', () => {
+    const store = loadStore();
+    store[map.name] = clone(map);
+    if (saveStore(store)) { showStore(); say(`Gespeichert als „${map.name}“`); }
+    else say('Speichern ging nicht (Browser-Speicher voll oder gesperrt)');
+  });
+  $('ed-open').addEventListener('click', () => {
+    const name = $('ed-saved').value;
+    const m = loadStore()[name];
+    if (!m) return;
+    setMap(readMap(m));
+    say(`„${name}“ geöffnet`);
+  });
+  // Löschen ohne Browser-Dialog: erster Klick fragt, zweiter löscht
+  $('ed-del').addEventListener('click', e => {
+    const name = $('ed-saved').value;
+    if (!name) return;
+    if (e.target.textContent !== 'Wirklich?') { e.target.textContent = 'Wirklich?'; return; }
+    const store = loadStore();
+    delete store[name];
+    saveStore(store);
+    showStore();
+    say(`„${name}“ gelöscht`);
+  });
+  $('ed-saved').addEventListener('change', () => { $('ed-del').textContent = 'Löschen'; });
+
+  $('ed-export').addEventListener('click', () => {
+    const built = buildMap(map);
+    const blob = new Blob([JSON.stringify(built, null, 1)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${map.name.replace(/[^\wäöüÄÖÜß -]/g, '').trim() || 'karte'}.json`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    say(`Als Datei ausgegeben (${built.waypoints.nodes.length} Wegpunkte)`);
+  });
+  $('ed-import').addEventListener('click', () => $('ed-file').click());
+  $('ed-file').addEventListener('change', async e => {
+    const file = e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    try {
+      setMap(readMap(JSON.parse(await file.text())));
+      say(`„${file.name}“ eingelesen`);
+    } catch (err) {
+      say(`Einlesen ging nicht: ${err.message}`);
+    }
+  });
+
+  $('ed-paths').addEventListener('click', () => {
+    const built = showPaths();
+    showStatus();
+    say(built.waypoints.nodes.length < 10 ? 'Kaum Wegpunkte — die Bots finden sich hier schlecht zurecht' : 'Wege der Bots in Pink');
+  });
+
+  $('ed-play').addEventListener('click', () => {
+    const a = map.spawns.some(s => s.team === 'A');
+    const b = map.spawns.some(s => s.team === 'B');
+    if (!a || !b) { say('Jedes Team braucht mindestens einen Startpunkt'); return; }
+    const built = buildMap(map);
+    if (built.waypoints.nodes.length < 2) { say('Keine Wege für die Bots gefunden — fehlt der Boden?'); return; }
+    onPlay(built);
+  });
+  $('ed-exit').addEventListener('click', () => onExit());
+
+  // ---- Kamera ----
+
+  function update(dt) {
+    const speed = cam.dist * 0.9 * dt;
+    const f = (keys.has('KeyW') || keys.has('ArrowUp') ? 1 : 0) - (keys.has('KeyS') || keys.has('ArrowDown') ? 1 : 0);
+    const r = (keys.has('KeyD') || keys.has('ArrowRight') ? 1 : 0) - (keys.has('KeyA') || keys.has('ArrowLeft') ? 1 : 0);
+    cam.x += (-Math.sin(cam.yaw) * f + Math.cos(cam.yaw) * r) * speed;
+    cam.z += (-Math.cos(cam.yaw) * f - Math.sin(cam.yaw) * r) * speed;
+    cam.yaw += ((keys.has('KeyQ') ? 1 : 0) - (keys.has('KeyE') ? 1 : 0)) * 1.5 * dt;
+  }
+
+  function camera() {
+    const cp = Math.cos(cam.pitch);
+    return {
+      x: cam.x + Math.sin(cam.yaw) * cp * cam.dist,
+      y: -Math.sin(cam.pitch) * cam.dist,
+      z: cam.z + Math.cos(cam.yaw) * cp * cam.dist,
+      yaw: cam.yaw,
+      pitch: cam.pitch,
+      fov: 55,
+    };
+  }
+
+  setTool('select');
+
+  return {
+    get map() { return map; },
+    open() {
+      active = true;
+      root.classList.remove('hidden');
+      overlay.visible = true;
+      showMapSettings();
+      showStore();
+      rebuild();
+    },
+    close() {
+      active = false;
+      drag = null;
+      keys.clear();
+      root.classList.add('hidden');
+      overlay.visible = false;
+      clearPaths();
+    },
+    update,
+    camera,
+    // Zum Prüfen im Browser
+    setMap, buildMap: () => buildMap(map), setTool, select,
+  };
+}

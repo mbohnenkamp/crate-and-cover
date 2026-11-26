@@ -82,8 +82,9 @@ export function createRenderer(canvas, world) {
 
   // Blöcke und Schmuckblöcke nach Oberfläche zusammengefasst (ein Mesh je Oberfläche). Farbe je Block als
   // Vertexfarbe mit leichter Abweichung, damit nicht jede Wand gleich aussieht. Schatten der Sonne über die ganze Karte.
-  function setWorld(world) {
-    if (worldName === world.name) return;
+  // force: auch bei gleichem Namen neu bauen (Kartenbauer)
+  function setWorld(world, force = false) {
+    if (worldName === world.name && !force) return;
     worldName = world.name;
     applyDaytime(DAYTIMES[world.licht] ?? DAYTIMES.mittag);
     if (mapGroup) {
@@ -148,7 +149,7 @@ export function createRenderer(canvas, world) {
       mapGroup.add(water);
     }
     scene.add(mapGroup);
-    const floor = world.boxes.find(b => b.type === 'boden');
+    const floor = world.boxes.find(b => b.type === 'boden') ?? { min: [-20, 0, -20], max: [20, 0, 20] };
     const hx = (floor.max[0] - floor.min[0]) / 2 + 4;
     const hz = (floor.max[2] - floor.min[2]) / 2 + 4;
     const r = Math.max(hx, hz);
@@ -216,6 +217,7 @@ export function createRenderer(canvas, world) {
 
   return {
     camera,
+    scene,
     setWorld,
     setEffects,
     setGame(g) {
@@ -252,6 +254,19 @@ export function createRenderer(canvas, world) {
         // Gegner zeigen ihren Lebensbalken 3 s nach jedem Schaden
         if (e.type === 'damaged' && figures[e.player]) figures[e.player].hurtShow = 3;
       }
+    },
+    // Nur Karte und Himmel, ohne Figuren und Waffe (Kartenbauer)
+    renderPlain(view) {
+      camera.position.set(view.x, view.y, view.z);
+      camera.rotation.set(view.pitch, view.yaw, 0);
+      sky.update(clock.getDelta(), camera.position);
+      if (camera.fov !== view.fov) {
+        camera.fov = view.fov;
+        camera.updateProjectionMatrix();
+      }
+      renderer.clear();
+      if (composer) composer.render();
+      else renderer.render(scene, camera);
     },
     // positions: interpolierte Fußpunkte aller Spieler in der Reihenfolge von game.players
     render(view, positions, dt) {

@@ -7,6 +7,7 @@ import { createHud, boardHtml, TEAM_NAMES } from './render/hud.js';
 import { createWorld } from './game/world.js';
 import { createSound } from './audio/sound.js';
 import { createMinimap } from './render/minimap.js';
+import { createEditor } from './editor/editor.js';
 import testkarte from './maps/testkarte.json';
 import hafen from './maps/hafen.json';
 import altstadt from './maps/altstadt.json';
@@ -14,7 +15,9 @@ import baustelle from './maps/baustelle.json';
 
 // Schießstand gibt es nur auf der Testkarte (dort stehen die Zielscheiben)
 const MAPS = { hafen, altstadt, baustelle, testkarte };
-const mapFor = s => (s.mode === 'schiessstand' ? testkarte : MAPS[s.map]);
+// testMap: Karte aus dem Kartenbauer, solange dort Probe gespielt wird
+let testMap = null;
+const mapFor = s => testMap ?? (s.mode === 'schiessstand' ? testkarte : MAPS[s.map]);
 
 const $ = id => document.getElementById(id);
 const canvas = $('game');
@@ -37,6 +40,41 @@ let game = null;
 let screen = 'menu';
 let prev = [];
 let showInfo = true;
+let forceWorld = false; // nach dem Kartenbauer die Karte neu bauen, auch bei gleichem Namen
+
+const editor = createEditor({
+  view,
+  canvas,
+  onPlay(map) {
+    testMap = map;
+    editor.close();
+    input.clickToLock = true;
+    $('btn-menu').textContent = 'Zum Kartenbauer';
+    startMatch();
+  },
+  onExit() {
+    editor.close();
+    input.clickToLock = true;
+    newGame();
+    showScreen('menu');
+  },
+});
+
+function openEditor() {
+  testMap = null;
+  forceWorld = true;
+  $('btn-menu').textContent = 'Startmenü';
+  if (document.pointerLockElement) document.exitPointerLock();
+  input.clickToLock = false;
+  view.setGame({ players: [], targets: [] });
+  showScreen('editor');
+  editor.open();
+}
+
+function backToMenu() {
+  if (testMap) openEditor();
+  else showScreen('menu');
+}
 
 // Einstellungen: fehlende oder ungültige Felder bekommen den Standardwert
 function loadSettings() {
@@ -60,7 +98,7 @@ function saveSettings() {
 
 function showScreen(name) {
   screen = name;
-  overlay.classList.toggle('hidden', name === null);
+  overlay.classList.toggle('hidden', name === null || name === 'editor');
   for (const [k, el] of Object.entries(screens)) el.classList.toggle('hidden', k !== name);
 }
 
@@ -136,7 +174,8 @@ function recordMatch(winner) {
 
 function newGame() {
   game = createGame(mapFor(settings), { ...settings, seed: (Math.random() * 1e9) | 0 });
-  view.setWorld(game.world);
+  view.setWorld(game.world, forceWorld);
+  forceWorld = false;
   view.setGame(game);
   hud.setGame(game);
   minimap.setGame(game);
@@ -155,8 +194,9 @@ function startMatch() {
 $('btn-start').addEventListener('click', startMatch);
 $('btn-again').addEventListener('click', startMatch);
 $('btn-resume').addEventListener('click', () => { sound.unlock(); input.lock(); });
-$('btn-quit').addEventListener('click', () => showScreen('menu'));
-$('btn-menu').addEventListener('click', () => showScreen('menu'));
+$('btn-quit').addEventListener('click', backToMenu);
+$('btn-menu').addEventListener('click', backToMenu);
+$('btn-editor').addEventListener('click', openEditor);
 
 input.onLockChange = locked => {
   if (locked) showScreen(null);
@@ -199,6 +239,14 @@ let fpsSince = last;
 function frame(now) {
   const frameDt = Math.min((now - last) / 1000, 0.25);
   last = now;
+  if (screen === 'editor') {
+    editor.update(frameDt);
+    view.renderPlain(editor.camera());
+    document.body.classList.add('in-menu');
+    info.classList.add('hidden');
+    requestAnimationFrame(frame);
+    return;
+  }
   const me = game.player;
   // Gespielt wird nur mit gefangener Maus; im Menü und in der Pause steht die Partie
   const running = input.locked && screen === null && game.state === 'running';
@@ -308,4 +356,4 @@ function playSounds(events) {
 }
 
 // Zum Prüfen im Browser
-window.arena = { get game() { return game; }, input, stepGame, startMatch, showScreen, sound, settings };
+window.arena = { get game() { return game; }, input, stepGame, startMatch, showScreen, sound, settings, editor, openEditor };

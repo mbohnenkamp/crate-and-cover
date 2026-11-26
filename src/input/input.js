@@ -14,6 +14,7 @@ export function createInput(canvas) {
     locked: false,
     onLockChange: null,
     onKey: null,
+    clickToLock: true, // im Kartenbauer aus
   };
 
   // Codes statt Zeichen, damit WASD auch auf deutschen Tastaturen gleich liegt
@@ -48,7 +49,7 @@ export function createInput(canvas) {
   state.lock = () => {
     if (!state.locked) canvas.requestPointerLock()?.catch?.(() => {});
   };
-  canvas.addEventListener('click', state.lock);
+  canvas.addEventListener('click', () => { if (state.clickToLock) state.lock(); });
   state.toggleFullscreen = async () => {
     if (document.fullscreenElement) return document.exitFullscreen();
     await document.documentElement.requestFullscreen();
