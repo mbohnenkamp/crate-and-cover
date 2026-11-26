@@ -124,13 +124,23 @@ export function createRenderer(canvas, world) {
     const t0 = performance.now();
     const shadows = shade && !OLD_LIGHT && !NO_AO ? bakeShadows(world.boxes, world.deko) : null;
     bakeMs = performance.now() - t0;
+    const add = (look, cast, geo) => (groups[look + (cast ? '+' : '-')] ??= { look, cast, geos: [] }).geos.push(geo);
     for (const b of [...world.boxes, ...world.deko]) {
       if (b.hidden) continue; // an seiner Stelle steht ein Blender-Modell
+      // Schräge Dächer (Schmuck in Dachform statt Block): Dachflächen und Giebeldreiecke getrennt
+      if (b.form) {
+        const white = shadows?.rects.get(b)?.[0];
+        for (const part of roofParts(b, white)) {
+          tint(part.geo, new THREE.Color(part.color ?? 0xff00ff), variation(b));
+          add(part.look, true, part.geo);
+        }
+        continue;
+      }
       const look = lookFor(b, world);
       const cast = b.type !== 'boden';
       const geo = boxGeometry(b, look === 'kiste', shadows?.rects.get(b));
       tint(geo, new THREE.Color(b.color ?? COLORS[b.type] ?? 0xff00ff), variation(b));
-      (groups[look + (cast ? '+' : '-')] ??= { look, cast, geos: [] }).geos.push(geo);
+      add(look, cast, geo);
     }
     for (const g of Object.values(groups)) {
       const merged = mergeGeometries(g.geos);
@@ -397,6 +407,72 @@ function loadProp(name) {
     .catch(() => null); // fehlt das Modell, bleibt die Stelle leer (Kollision bleibt)
   return propCache[name];
 }
+
+// Schräges Dach in seinem Kasten min/max: form 'satteldach' (First entlang axis 'x' oder 'z', Giebel an den Enden)
+// oder 'zeltdach' (vier Flächen zur Spitze in der Mitte). Dachflächen bekommen b.color und b.look (Standard
+// dachziegel), Giebel b.wallColor und b.wallLook (Standard putz). Texturkoordinaten in Metern wie bei den Blöcken.
+// white: Platz im Verschattungsbild ohne Verschattung (oder null, wenn es keins gibt).
+function roofParts(b, white) {
+  const [x0, y0, z0] = b.min;
+  const [x1, y1, z1] = b.max;
+  const center = [(x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2];
+  const roof = { pos: [], uv: [] };
+  const gable = { pos: [], uv: [] };
+  // Dreieck mit Außenseite weg von der Kastenmitte (bzw. nach unten, wenn out angegeben)
+  const tri = (part, a, c, d, uvs, out = null) => {
+    const n = cross(sub(c, a), sub(d, a));
+    const centroid = [0, 1, 2].map(k => (a[k] + c[k] + d[k]) / 3);
+    const want = out ?? sub(centroid, center);
+    if (dot(n, want) < 0) { [c, d] = [d, c]; uvs = [uvs[0], uvs[2], uvs[1]]; }
+    part.pos.push(...a, ...c, ...d);
+    part.uv.push(...uvs.flat());
+  };
+  const quad = (part, a, c, d, e, uvs, out) => {
+    tri(part, a, c, d, [uvs[0], uvs[1], uvs[2]], out);
+    tri(part, a, d, e, [uvs[0], uvs[2], uvs[3]], out);
+  };
+  if (b.form === 'satteldach') {
+    // in Firstrichtung: Koordinate k (along), quer: q; Hilfsfunktion baut Punkte je nach Achse
+    const alongZ = b.axis !== 'x';
+    const P = (q, y, k) => (alongZ ? [q, y, k] : [k, y, q]);
+    const [q0, q1, k0, k1] = alongZ ? [x0, x1, z0, z1] : [z0, z1, x0, x1];
+    const qm = (q0 + q1) / 2;
+    const slope = Math.hypot(qm - q0, y1 - y0);
+    for (const qe of [q0, q1]) {
+      quad(roof, P(qe, y0, k0), P(qe, y0, k1), P(qm, y1, k1), P(qm, y1, k0), [[k0, 0], [k1, 0], [k1, slope], [k0, slope]]);
+    }
+    for (const k of [k0, k1]) {
+      tri(gable, P(q0, y0, k), P(q1, y0, k), P(qm, y1, k), [[q0, y0], [q1, y0], [qm, y1]]);
+    }
+    quad(roof, P(q0, y0, k0), P(q1, y0, k0), P(q1, y0, k1), P(q0, y0, k1), [[q0, k0], [q1, k0], [q1, k1], [q0, k1]], [0, -1, 0]);
+  } else {
+    const apex = [center[0], y1, center[2]];
+    const corners = [[x0, z0], [x1, z0], [x1, z1], [x0, z1]];
+    for (let i = 0; i < 4; i++) {
+      const [ax, az] = corners[i];
+      const [cx, cz] = corners[(i + 1) % 4];
+      const len = Math.hypot(cx - ax, cz - az);
+      const h = Math.hypot(Math.hypot(apex[0] - (ax + cx) / 2, apex[2] - (az + cz) / 2), y1 - y0);
+      tri(roof, [ax, y0, az], [cx, y0, cz], apex, [[0, 0], [len, 0], [len / 2, h]]);
+    }
+    quad(roof, [x0, y0, z0], [x1, y0, z0], [x1, y0, z1], [x0, y0, z1], [[x0, z0], [x1, z0], [x1, z1], [x0, z1]], [0, -1, 0]);
+  }
+  const parts = [];
+  for (const [part, look, color] of [[roof, b.look ?? 'dachziegel', b.color], [gable, b.wallLook ?? 'putz', b.wallColor]]) {
+    if (!part.pos.length) continue;
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(part.pos, 3));
+    geo.setAttribute('uv', new THREE.Float32BufferAttribute(part.uv, 2));
+    geo.computeVertexNormals();
+    if (white) geo.setAttribute('uv1', new THREE.Float32BufferAttribute(new Array(part.pos.length / 3 * 2).fill(white[0]), 2));
+    geo.setIndex([...Array(part.pos.length / 3).keys()]); // wie BoxGeometry mit Index, sonst lässt es sich nicht zusammenlegen
+    parts.push({ geo, look, color });
+  }
+  return parts;
+}
+const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 
 // Farbe als Vertexfarbe auf alle Ecken, k hellt auf oder dunkelt ab
 function tint(geo, color, k) {

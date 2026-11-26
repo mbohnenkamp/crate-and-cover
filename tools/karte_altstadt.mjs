@@ -25,6 +25,11 @@ const hiddenBox = (type, min, max, color) => { box(type, min, max, color); boxes
 const props = [];
 const prop = (model, x, z, yaw = 0, color) => props.push({ model, pos: [+x.toFixed(3), 0, +z.toFixed(3)], yaw, ...(color ? { color } : {}) });
 
+// Schräges Dach als Schmuck (siehe roofParts im Renderer); die Blöcke darunter bleiben die Kollision
+const roofDeko = (form, min, max, color, extra = {}) => deko.push({ type: 'deko', form, min: min.map(v => +v.toFixed(3)), max: max.map(v => +v.toFixed(3)), color, ...extra });
+const LADEN = ['#3f6b4a', '#2f5a7a', '#7a3a32', '#5a4a3a'];
+const RINNE = '#9aa1a6';
+
 const RAHMEN = '#f1ebdf';
 const TUER = '#4a3220';
 const SIMS = '#c9c2b4';
@@ -42,7 +47,7 @@ function stair(start, dir, height, width) {
 // Öffnungen: [von, bis, unten, oben] entlang der Wand; darüber und darunter bleibt Wand stehen.
 // out: −1 oder +1 = auf welcher Seite (in f) die Außenfläche liegt; dort bekommen Fenster Rahmen und Bank,
 // Türen einen Holzrahmen. look: Oberfläche der Wand.
-function wall(axis, f0, f1, a0, a1, y0, y1, holes, color, type = 'wand', { out = 0, look } = {}) {
+function wall(axis, f0, f1, a0, a1, y0, y1, holes, color, type = 'wand', { out = 0, look, shutters = null } = {}) {
   const cuts = [...new Set([a0, a1, ...holes.flatMap(h => [h[0], h[1]])])].filter(c => c >= a0 && c <= a1).sort((p, q) => p - q);
   for (let i = 0; i < cuts.length - 1; i++) {
     const [p, q] = [cuts[i], cuts[i + 1]];
@@ -73,6 +78,15 @@ function wall(axis, f0, f1, a0, a1, y0, y1, holes, color, type = 'wand', { out =
     strip(h[1], h[1] + 0.1, h[2], h[3], 0.05, col, 'bretter');
     strip(h[0] - 0.1, h[1] + 0.1, h[3], h[3] + 0.1, 0.05, col, 'bretter');
     if (!door) strip(h[0] - 0.15, h[1] + 0.15, h[2] - 0.08, h[2], 0.14, SIMS, 'stein');
+    // Fensterläden links und rechts, im Obergeschoss dazu ein Blumenkasten
+    if (!door && shutters) {
+      strip(h[0] - 0.58, h[0] - 0.12, h[2] - 0.05, h[3] + 0.05, 0.04, shutters, 'bretter');
+      strip(h[1] + 0.12, h[1] + 0.58, h[2] - 0.05, h[3] + 0.05, 0.04, shutters, 'bretter');
+      if (h[2] >= 3) {
+        strip(h[0] + 0.05, h[1] - 0.05, h[2] - 0.38, h[2] - 0.1, 0.24, '#6b4a2f', 'bretter');
+        strip(h[0] + 0.1, h[1] - 0.1, h[2] - 0.1, h[2] + 0.14, 0.2, '#4f7d3f', 'laub');
+      }
+    }
   }
 }
 
@@ -95,6 +109,7 @@ const holeAt = (c, w, lo, hi) => [c - w / 2, c + w / 2, lo, hi];
 // Treppe innen an der Wand 'stair' (W oder E), Flachdach mit gestuftem First
 function house({ x0, x1, z0, z1, doors = {}, stair: side, color, roof }) {
   const H = 6;
+  const shutters = LADEN[Math.abs(Math.round(x0 * 3 + z0 * 7)) % LADEN.length];
   const near = (list, c) => (list ?? []).some(d => Math.abs(d - c) < 1.8);
   const holes = (key, lo, hi) => {
     const list = [];
@@ -104,10 +119,10 @@ function house({ x0, x1, z0, z1, doors = {}, stair: side, color, roof }) {
     for (const k of [1 / 3, 2 / 3]) list.push(holeAt(lo + (hi - lo) * k, 1.2, 4.0, 5.2));
     return list;
   };
-  wall('x', z0, z0 + T, x0, x1, 0, H, holes('N', x0, x1), color, 'wand', { out: -1 });
-  wall('x', z1 - T, z1, x0, x1, 0, H, holes('S', x0, x1), color, 'wand', { out: 1 });
-  wall('z', x0, x0 + T, z0 + T, z1 - T, 0, H, holes('W', z0, z1), color, 'wand', { out: -1 });
-  wall('z', x1 - T, x1, z0 + T, z1 - T, 0, H, holes('E', z0, z1), color, 'wand', { out: 1 });
+  wall('x', z0, z0 + T, x0, x1, 0, H, holes('N', x0, x1), color, 'wand', { out: -1, shutters });
+  wall('x', z1 - T, z1, x0, x1, 0, H, holes('S', x0, x1), color, 'wand', { out: 1, shutters });
+  wall('z', x0, x0 + T, z0 + T, z1 - T, 0, H, holes('W', z0, z1), color, 'wand', { out: -1, shutters });
+  wall('z', x1 - T, x1, z0 + T, z1 - T, 0, H, holes('E', z0, z1), color, 'wand', { out: 1, shutters });
 
   // Außen: Sockel (mit Lücken an den Türen), Gesims zwischen den Geschossen, Fachwerk im Obergeschoss
   for (const [axis, f, out, lo, hi, key] of [['x', z0, -1, x0, x1, 'N'], ['x', z1, 1, x0, x1, 'S'], ['z', x0, -1, z0, z1, 'W'], ['z', x1, 1, z0, z1, 'E']]) {
@@ -134,8 +149,23 @@ function house({ x0, x1, z0, z1, doors = {}, stair: side, color, roof }) {
 
   box('dach', [x0 - 0.2, H, z0 - 0.2], [x1 + 0.2, H + 0.3, z1 + 0.2], roof);
   const cx = (x0 + x1) / 2;
-  box('dach', [cx - 2, H + 0.3, z0], [cx + 2, H + 1.2, z1], roof);
-  box('dach', [cx - 0.8, H + 1.2, z0], [cx + 0.8, H + 1.8, z1], roof);
+  // Die gestuften Firstblöcke bleiben als Kollision, gezeichnet wird ein Satteldach mit Giebeln
+  hiddenBox('dach', [cx - 2, H + 0.3, z0], [cx + 2, H + 1.2, z1], roof);
+  hiddenBox('dach', [cx - 0.8, H + 1.2, z0], [cx + 0.8, H + 1.8, z1], roof);
+  roofDeko('satteldach', [x0 - 0.35, H + 0.3, z0 - 0.35], [x1 + 0.35, H + 0.3 + (x1 - x0) * 0.32, z1 + 0.35], roof, { axis: 'z', wallColor: color });
+  // Regenrinnen an den Traufseiten (West und Ost, quer zum First) und Fallrohre an den vier Ecken
+  for (const [xa, xb] of [[x0 - 0.47, x0 - 0.35], [x1 + 0.35, x1 + 0.47]]) {
+    trim([xa, H + 0.18, z0 - 0.35], [xb, H + 0.32, z1 + 0.35], RINNE, 'stahl');
+  }
+  // Fallrohr liegt an der Wand (vor Sockel und Fachwerk), oben ein kurzes Stück hinüber zur Rinne
+  for (const [x, dir] of [[x0 - 0.13, -1], [x1 + 0.07, 1]]) {
+    for (const z of [z0 + 0.15, z1 - 0.21]) {
+      trim([x, 0.05, z], [x + 0.06, H + 0.05, z + 0.06], RINNE, 'stahl');
+      const [ra, rb] = dir < 0 ? [x0 - 0.41, x + 0.06] : [x, x1 + 0.41];
+      trim([ra, H - 0.05, z], [rb, H + 0.05, z + 0.06], RINNE, 'stahl');
+      trim([dir < 0 ? x0 - 0.47 : x1 + 0.35, H + 0.05, z], [dir < 0 ? x0 - 0.35 : x1 + 0.47, H + 0.2, z + 0.06], RINNE, 'stahl');
+    }
+  }
 }
 
 // Boden (Pflaster) und Stadtmauer
@@ -213,8 +243,9 @@ for (const [f0, f1, out] of [[-6, -5.5, -1], [5.5, 6, 1]]) {
 }
 band('x', -22, -1, -6, 6, 0, 0.6, 0.06, '#8a8176', 'stein');
 box('dach', [-6.3, 8, -22.3], [6.3, 8.4, -11.02], '#5b5f66');
-box('dach', [-3, 8.4, -22.3], [3, 9.6, -11.02], '#5b5f66');
-box('dach', [-1.2, 9.6, -22.3], [1.2, 10.4, -11.02], '#5b5f66');
+hiddenBox('dach', [-3, 8.4, -22.3], [3, 9.6, -11.02], '#5b5f66');
+hiddenBox('dach', [-1.2, 9.6, -22.3], [1.2, 10.4, -11.02], '#5b5f66');
+roofDeko('satteldach', [-6.5, 8.4, -22.5], [6.5, 12.2, -11.02], '#5b5f66', { axis: 'z', wallColor: STEIN, wallLook: 'stein' });
 for (const z of [-20, -18, -16, -14]) {
   box('bank', [-4.5, 0, z], [-1, 0.5, z + 0.5], '#7a5532');
   box('bank', [1, 0, z], [4.5, 0.5, z + 0.5], '#7a5532');
@@ -238,8 +269,10 @@ box('decke', [TX, 7.6, TZ], [TX + 6.9, 7.8, TZ + 5.7], '#7a6a55');
 box('decke', [TX, 7.6, TZ + 5.7], [TX + 1.2, 7.8, TZ + 6.9], '#7a6a55');
 box('dach', [-3.85, 9.8, -11], [3.85, 10.2, -3.3], '#4f5a63');
 for (const [h0, h1, r] of [[10.2, 11.2, 3], [11.2, 12.7, 2], [12.7, 14.7, 1], [14.7, 16.7, 0.25]]) {
-  box('dach', [-r, h0, -7.15 - r], [r, h1, -7.15 + r], '#4f5a63');
+  hiddenBox('dach', [-r, h0, -7.15 - r], [r, h1, -7.15 + r], '#4f5a63');
 }
+// Turmhelm: Zeltdach über den gestuften Kollisionsblöcken
+roofDeko('zeltdach', [-3.3, 10.2, -10.45], [3.3, 16.9, -3.85], '#4f5a63');
 // Turm: Sockel, Zifferblatt zum Markt hin, Kreuz auf der Spitze
 band('x', -3.3, 1, -3.85, 3.85, 0, 0.6, 0.06, '#8a8176', 'stein', [[-1.2, 1.2]]);
 band('z', -3.85, -1, -10.6, -3.3, 0, 0.6, 0.06, '#8a8176', 'stein');

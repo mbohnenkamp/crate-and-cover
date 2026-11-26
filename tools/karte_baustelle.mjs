@@ -111,6 +111,25 @@ for (let lvl = 0; lvl < 3; lvl++) {
 }
 // Oben auf dem Dach: Stützenstummel mit Bewehrung
 for (const x of [-5.5, 5.5]) box('stahl', [x - 0.25, 9.6, -7.75 - 0.25], [x + 0.25, 10.4, -7.75 + 0.25], '#6f5a4a');
+// Bewehrungseisen: je Stützenplatz vier rostige Stäbe, wo das nächste Geschoss fehlt (Süden auf 6,4 m, Dach auf 9,6 m)
+const ROST = '#7a4a2e';
+const rebar = (x, y, z, h) => {
+  for (const [dx, dz] of [[-0.15, -0.15], [0.15, -0.15], [-0.15, 0.15], [0.15, 0.15]]) {
+    trim('deko', [x + dx - 0.02, y, z + dz - 0.02], [x + dx + 0.02, y + h, z + dz + 0.02], ROST, 'stahl');
+  }
+};
+for (const x of [-10.75, -5.5, 0, 5.5, 10.75]) {
+  rebar(x, 6.4, 7.75, 0.9);
+  for (const z of [-7.75, 0]) if (!(Math.abs(x) === 5.5 && z === -7.75)) rebar(x, 9.6, z, 0.7);
+}
+for (const x of [-5.5, 5.5]) rebar(x, 10.4, -7.75, 0.5);
+// Absperrband an der Baugrube (Nord- und Südkante), rot-weiß im Wechsel, an Pfosten alle 3 m
+for (const z of [11.9, 21.1]) {
+  for (let x = -9; x < 9; x += 0.5) {
+    trim('deko', [x, 0.92, z - 0.01], [x + 0.5, 1.0, z + 0.01], Math.round((x + 9) * 2) % 2 ? '#f2f2f2' : '#c8322a', 'glatt');
+  }
+  for (let x = -9; x <= 9; x += 3) trim('deko', [x - 0.03, 0, z - 0.03], [x + 0.03, 1.05, z + 0.03], '#d8d2c4', 'stahl');
+}
 
 both((X, s) => {
   // Treppenhaus im Rohbau: drei Läufe im Zickzack
