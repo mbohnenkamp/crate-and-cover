@@ -19,6 +19,9 @@ import { surfaceMaterial, lookFor, OLD_LIGHT } from './textures.js';
 const NO_AO = new URLSearchParams(location.search).get('schatten') === 'aus';
 import { createSky, DAYTIMES } from './sky.js';
 import { bakeShadows } from './schatten.js';
+import { buildGrime } from './schmutz.js';
+// ?schmutz=aus: ohne Schmutz und Risse (zum Vergleich)
+const NO_GRIME = new URLSearchParams(location.search).get('schmutz') === 'aus';
 import { PROP_MODELS } from '../game/props.js';
 
 const COLORS = {
@@ -153,6 +156,7 @@ export function createRenderer(canvas, world) {
       mesh.receiveShadow = true;
       mapGroup.add(mesh);
     }
+    if (shade && !OLD_LIGHT && !NO_GRIME) mapGroup.add(buildGrime(world));
     // Blender-Modelle (Baum, Brunnen, Marktstand …) an ihre Plätze; Modelle laden einmal, dann Kopien
     const group = mapGroup;
     for (const p of world.props) {
