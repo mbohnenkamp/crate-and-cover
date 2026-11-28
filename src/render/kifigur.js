@@ -11,10 +11,10 @@ import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
 import { HANDS } from './viewmodel.js';
 import { WEAPONS } from '../config.js';
 
-// Mehrere Varianten (soldat.glb, soldat_muetze.glb …), je Spieler eine. Alle mit demselben Meshy-Skelett.
+// Mehrere Varianten (soldat.glb, soldat_muetze.glb, soldat_kapuze.glb), je Spieler eine. Alle mit demselben Meshy-Skelett.
 // Je Variante: { scene, clips: { stehen, gehen, rennen, ducken, tod }, maps: { A, B } }
 // ?varianten=aus: nur der erste Soldat (zum Vergleich)
-const VARIANTS = new URLSearchParams(location.search).get('varianten') === 'aus' ? ['soldat'] : ['soldat', 'soldat_muetze'];
+const VARIANTS = new URLSearchParams(location.search).get('varianten') === 'aus' ? ['soldat'] : ['soldat', 'soldat_muetze', 'soldat_kapuze'];
 const models = [];
 
 // Bei diesem Tempo (m/s) laufen die Bewegungen in ihrer eigenen Geschwindigkeit. Von sich aus (in Blender gemessen)
