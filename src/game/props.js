@@ -33,6 +33,29 @@ export const PROP_MODELS = {
   'polyhaven/weed_plant_02': { name: 'Unkraut', boxes: [], scale: 3.7, shadow: false },
   'polyhaven/shrub_sorrel_01': { name: 'Sauerampfer', boxes: [], scale: 5, shadow: false },
   'polyhaven/street_lamp_02': { name: 'Wandlaterne', boxes: [], shadow: false },
+  // KI-Modelle (Meshy über Higgsfield, 28.11.2026), mit blender/ki_requisit.py auf Maß gebracht. Kollision aus den
+  // Querschnitten des Modells gemessen. Kran: Ursprung 13,3 m hinter der Mitte der Beine, Ausleger nach −Z in 25 m.
+  'ki/kran': {
+    name: 'Containerkran',
+    boxes: [
+      ...[[-7.84, -7.04], [6.16, 6.96]].flatMap(([x0, x1]) => [7.4, 18.4].map(z => ['kran', [x0, 0, z], [x1, 25, z + 0.8], '#d9a92e'])),
+      ...[[-8.24, -6.74], [5.86, 7.36]].flatMap(([x0, x1]) => [5.2, 16.2].map(z => ['kran', [x0, 0, z], [x1, 2.8, z + 5.1], '#d9a92e'])),
+      ...[7.3, 18.3].map(z => ['kran', [-8.24, 25, z], [7.36, 27, z + 1], '#d9a92e']),
+      ['kran', [-1.94, 25.4, -25.3], [1.06, 27, 25.3], '#d9a92e'],
+    ],
+  },
+  // Bagger: Ursprung in der Mitte, Arm nach −X
+  'ki/bagger': {
+    name: 'Bagger',
+    boxes: [
+      ['bagger', [-0.75, 0, -1.28], [3.1, 1.2, 1.28], '#2b2d30'],
+      ['bagger', [-0.4, 1.2, -1.15], [3.2, 2.6, 1.15], '#d9b02e'],
+      ['bagger', [-0.4, 2.6, -1], [2.8, 3.2, 1.1], '#d9b02e'],
+      ['bagger', [-2.95, 2.6, -0.4], [0.28, 3.77, 0.2], '#d9b02e'],
+      ['bagger', [-3.2, 0.9, -0.5], [-2.3, 2.6, 0.33], '#d9b02e'],
+      ['bagger', [-3.2, 0, -1.04], [-1.94, 0.9, 0.9], '#5a4f46'],
+    ],
+  },
 };
 
 const round = v => Math.round(v * 1000) / 1000;

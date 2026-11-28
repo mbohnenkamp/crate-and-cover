@@ -91,11 +91,6 @@ both((X, s) => {
   box('balken', [X(12), 5.2, -1.25], [X(18), 6.2, -1.2]);
   box('balken', [X(18), 5.2, -1.2], [X(18.05), 6.2, 1.2]);
 
-  // Kran: Beine, Querträger oben in 10 m
-  for (const z of [-5.5, 5.5]) box('kran', [X(6.6), 0, z - 0.4], [X(7.4), 10, z + 0.4]);
-  box('kran', [X(6.6), 10, -5.9], [X(7.4), 11, 5.9]);
-  // Querstreben zwischen den Kranbeinen, über Kopfhöhe
-  for (const y of [3.5, 7]) trim('deko', [X(6.7), y, -5.1], [X(7.3), y + 0.3, 5.1], '#b8891f', 'stahl');
 
   // Deckung im Mittelgang bei den Spawns
   box('kiste', [X(27), 0, 3], [X(28.5), 1.5, 4.5]);
@@ -149,12 +144,10 @@ box('steg', [-12, 5, -1], [12, 5.2, 1]);
 box('balken', [-12, 5.2, -1.05], [12, 6.2, -1]);
 box('balken', [-12, 5.2, 1], [12, 6.2, 1.05]);
 
-// Kranträger längs und Ausleger übers Wasser, Gegengewicht, ein Container hängt am Haken
-for (const z of [-5.5, 5.5]) box('kran', [-7.4, 10, z - 0.4], [7.4, 11, z + 0.4]);
-box('kran', [-0.6, 10, -32], [0.6, 11, -5.9]);
-box('kran', [-1.5, 9.5, 9], [1.5, 11.5, 13]);
-box('kran', [-0.6, 10, 5.9], [0.6, 11, 9]);
-box('balken', [-0.05, 5.2, -26.05], [0.05, 10, -25.95]);
+// Containerkran als KI-Modell (src/game/props.js, Kollision dort): Beine bei x ±7, z ±5,5, Ausleger in 25 m übers
+// Wasser. Ein Container hängt am Haken.
+place('ki/kran', 0.44, 0, -13.3, 0);
+box('balken', [-0.05, 5.2, -26.05], [0.05, 25.4, -25.95]);
 box('container', [-3, 2.6, -27.2], [3, 5.2, -24.8], COLORS[0]);
 containerDeko(trim, [-3, 2.6, -27.2], [3, 5.2, -24.8], COLORS[0]);
 

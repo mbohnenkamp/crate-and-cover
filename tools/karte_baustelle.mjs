@@ -204,22 +204,8 @@ both((X, s) => {
   box('rohr', [x0, 0, 20.2], [x1, 0.6, 20.8], '#8a9198');
   box('rohr', [x0, 0.6, 19.9], [x1, 1.2, 20.5], '#8a9198');
 
-  // Bagger am Grubenrand, Schaufel hängt in die Grube
-  [x0, x1] = xr(X, 11.5, 15.5);
-  box('bagger', [x0, 0, 12.8], [x1, 0.7, 13.4], '#2b2d30');
-  box('bagger', [x0, 0, 15.1], [x1, 0.7, 15.7], '#2b2d30');
-  [x0, x1] = xr(X, 12, 15);
-  box('bagger', [x0, 0.7, 13], [x1, 2.3, 15.5], '#d9b02e');
-  [x0, x1] = xr(X, 12.2, 13.6);
-  box('bagger', [x0, 2.3, 13.2], [x1, 3.6, 14.6], '#d9b02e');
-  // Scheiben am Führerhaus: zum Arm hin und zur Seite
-  const [g0, g1] = s < 0 ? [X(12.2), X(12.2) + 0.03] : [X(12.2) - 0.03, X(12.2)];
-  trim('deko', [g0, 2.6, 13.4], [g1, 3.4, 14.4], GLAS, 'glatt');
-  trim('deko', [x0 + 0.2, 2.6, 14.6], [x1 - 0.2, 3.4, 14.63], GLAS, 'glatt');
-  [x0, x1] = xr(X, 9.6, 12);
-  box('bagger', [x0, 2.6, 14], [x1, 3.2, 14.6], '#d9b02e');
-  [x0, x1] = xr(X, 9.1, 9.8);
-  box('bagger', [x0, 1.2, 13.9], [x1, 2.6, 14.7], '#2b2d30');
+  // Bagger am Grubenrand als KI-Modell (Kollision in src/game/props.js), Arm zur Grube hin
+  place('ki/bagger', X(12.3), 0, 14.25, s > 0 ? 0 : Math.PI);
 
   // Baugrube: Treppe hinaus, Bewehrung und Kisten unten
   stair([X(4.5), -2.6, 18.5], flip('+x', s), 2.6, 1.4);
