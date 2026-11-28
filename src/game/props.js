@@ -45,6 +45,28 @@ export const PROP_MODELS = {
       ['kran', [-1.94, 10, -25.3], [1.06, 10.65, 25.3], '#d9a92e'],
     ],
   },
+  // Baukran: Ursprung 3,4 m neben dem Mast, Ausleger nach +X in 14 m (12 m lang), Gegenausleger nach −X (5 m)
+  'ki/baukran': {
+    name: 'Baukran',
+    boxes: [
+      ['kran', [-4.43, 0, -1.53], [-2.4, 0.5, 1.37], '#8a8f94'],
+      ['kran', [-4.13, 0, -0.8], [-2.7, 12.3, 0.65], '#d9a92e'],
+      ['kran', [-4.9, 12.3, -1.66], [-1.85, 14, 1.63], '#d9a92e'],
+      ['kran', [-8.76, 14, -0.97], [8.76, 15, 1], '#d9a92e'],
+      ['kran', [-4.04, 15, -0.63], [-3.12, 18.09, 0.32], '#d9a92e'],
+    ],
+  },
+  // Lkw: Ursprung in der Mitte, Fahrerhaus nach −X, Pritsche mit Bordwänden
+  'ki/lkw': {
+    name: 'Lkw',
+    boxes: [
+      ['lkw', [-3.45, 0, -1.27], [-1.5, 3.1, 1.27], '#c9c4b8'],
+      ['lkw', [-1.5, 0, -1.15], [3.45, 1.45, 1.15], '#5d6670'],
+      ['lkw', [-1.5, 1.45, -1.27], [3.45, 1.85, -1.1], '#5d6670'],
+      ['lkw', [-1.5, 1.45, 1.1], [3.45, 1.85, 1.27], '#5d6670'],
+      ['lkw', [3.3, 1.45, -1.1], [3.45, 1.85, 1.1], '#5d6670'],
+    ],
+  },
   // Bagger: Ursprung in der Mitte, Arm nach −X
   'ki/bagger': {
     name: 'Bagger',

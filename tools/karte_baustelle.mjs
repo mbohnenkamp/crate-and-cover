@@ -5,7 +5,7 @@
 // Baugrube im Süden mit Treppen und Bagger, Baucontainer, Material, Bretterzaun rundum.
 
 import { writeFileSync } from 'node:fs';
-import { containerDeko, wheels, GLAS } from './schmuck.mjs';
+import { containerDeko } from './schmuck.mjs';
 import { propBoxes } from '../src/game/props.js';
 
 const boxes = [];
@@ -181,17 +181,8 @@ both((X, s) => {
     trim('deko', [d0, 2.05, z - 0.3], [d1, 2.2, z + 0.3], '#1e1f21', 'glatt');
   }
 
-  // Lkw im Norden: Fahrerhaus zur Mitte hin, Räder, Windschutzscheibe
-  [x0, x1] = xr(X, 13, 15);
-  box('lkw', [x0, 0, -21], [x1, 3, -18.6], '#c9c4b8');
-  wheels(trim, [X(14)], 0, -21, -18.6);
-  const [w0, w1] = s < 0 ? [X(13), X(13) + 0.03] : [X(13) - 0.03, X(13)];
-  trim('deko', [w0, 1.6, -20.7], [w1, 2.6, -18.9], GLAS, 'glatt');
-  [x0, x1] = xr(X, 15, 20);
-  box('lkw', [x0, 0, -21], [x1, 1.4, -18.6], '#5d6670');
-  box('lkw', [x0, 1.4, -21], [x1, 2.2, -20.8], '#5d6670');
-  box('lkw', [x0, 1.4, -18.8], [x1, 2.2, -18.6], '#5d6670');
-  wheels(trim, [X(16.2), X(17.3), X(19.2)], 0, -21, -18.6);
+  // Lkw im Norden als KI-Modell (Kollision in src/game/props.js), Fahrerhaus zur Mitte hin
+  place('ki/lkw', X(16.5), 0, -19.8, s > 0 ? 0 : Math.PI);
 
   // Material: Ziegelpaletten, Sandhaufen, Betonmischer, Rohrstapel
   for (const [a, z, h] of [[5.6, -13.4, 1], [6.9, -13.4, 1], [6.2, -13.4, 2]]) {
@@ -216,17 +207,10 @@ both((X, s) => {
 
 // Baukran am Nordrand des Rohbaus: Plattform in 9,6 m vom Dach aus, Mast, Führerhaus, Ausleger mit Last
 slab('steg', -2, 2, -12, -8, 9.4, 9.6, [[-1, 1, -11, -9]], '#5d6670');
-box('kran', [-1, 0, -11], [1, 14, -9], '#d9a92e');
-box('kran', [1, 12, -11], [2.6, 13.5, -9], '#d9a92e');
-box('kran', [-22, 14, -10.5], [20, 14.8, -9.5], '#d9a92e');
-// Gitterbänder am Mast und am Ausleger, Scheibe am Führerhaus
-for (let y = 1.9; y < 11.5; y += 2) trim('deko', [-1.05, y, -11.05], [1.05, y + 0.2, -8.95], '#8a6a1a', 'stahl');
-for (let x = -21.5; x < 20; x += 3) trim('deko', [x, 13.95, -10.55], [x + 0.2, 14.85, -9.45], '#8a6a1a', 'stahl');
-trim('deko', [2.6, 12.3, -10.7], [2.63, 13.3, -9.3], GLAS, 'glatt');
-box('kran', [-0.4, 14.8, -10.4], [0.4, 17, -9.6], '#d9a92e');
-box('kran', [-21, 12.5, -10.8], [-17, 14, -9.2], '#5d6670');
-box('balken', [14.95, 9, -10.05], [15.05, 14, -9.95]);
-box('ziegel', [14.4, 8, -10.6], [15.6, 9, -9.4], '#9a4e3a');
+// Baukran als KI-Modell (Kollision in src/game/props.js): Mast in der Öffnung der Plattform, Ausleger nach Osten,
+// eine Ziegelpalette hängt unter dem Haken des Modells
+place('ki/baukran', 3.415, 0, -9.92, 0);
+box('ziegel', [6.87, 8.4, -10.6], [8.07, 9.4, -9.4], '#9a4e3a');
 
 // Kleinkram von Poly Haven, spiegelgleich
 const PH = 'polyhaven/';
