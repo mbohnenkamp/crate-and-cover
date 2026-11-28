@@ -110,7 +110,7 @@ export function stepGame(game, humanCmd) {
       continue;
     }
     const cmd = p.isBot ? thinkBot(game, p, DT, events) : humanCmd;
-    if (p.isBot && game.world.zones.length) avoidZones(game.world, p, cmd);
+    if (p.isBot && p.onGround) avoidEdges(game.world, p, cmd);
     // Blick zuerst übernehmen, sonst schießt die Waffe in die Richtung des vorigen Schritts
     p.yaw = cmd.yaw;
     p.pitch = cmd.pitch;
@@ -182,21 +182,48 @@ export function damagePlayer(game, victim, shooter, damage, part, weapon, events
   return false;
 }
 
-// Bots bleiben am Rand von Wasser und Absturzzonen stehen, statt im Gefecht hineinzulaufen
-function avoidZones(world, p, cmd) {
+// Bots bleiben an Kanten stehen, statt im Gefecht hinunterzulaufen oder -zuspringen: vor Wasser und Absturzzonen,
+// wo kein Boden mehr kommt (Hafenbecken) und wo es tiefer als bis zum Fallschaden hinabgeht (Seite einer Treppe).
+// Kein Bot-Weg führt tiefer als 3,5 m hinab (geprüft am 28.11.2026), Wege werden also nicht abgeschnitten.
+function unsafeAt(world, p, x, z) {
+  if (zoneAt(world, x, p.pos.y, z)) return true;
+  let floor = -Infinity;
+  for (const b of world.boxes) {
+    // Alles, was unterhalb der Knie beginnt, trägt (auch eine ansteigende Stufe oder eine Wand); darüber nur Überhang
+    if (x > b.min[0] && x < b.max[0] && z > b.min[2] && z < b.max[2] && b.min[1] < p.pos.y + 0.5 && b.max[1] > floor) floor = b.max[1];
+  }
+  return p.pos.y - floor > MATCH.fall.safe;
+}
+
+function avoidEdges(world, p, cmd) {
   const sin = Math.sin(cmd.yaw);
   const cos = Math.cos(cmd.yaw);
-  const wx = -sin * cmd.forward + cos * cmd.right;
-  const wz = -cos * cmd.forward - sin * cmd.right;
-  const len = Math.hypot(wx, wz);
-  // Auch mit dem Schwung, den er schon hat: 1,2 m in Laufrichtung und dort, wo er in 0,4 s wäre
-  const ahead = len > 0 ? [[p.pos.x + (wx / len) * 1.2, p.pos.z + (wz / len) * 1.2]] : [];
-  ahead.push([p.pos.x + p.vel.x * 0.4, p.pos.z + p.vel.z * 0.4]);
-  if (ahead.some(([x, z]) => zoneAt(world, x, p.pos.y, z))) {
+  // Punkt d Meter in Laufrichtung (Vorwärts- und Seitenanteil f, r), dazu t Sekunden mit dem jetzigen Schwung
+  const at = (f, r, d, t) => {
+    const wx = -sin * f + cos * r;
+    const wz = -cos * f - sin * r;
+    const len = Math.hypot(wx, wz) || 1;
+    return [p.pos.x + (wx / len) * d + p.vel.x * t, p.pos.z + (wz / len) * d + p.vel.z * t];
+  };
+  const unsafe = ([x, z]) => unsafeAt(world, p, x, z);
+  // Schwung trägt schon über die Kante: anhalten und abbremsen lassen
+  if (unsafe(at(0, 0, 0, 0.4))) {
     cmd.forward = 0;
     cmd.right = 0;
     cmd.jump = false;
+    return;
   }
+  // Nur den Anteil streichen, der zur Kante führt (erst seitliches Ausweichen, dann vorwärts), sonst bliebe ein
+  // Bot auf einer schmalen Treppe beim Ausweichen für immer stehen
+  for (const [f, r] of [[cmd.forward, cmd.right], [cmd.forward, 0], [0, cmd.right], [0, 0]]) {
+    if ((f || r) && unsafe(at(f, r, 1.2, 0))) continue;
+    if (f !== cmd.forward || r !== cmd.right) cmd.jump = false;
+    cmd.forward = f;
+    cmd.right = r;
+    break;
+  }
+  // Ein Sprung trägt weiter: nicht abspringen, wenn er hinter der Kante landen würde
+  if (cmd.jump && (unsafe(at(cmd.forward, cmd.right, 2.5, 0)) || unsafe(at(0, 0, 0, 0.9)))) cmd.jump = false;
 }
 
 function killPlayer(game, victim, killer, weapon, head, events, cause = null) {
