@@ -34,14 +34,15 @@ export const PROP_MODELS = {
   'polyhaven/shrub_sorrel_01': { name: 'Sauerampfer', boxes: [], scale: 5, shadow: false },
   'polyhaven/street_lamp_02': { name: 'Wandlaterne', boxes: [], shadow: false },
   // KI-Modelle (Meshy über Higgsfield, 28.11.2026), mit blender/ki_requisit.py auf Maß gebracht. Kollision aus den
-  // Querschnitten des Modells gemessen. Kran: Ursprung 13,3 m hinter der Mitte der Beine, Ausleger nach −Z in 25 m.
+  // Querschnitten des Modells gemessen. Kran: Ursprung 13,3 m hinter der Mitte der Beine, Ausleger nach −Z in 10 m
+  // (Höhe auf Marcos Wunsch so niedrig wie der alte Blockkran, also 0,39-fach gestaucht; in echter Form wären es 25 m).
   'ki/kran': {
     name: 'Containerkran',
     boxes: [
-      ...[[-7.84, -7.04], [6.16, 6.96]].flatMap(([x0, x1]) => [7.4, 18.4].map(z => ['kran', [x0, 0, z], [x1, 25, z + 0.8], '#d9a92e'])),
-      ...[[-8.24, -6.74], [5.86, 7.36]].flatMap(([x0, x1]) => [5.2, 16.2].map(z => ['kran', [x0, 0, z], [x1, 2.8, z + 5.1], '#d9a92e'])),
-      ...[7.3, 18.3].map(z => ['kran', [-8.24, 25, z], [7.36, 27, z + 1], '#d9a92e']),
-      ['kran', [-1.94, 25.4, -25.3], [1.06, 27, 25.3], '#d9a92e'],
+      ...[[-7.84, -7.04], [6.16, 6.96]].flatMap(([x0, x1]) => [7.4, 18.4].map(z => ['kran', [x0, 0, z], [x1, 9.85, z + 0.8], '#d9a92e'])),
+      ...[[-8.24, -6.74], [5.86, 7.36]].flatMap(([x0, x1]) => [5.2, 16.2].map(z => ['kran', [x0, 0, z], [x1, 1.4, z + 5.1], '#d9a92e'])),
+      ...[7.3, 18.3].map(z => ['kran', [-8.24, 9.85, z], [7.36, 10.65, z + 1], '#d9a92e']),
+      ['kran', [-1.94, 10, -25.3], [1.06, 10.65, 25.3], '#d9a92e'],
     ],
   },
   // Bagger: Ursprung in der Mitte, Arm nach −X

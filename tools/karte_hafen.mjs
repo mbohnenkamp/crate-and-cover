@@ -144,10 +144,10 @@ box('steg', [-12, 5, -1], [12, 5.2, 1]);
 box('balken', [-12, 5.2, -1.05], [12, 6.2, -1]);
 box('balken', [-12, 5.2, 1], [12, 6.2, 1.05]);
 
-// Containerkran als KI-Modell (src/game/props.js, Kollision dort): Beine bei x ±7, z ±5,5, Ausleger in 25 m übers
+// Containerkran als KI-Modell (src/game/props.js, Kollision dort): Beine bei x ±7, z ±5,5, Ausleger in 10 m übers
 // Wasser. Ein Container hängt am Haken.
 place('ki/kran', 0.44, 0, -13.3, 0);
-box('balken', [-0.05, 5.2, -26.05], [0.05, 25.4, -25.95]);
+box('balken', [-0.05, 5.2, -26.05], [0.05, 10, -25.95]);
 box('container', [-3, 2.6, -27.2], [3, 5.2, -24.8], COLORS[0]);
 containerDeko(trim, [-3, 2.6, -27.2], [3, 5.2, -24.8], COLORS[0]);
 
